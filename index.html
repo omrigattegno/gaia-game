@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gaia Game - לומדים בכיף</title>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
+    <style>
+        /* --- הגדרות עיצוב כלליות --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #fdfbf7;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            user-select: none;
+            touch-action: manipulation;
+            transition: background-color 0.3s ease;
+        }
+
+        .screen {
+            display: none;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            animation: fadeIn 0.4s ease-out;
+            max-height: 95vh;
+            overflow-y: auto;
+        }
+
+        .screen.active { display: block; }
+
+        /* --- מסך פתיחה --- */
+        #welcome-screen {
+            background: radial-gradient(circle, #fff0f5 0%, #ffe4e1 100%);
+            padding: 40px 20px;
+            border-radius: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 4px solid #ffb6c1;
+        }
+
+        .logo-container { margin-bottom: 30px; animation: popIn 0.8s; }
+        .logo-wrapper { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: nowrap; }
+        .cartoon-girl { font-size: 5rem; animation: subtle-bounce 3s infinite ease-in-out; }
+
+        .gaia-logo {
+            font-family: 'Comic Sans MS', sans-serif; font-size: 4rem; font-weight: 900;
+            background: linear-gradient(to right, #ff69b4, #da70d6, #9c27b0, #673ab7);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 3px 3px 0px rgba(0,0,0,0.05); letter-spacing: -2px; line-height: 1.1;
+        }
+
+        .welcome-text { font-size: 2rem; color: #880e4f; margin-top: 5px; font-weight: bold; }
+
+        .start-btn {
+            background: linear-gradient(135deg, #e040fb, #d500f9);
+            font-size: 2rem !important; animation: pulse 2s infinite;
+            box-shadow: 0 6px 0 #aa00ff !important;
+        }
+        .start-btn:active { top: 4px; box-shadow: 0 2px 0 #aa00ff !important; }
+
+        /* --- תפריטים --- */
+        .big-btn {
+            display: block; width: 100%; padding: 15px; margin: 10px 0;
+            font-size: 1.5rem; border: none; border-radius: 20px; color: white;
+            cursor: pointer; font-weight: bold; box-shadow: 0 5px 0 rgba(0,0,0,0.15);
+            transition: transform 0.1s, top 0.1s; position: relative;
+        }
+        .big-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0,0,0,0.15); top: 4px;}
+
+        .btn-hebrew { background: linear-gradient(135deg, #42a5f5, #1976d2); }
+        .btn-math { background: linear-gradient(135deg, #ef5350, #c62828); }
+        .btn-biology { background: linear-gradient(135deg, #26a69a, #00695c); }
+        .btn-level-1 { background: #66bb6a; }
+        .btn-level-2 { background: #ffa726; }
+        .btn-level-3 { background: #ab47bc; }
+        .btn-home { background: #607d8b; margin-top: 20px;}
+        .btn-save { background: #ff9800; font-size: 1.2rem; padding: 10px; width: auto; display: inline-block; min-width: 120px;}
+
+        .menu-box {
+            background: white; padding: 1.5rem; border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 5px solid white;
+        }
+
+        h1 { color: #ff6f00; font-size: 2rem; margin-bottom: 15px; }
+        h2 { color: #0277bd; font-size: 1.8rem; margin-bottom: 15px; }
+
+        /* --- מסך המשחק --- */
+        .game-container {
+            background: white; padding: 1rem; border-radius: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1); position: relative;
+            min-height: 480px; display: flex; flex-direction: column;
+            justify-content: center; border: 6px solid #ffca28;
+            overflow: hidden;
+        }
+
+        .hud-container {
+            position: absolute; top: 0; left: 0; width: 100%; height: 50px;
+            background: #fff8e1; display: flex; justify-content: space-between;
+            align-items: center; padding: 0 15px; box-sizing: border-box;
+            border-bottom: 2px solid #ffca28; font-weight: bold; color: #555;
+            font-size: 1.1rem;
+        }
+        .score-box { color: #ff8f00; }
+        .progress-box { color: #1976d2; }
+
+        /* שעון */
+        .timer-box {
+            font-weight: bold; font-size: 1.2rem;
+            transition: color 0.3s, transform 0.3s;
+            min-width: 50px; text-align: center;
+        }
+        .timer-green { color: #2e7d32; }
+        .timer-orange { color: #e65100; }
+        .timer-red { color: #c62828; animation: timerPulse 0.5s infinite; }
+
+        .home-btn {
+            position: absolute; bottom: 10px; left: 10px;
+            background: #eceff1; border: none; border-radius: 50%;
+            width: 40px; height: 40px; font-size: 1.2rem; cursor: pointer;
+            box-shadow: 0 3px 0 #cfd8dc; z-index: 10;
+        }
+
+        .display-area { margin: 40px 0 10px 0; }
+        .word-display { font-size: 3.5rem; font-weight: 800; color: #333; letter-spacing: 2px; direction: rtl; }
+        .emoji-display { font-size: 6rem; animation: bounce 3s infinite; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.1)); }
+        .missing-letter { color: #f44336; text-decoration: underline; }
+
+        .math-display {
+            font-size: 4rem; font-weight: bold; color: #333;
+            font-family: 'Courier New', monospace; margin: 30px 0;
+            direction: ltr; unicode-bidi: bidi-override; white-space: nowrap;
+        }
+
+        .options-container { display: flex; justify-content: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+
+        .answer-btn {
+            background: white; border: 3px solid #eee; color: #333;
+            border-radius: 15px; font-size: 2.2rem; min-width: 70px; height: 70px;
+            padding: 0 10px; cursor: pointer; box-shadow: 0 4px 0 #e0e0e0;
+            font-weight: bold; transition: background 0.2s;
+        }
+        .answer-btn:active { transform: translateY(4px); box-shadow: none; }
+
+        .answer-btn-bio {
+            background: white; border: 3px solid #26a69a; color: #333;
+            border-radius: 15px; font-size: 1.1rem; width: 100%; padding: 12px 10px;
+            cursor: pointer; box-shadow: 0 4px 0 #b2dfdb;
+            font-weight: bold; transition: background 0.2s; margin: 4px 0;
+            display: block; text-align: center;
+        }
+        .answer-btn-bio:active { transform: translateY(4px); box-shadow: none; }
+
+        .bio-organ-name { font-size: 1.8rem; font-weight: 800; color: #004d40; margin-top: 8px; }
+        .bio-question { font-size: 1rem; color: #555; margin: 6px 0 10px; }
+        .options-bio { display: flex; flex-direction: column; align-items: stretch; margin-top: 5px; }
+
+        .feedback { font-size: 1.8rem; height: 40px; margin-top: 5px; font-weight: bold; line-height: 40px; }
+
+        /* --- טבלת שיאים --- */
+        .highscore-table {
+            width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 1.1rem;
+        }
+        .highscore-table th { background: #ffca28; color: white; padding: 8px; border-radius: 10px 10px 0 0; }
+        .highscore-table td { background: #fffde7; padding: 8px; border-bottom: 1px solid #fff59d; }
+        .highscore-table tr:last-child td { border-radius: 0 0 10px 10px; }
+
+        .name-input {
+            padding: 10px; font-size: 1.2rem; border-radius: 10px; border: 2px solid #ddd;
+            width: 70%; text-align: center; margin-bottom: 10px;
+        }
+
+        /* --- אנימציות --- */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes subtle-bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+        @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 80% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); } }
+        @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 6px 0 #aa00ff; } 50% { transform: scale(1.03); box-shadow: 0 15px 25px rgba(224, 64, 251, 0.5); } 100% { transform: scale(1); box-shadow: 0 6px 0 #aa00ff; } }
+        @keyframes timerPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+        .shake { animation: shake 0.5s ease; }
+    </style>
+</head>
+<body>
+
+    <div id="welcome-screen" class="screen active">
+        <div class="logo-container">
+            <div class="logo-wrapper">
+                <span class="cartoon-girl">👧🏼</span>
+                <div class="gaia-logo">Gaia Game</div>
+            </div>
+            <p class="welcome-text">בְּרוּכִים הַבָּאִים!</p>
+        </div>
+        <button class="big-btn start-btn" onclick="startGameApp()">הַתְחֵל מִשְׂחָק ▶️</button>
+    </div>
+
+    <div id="main-menu" class="screen">
+        <div class="menu-box" style="border-color: #ff9800;">
+            <h1>מָה לוֹמְדִים הַיּוֹם? 🎓</h1>
+            <button class="big-btn btn-hebrew" onclick="goToHebrewMenu()">עִבְרִית (קְרִיאָה) 📚</button>
+            <button class="big-btn btn-math" onclick="goToMathMenu()">חֶשְׁבּוֹן (מִסְפָּרִים) 🧮</button>
+            <button class="big-btn btn-biology" onclick="goToBiologyMenu()">בִּיוֹלוֹגְיָה (גּוּף הָאָדָם) 🫀</button>
+        </div>
+    </div>
+
+    <div id="hebrew-menu" class="screen">
+        <div class="menu-box" style="border-color: #42a5f5;">
+            <button class="home-btn" onclick="goHome()" style="position:relative; top:0; left:0; width:60px; margin-bottom:10px;">🔙</button>
+            <h2>בַּחֲרִי מִשְׂחָק 🔡</h2>
+            <button class="big-btn btn-level-1" onclick="startHebrewGame(1)">אוֹת רִאשׁוֹנָה</button>
+            <button class="big-btn btn-level-2" onclick="startHebrewGame(2)">אוֹת אַחֲרוֹנָה</button>
+            <button class="big-btn btn-level-3" onclick="startHebrewGame(3)">מִילָה מְבֻלְבֶּלֶת</button>
+        </div>
+    </div>
+
+    <div id="biology-menu" class="screen">
+        <div class="menu-box" style="border-color: #26a69a;">
+            <button class="home-btn" onclick="goHome()" style="position:relative; top:0; left:0; width:60px; margin-bottom:10px;">🔙</button>
+            <h2 style="color:#00695c;">בַּחֲרִי רָמָה 🫁</h2>
+            <button class="big-btn btn-level-1" onclick="startBiologyGame(1)">אֵיבָרִים עִיקָרִיִּים</button>
+            <button class="big-btn btn-level-2" onclick="startBiologyGame(2)">כָּל הָאֵיבָרִים</button>
+        </div>
+    </div>
+
+    <div id="math-menu" class="screen">
+        <div class="menu-box" style="border-color: #ef5350;">
+            <button class="home-btn" onclick="goHome()" style="position:relative; top:0; left:0; width:60px; margin-bottom:10px;">🔙</button>
+            <h2>בַּחֲרִי רָמָה 🔢</h2>
+            <button class="big-btn btn-level-1" onclick="startMathGame(10)">חִבּוּר וְחִסּוּר עַד 10</button>
+            <button class="big-btn btn-level-2" onclick="startMathGame(20)">חִבּוּר וְחִסּוּר עַד 20</button>
+        </div>
+    </div>
+
+    <div id="game-screen" class="screen">
+        <div class="game-container">
+            <div class="hud-container">
+                <div class="progress-box">שְׁאֵלָה <span id="q-num">1</span>/15</div>
+                <div class="timer-box timer-green" id="timer-box"><span id="timer-num">15</span> ⏱️</div>
+                <div class="score-box"><span id="score-num">0</span> ⭐</div>
+            </div>
+
+            <div id="game-content" class="display-area"></div>
+            <div class="options-container" id="options"></div>
+            <div class="feedback" id="feedback"></div>
+
+            <button class="home-btn" onclick="goHome()">🏠</button>
+        </div>
+    </div>
+
+    <div id="end-screen" class="screen">
+        <div class="menu-box" style="border-color: #ffd700; background: #fffde7;">
+            <div style="font-size: 4rem;">🏆</div>
+            <h1>סִיַּמְתְּ אֶת הַמִּשְׂחָק!</h1>
+            <p style="font-size: 1.5rem; margin: 10px 0;">צָבַרְתְּ: <strong id="final-score-display" style="color:#ff8f00; font-size: 2rem;">0</strong> כּוֹכָבִים!</p>
+
+            <div id="save-score-area">
+                <p>כִּתְבִי אֶת הַשֵּׁם שֶׁלָּךְ:</p>
+                <input type="text" id="player-name" class="name-input" placeholder="שֵׁם...">
+                <br>
+                <button class="big-btn btn-save" onclick="saveScore()">שְׁמוֹר בַּטַּבְלָה 💾</button>
+            </div>
+
+            <div id="leaderboard-area" style="display:none; margin-top:20px;">
+                <h2>👑 טַבְלַת הָאֲלוּפִים 👑</h2>
+                <table class="highscore-table">
+                    <thead>
+                        <tr>
+                            <th>מָקוֹם</th>
+                            <th>שֵׁם</th>
+                            <th>כּוֹכָבִים</th>
+                        </tr>
+                    </thead>
+                    <tbody id="highscore-body"></tbody>
+                </table>
+            </div>
+
+            <button class="big-btn btn-home" onclick="goHome()">חֲזָרָה לַתַּפְרִיט 🏠</button>
+        </div>
+    </div>
+
+    <script>
+        // ====== הגדרות Firebase ======
+        // כדי לאפשר טבלת שיאים משותפת בין כל המשתמשים:
+        // 1. היכנסו ל-console.firebase.google.com
+        // 2. צרו פרויקט חדש בשם "GaiaGame"
+        // 3. הוסיפו Web App והעתיקו את ה-firebaseConfig
+        // 4. לכו ל-Realtime Database → צרו מסד נתונים → בחרו "Test mode"
+        // 5. הדביקו את הנתונים כאן במקום ה-YOUR_... הנוכחי
+        const firebaseConfig = {
+            apiKey: "AIzaSyD0fwRCfuG0oceW2q0CP2GmC03Dn6bJ14k",
+            authDomain: "gaia-game-a32c0.firebaseapp.com",
+            databaseURL: "https://gaia-game-a32c0-default-rtdb.firebaseio.com",
+            projectId: "gaia-game-a32c0",
+            storageBucket: "gaia-game-a32c0.firebasestorage.app",
+            messagingSenderId: "416450984656",
+            appId: "1:416450984656:web:4a87c8b2ca99a64767bcd5"
+        };
+
+        let db = null;
+        const FIREBASE_CONFIGURED = firebaseConfig.apiKey !== "YOUR_API_KEY";
+        if (FIREBASE_CONFIGURED) {
+            try {
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.database();
+            } catch(e) {
+                console.warn("Firebase init failed:", e);
+            }
+        }
+
+        // --- מאגר 200 מילים ---
+        const words = [
+            // חיות (20)
+            { full: "כלב", emoji: "🐶" }, { full: "חתול", emoji: "🐱" }, { full: "פיל", emoji: "🐘" }, { full: "אריה", emoji: "🦁" },
+            { full: "דג", emoji: "🐟" }, { full: "פרפר", emoji: "🦋" }, { full: "צפרדע", emoji: "🐸" }, { full: "דוב", emoji: "🐻" },
+            { full: "ארנב", emoji: "🐰" }, { full: "סוס", emoji: "🐴" }, { full: "קוף", emoji: "🐒" }, { full: "תרנגול", emoji: "🐓" },
+            { full: "גירפה", emoji: "🦒" }, { full: "נחש", emoji: "🐍" }, { full: "ציפור", emoji: "🐦" }, { full: "זברה", emoji: "🦓" },
+            { full: "עכבר", emoji: "🐭" }, { full: "כבשה", emoji: "🐑" }, { full: "צב", emoji: "🐢" }, { full: "פרה", emoji: "🐮" },
+
+            // אוכל ופירות (20)
+            { full: "תפוח", emoji: "🍎" }, { full: "בננה", emoji: "🍌" }, { full: "אבטיח", emoji: "🍉" }, { full: "ענבים", emoji: "🍇" },
+            { full: "תות", emoji: "🍓" }, { full: "לימון", emoji: "🍋" }, { full: "גזר", emoji: "🥕" }, { full: "פיצה", emoji: "🍕" },
+            { full: "לחם", emoji: "🍞" }, { full: "ביצה", emoji: "🥚" }, { full: "גלידה", emoji: "🍦" }, { full: "עוגה", emoji: "🎂" },
+            { full: "חלב", emoji: "🥛" }, { full: "סוכריה", emoji: "🍬" }, { full: "המבורגר", emoji: "🍔" }, { full: "קיווי", emoji: "🥝" },
+            { full: "עגבניה", emoji: "🍅" }, { full: "מלפפון", emoji: "🥒" }, { full: "תירס", emoji: "🌽" }, { full: "דובדבן", emoji: "🍒" },
+
+            // חפצים וצעצועים (20)
+            { full: "כדור", emoji: "⚽" }, { full: "בלון", emoji: "🎈" }, { full: "בובה", emoji: "🧸" }, { full: "ספר", emoji: "📚" },
+            { full: "עפרון", emoji: "✏️" }, { full: "מספריים", emoji: "✂️" }, { full: "שעון", emoji: "⌚" }, { full: "משקפיים", emoji: "👓" },
+            { full: "מפתח", emoji: "🔑" }, { full: "מתנה", emoji: "🎁" }, { full: "כתר", emoji: "👑" }, { full: "מטריה", emoji: "☂️" },
+            { full: "תיק", emoji: "🎒" }, { full: "מצלמה", emoji: "📷" }, { full: "טלפון", emoji: "📱" }, { full: "נר", emoji: "🕯️" },
+            { full: "מסרק", emoji: "💇" }, { full: "מברשת", emoji: "🖌️" }, { full: "כסא", emoji: "🪑" }, { full: "מיטה", emoji: "🛏️" },
+
+            // גוף וביגוד (15)
+            { full: "עין", emoji: "👁️" }, { full: "אוזן", emoji: "👂" }, { full: "יד", emoji: "✋" }, { full: "רגל", emoji: "🦶" },
+            { full: "פה", emoji: "👄" }, { full: "אף", emoji: "👃" }, { full: "שמלה", emoji: "👗" }, { full: "חולצה", emoji: "👕" },
+            { full: "מכנס", emoji: "👖" }, { full: "נעל", emoji: "👟" }, { full: "כובע", emoji: "🧢" }, { full: "גרביים", emoji: "🧦" },
+            { full: "מעיל", emoji: "🧥" }, { full: "טבעת", emoji: "💍" }, { full: "לב", emoji: "❤️" },
+
+            // טבע, מקומות וכלי רכב (25)
+            { full: "בית", emoji: "🏠" }, { full: "שמש", emoji: "☀️" }, { full: "ירח", emoji: "🌙" }, { full: "כוכב", emoji: "⭐" },
+            { full: "עץ", emoji: "🌳" }, { full: "פרח", emoji: "🌸" }, { full: "אוטו", emoji: "🚗" }, { full: "מטוס", emoji: "✈️" },
+            { full: "רכבת", emoji: "🚂" }, { full: "אופניים", emoji: "🚲" }, { full: "סירה", emoji: "⛵" }, { full: "אוטובוס", emoji: "🚌" },
+            { full: "ים", emoji: "🌊" }, { full: "הר", emoji: "🏔️" }, { full: "ענן", emoji: "☁️" }, { full: "גשם", emoji: "🌧️" },
+            { full: "קשת", emoji: "🌈" }, { full: "שלג", emoji: "❄️" }, { full: "אש", emoji: "🔥" }, { full: "אוהל", emoji: "⛺" },
+            { full: "משאית", emoji: "🚚" }, { full: "טרקטור", emoji: "🚜" }, { full: "גיטרה", emoji: "🎸" }, { full: "תוף", emoji: "🥁" }, { full: "דלת", emoji: "🚪" },
+
+            // === 100 מילים חדשות ===
+
+            // עוד חיות (20)
+            { full: "פינגווין", emoji: "🐧" }, { full: "ינשוף", emoji: "🦉" }, { full: "שועל", emoji: "🦊" }, { full: "נמר", emoji: "🐆" },
+            { full: "קנגורו", emoji: "🦘" }, { full: "תנין", emoji: "🐊" }, { full: "דולפין", emoji: "🐬" }, { full: "כריש", emoji: "🦈" },
+            { full: "תמנון", emoji: "🐙" }, { full: "פנדה", emoji: "🐼" }, { full: "קיפוד", emoji: "🦔" }, { full: "יונה", emoji: "🕊️" },
+            { full: "טווס", emoji: "🦚" }, { full: "חמור", emoji: "🫏" }, { full: "חזיר", emoji: "🐷" }, { full: "ברווז", emoji: "🦆" },
+            { full: "פלמינגו", emoji: "🦩" }, { full: "לטאה", emoji: "🦎" }, { full: "דבורה", emoji: "🐝" }, { full: "נמלה", emoji: "🐜" },
+
+            // עוד אוכל (20)
+            { full: "עוגיה", emoji: "🍪" }, { full: "שוקולד", emoji: "🍫" }, { full: "פופקורן", emoji: "🍿" }, { full: "ממתק", emoji: "🍭" },
+            { full: "מנגו", emoji: "🥭" }, { full: "אננס", emoji: "🍍" }, { full: "אבוקדו", emoji: "🥑" }, { full: "פטרייה", emoji: "🍄" },
+            { full: "דבש", emoji: "🍯" }, { full: "אוכמניה", emoji: "🫐" }, { full: "אפרסק", emoji: "🍑" }, { full: "פלפל", emoji: "🌶️" },
+            { full: "שום", emoji: "🧄" }, { full: "בטטה", emoji: "🍠" }, { full: "חציל", emoji: "🍆" }, { full: "ברוקולי", emoji: "🥦" },
+            { full: "גבינה", emoji: "🧀" }, { full: "מרק", emoji: "🍲" }, { full: "פסטה", emoji: "🍝" }, { full: "סושי", emoji: "🍣" },
+
+            // משפחה (8)
+            { full: "אמא", emoji: "👩" }, { full: "אבא", emoji: "👨" }, { full: "סבתא", emoji: "👵" }, { full: "סבא", emoji: "👴" },
+            { full: "אחות", emoji: "👧" }, { full: "אח", emoji: "👦" }, { full: "תינוק", emoji: "👶" }, { full: "ילד", emoji: "🧒" },
+
+            // בית ספר (7)
+            { full: "מורה", emoji: "👩‍🏫" }, { full: "עט", emoji: "🖊️" }, { full: "סרגל", emoji: "📏" }, { full: "מחברת", emoji: "📓" },
+            { full: "כיתה", emoji: "🏫" }, { full: "מדבקה", emoji: "⭐" }, { full: "דף", emoji: "📄" },
+
+            // ספורט (8)
+            { full: "כדורסל", emoji: "🏀" }, { full: "כדורעף", emoji: "🏐" }, { full: "טניס", emoji: "🎾" }, { full: "שחייה", emoji: "🏊" },
+            { full: "ריצה", emoji: "🏃" }, { full: "גלישה", emoji: "🏄" }, { full: "סקי", emoji: "⛷️" }, { full: "כדורגל", emoji: "⚽" },
+
+            // צבעים (10)
+            { full: "אדום", emoji: "🔴" }, { full: "כחול", emoji: "🔵" }, { full: "ירוק", emoji: "🟢" }, { full: "צהוב", emoji: "🟡" },
+            { full: "כתום", emoji: "🟠" }, { full: "סגול", emoji: "🟣" }, { full: "לבן", emoji: "⬜" }, { full: "שחור", emoji: "⬛" },
+            { full: "ורוד", emoji: "🩷" }, { full: "חום", emoji: "🟤" },
+
+            // טכנולוגיה וחפצים (7)
+            { full: "מחשב", emoji: "💻" }, { full: "טלוויזיה", emoji: "📺" }, { full: "מקרר", emoji: "🧊" }, { full: "מנורה", emoji: "💡" },
+            { full: "כוס", emoji: "🥤" }, { full: "מאוורר", emoji: "🌀" }, { full: "פנס", emoji: "🔦" },
+
+            // טבע ומקומות (10)
+            { full: "נהר", emoji: "🏞️" }, { full: "יער", emoji: "🌲" }, { full: "מדבר", emoji: "🏜️" }, { full: "גשר", emoji: "🌉" },
+            { full: "מגדל", emoji: "🗼" }, { full: "חווה", emoji: "🏡" }, { full: "גינה", emoji: "🌻" }, { full: "עיר", emoji: "🌆" },
+            { full: "כפר", emoji: "🏘️" }, { full: "נמל", emoji: "⚓" },
+
+            // מוזיקה ואומנות (5)
+            { full: "שיר", emoji: "🎵" }, { full: "ריקוד", emoji: "💃" }, { full: "כינור", emoji: "🎻" },
+            { full: "פסנתר", emoji: "🎹" }, { full: "ציור", emoji: "🎨" },
+
+            // שונות (5)
+            { full: "חגיגה", emoji: "🎉" }, { full: "אוצר", emoji: "💎" }, { full: "קסם", emoji: "✨" },
+            { full: "מלכה", emoji: "👸" }, { full: "גיבור", emoji: "🦸" }
+        ];
+
+        // --- מאגר ביולוגיה ---
+        const biologyData = [
+            // רמה 1 — איברים עיקריים
+            { emoji: "❤️", name: "לֵב",       func: "מַזְרִים דָּם בְּכָל הַגּוּף",          level: 1 },
+            { emoji: "🧠", name: "מוֹחַ",     func: "שׁוֹלֵט עַל הַגּוּף וְהַמַּחְשָׁבוֹת",  level: 1 },
+            { emoji: "🫁", name: "רֵיאוֹת",   func: "מַכְנִיסוֹת אֲוִויר לַגּוּף",           level: 1 },
+            { emoji: "🦴", name: "עֲצָמוֹת",  func: "נוֹתְנוֹת לַגּוּף אֶת הַצּוּרָה שֶׁלּוֹ", level: 1 },
+            { emoji: "👁️", name: "עֵינַיִם",  func: "עוֹזְרוֹת לָנוּ לִרְאוֹת",              level: 1 },
+            { emoji: "👂", name: "אוֹזְנַיִם", func: "עוֹזְרוֹת לָנוּ לִשְׁמוֹעַ",            level: 1 },
+            { emoji: "👃", name: "אַף",        func: "עוֹזֵר לָנוּ לְהָרִיחַ",                level: 1 },
+            { emoji: "🦷", name: "שִׁינַּיִם", func: "עוֹזְרוֹת לָנוּ לִלְעוֹס אוֹכֶל",       level: 1 },
+            // רמה 2 — כל האיברים
+            { emoji: "🫀", name: "כָּבֵד",    func: "מְנַקֶּה אֶת הַדָּם מֵרַעֲלִים",         level: 2 },
+            { emoji: "🟡", name: "קֵיבָה",    func: "מְפָרֶקֶת אֶת הָאוֹכֶל אַחֲרֵי הָאֲכִילָה", level: 2 },
+            { emoji: "🫘", name: "כְּלָיוֹת",  func: "מְסַנְּנוֹת פְּסוֹלֶת מֵהַדָּם",          level: 2 },
+            { emoji: "💪", name: "שְׁרִירִים", func: "מְאַפְשְׁרִים תְּנוּעָה שֶׁל הַגּוּף",     level: 2 },
+            { emoji: "🩸", name: "דָּם",       func: "מוֹבִיל חַמְצָן וּמָזוֹן לְכָל הַגּוּף",   level: 2 },
+            { emoji: "🧴", name: "עוֹר",       func: "מָגֵן עַל הַגּוּף מִבַּחוּץ",            level: 2 },
+            { emoji: "👅", name: "לָשׁוֹן",    func: "עוֹזֶרֶת לָנוּ לִטְעוֹם אוֹכֶל",         level: 2 },
+            { emoji: "🦵", name: "רַגְלַיִם",  func: "עוֹזְרוֹת לָנוּ לָלֶכֶת וְלָרוּץ",        level: 2 },
+        ];
+
+        let biologyOrg = {};
+
+        // משתנים גלובליים
+        let currentGameType = "";
+        let currentLevel = 0;
+        let currentAnswer = "";
+        let hebrewWordObj = {};
+        let score = 0;
+        let questionCount = 0;
+        const MAX_QUESTIONS = 15;
+        const TIMER_SECONDS = 15;
+        let timeLeft = TIMER_SECONDS;
+        let timerInterval = null;
+        const positiveFeedback = ["כֹּל הַכָּבוֹד! 🎉", "אַלּוּפָה! 🏆", "מְצֻיָּן! 🌟", "גְּאוֹנָה! 💡", "מַדְהִים! 🚀"];
+
+        // --- ניהול מסכים ---
+        function hideAllScreens() {
+            document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+        }
+
+        function startGameApp() {
+            hideAllScreens();
+            document.getElementById('main-menu').classList.add('active');
+            document.body.style.backgroundColor = "#fdfbf7";
+        }
+
+        function goHome() {
+            stopTimer();
+            hideAllScreens();
+            document.getElementById('main-menu').classList.add('active');
+            document.body.style.backgroundColor = "#fdfbf7";
+        }
+
+        function goToHebrewMenu() {
+            hideAllScreens();
+            document.getElementById('hebrew-menu').classList.add('active');
+            document.body.style.backgroundColor = "#e3f2fd";
+        }
+
+        function goToMathMenu() {
+            hideAllScreens();
+            document.getElementById('math-menu').classList.add('active');
+            document.body.style.backgroundColor = "#ffebee";
+        }
+
+        function goToBiologyMenu() {
+            hideAllScreens();
+            document.getElementById('biology-menu').classList.add('active');
+            document.body.style.backgroundColor = "#e0f2f1";
+        }
+
+        // --- שעון עצר ---
+        function startTimer() {
+            stopTimer();
+            timeLeft = TIMER_SECONDS;
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                if (timeLeft <= 0) {
+                    stopTimer();
+                    timeoutAnswer();
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+
+        function updateTimerDisplay() {
+            const el = document.getElementById('timer-num');
+            const box = document.getElementById('timer-box');
+            if (!el || !box) return;
+            el.innerText = timeLeft;
+            box.className = 'timer-box';
+            if (timeLeft > 8) box.classList.add('timer-green');
+            else if (timeLeft > 4) box.classList.add('timer-orange');
+            else box.classList.add('timer-red');
+        }
+
+        function timeoutAnswer() {
+            score -= 5;
+            if (score < 0) score = 0;
+            questionCount++;
+            updateHud();
+            const feedback = document.getElementById('feedback');
+            feedback.innerText = "הזמן נגמר! ⏰";
+            feedback.style.color = "#c62828";
+
+            // גלוי תשובה נכונה
+            if (currentGameType === 'hebrew') {
+                const wordDisplay = document.querySelector('.word-display');
+                if (wordDisplay) wordDisplay.innerText = hebrewWordObj.full;
+            } else if (currentGameType === 'math') {
+                const mathDisplay = document.querySelector('.math-display');
+                if (mathDisplay) mathDisplay.innerText = mathDisplay.innerText.replace('?', currentAnswer);
+            } else if (currentGameType === 'biology') {
+                feedback.innerText = `הזמן נגמר! ⏰  התשובה: ${currentAnswer}`;
+            }
+
+            const container = document.querySelector('.game-container');
+            container.classList.remove('shake');
+            void container.offsetWidth;
+            container.classList.add('shake');
+            setTimeout(newTurn, 1500);
+        }
+
+        // --- לוגיקת המשחק ---
+        function resetGameStats() {
+            score = 0;
+            questionCount = 0;
+            updateHud();
+        }
+
+        function updateHud() {
+            document.getElementById('score-num').innerText = score;
+            let displayQ = questionCount + 1;
+            if (displayQ > MAX_QUESTIONS) displayQ = MAX_QUESTIONS;
+            document.getElementById('q-num').innerText = displayQ;
+        }
+
+        function startHebrewGame(level) {
+            currentGameType = 'hebrew';
+            currentLevel = level;
+            resetGameStats();
+            hideAllScreens();
+            document.getElementById('game-screen').classList.add('active');
+            newTurn();
+        }
+
+        function startBiologyGame(level) {
+            currentGameType = 'biology';
+            currentLevel = level;
+            resetGameStats();
+            hideAllScreens();
+            document.getElementById('game-screen').classList.add('active');
+            newTurn();
+        }
+
+        function startMathGame(maxNum) {
+            currentGameType = 'math';
+            currentLevel = maxNum;
+            resetGameStats();
+            hideAllScreens();
+            document.getElementById('game-screen').classList.add('active');
+            newTurn();
+        }
+
+        function newTurn() {
+            if (questionCount >= MAX_QUESTIONS) {
+                endGame();
+                return;
+            }
+            updateHud();
+            document.getElementById('feedback').innerText = "";
+            const contentDiv = document.getElementById('game-content');
+
+            if (currentGameType === 'hebrew') {
+                setupHebrewTurn(contentDiv);
+            } else if (currentGameType === 'biology') {
+                setupBiologyTurn(contentDiv);
+            } else {
+                setupMathTurn(contentDiv);
+            }
+        }
+
+        // --- עברית ---
+        function setupHebrewTurn(container) {
+            document.getElementById('options').className = "options-container";
+            const randomIndex = Math.floor(Math.random() * words.length);
+            hebrewWordObj = words[randomIndex];
+            let wordStr = hebrewWordObj.full;
+            let hiddenIndex = 0;
+
+            if (currentLevel === 1) hiddenIndex = 0;
+            else if (currentLevel === 2) hiddenIndex = wordStr.length - 1;
+            else {
+                do { hiddenIndex = Math.floor(Math.random() * wordStr.length); }
+                while(wordStr[hiddenIndex] === ' ');
+            }
+            currentAnswer = wordStr[hiddenIndex];
+
+            let htmlWord = "";
+            for (let i = 0; i < wordStr.length; i++) {
+                if (i === hiddenIndex) htmlWord += `<span class="missing-letter">_</span>`;
+                else htmlWord += wordStr[i];
+            }
+            container.innerHTML = `<div class="emoji-display">${hebrewWordObj.emoji}</div><div class="word-display">${htmlWord}</div>`;
+            generateButtons(currentAnswer, 'hebrew');
+            startTimer();
+        }
+
+        // --- ביולוגיה ---
+        function setupBiologyTurn(container) {
+            const pool = biologyData.filter(o => o.level <= currentLevel);
+            const idx = Math.floor(Math.random() * pool.length);
+            biologyOrg = pool[idx];
+            currentAnswer = biologyOrg.func;
+
+            container.innerHTML = `
+                <div class="emoji-display">${biologyOrg.emoji}</div>
+                <div class="bio-organ-name">${biologyOrg.name}</div>
+                <div class="bio-question">מָה הַתַּפְקִיד שֶׁל הָאֵיבָר הַזֶּה?</div>`;
+
+            // כפתורי תשובה לביולוגיה
+            const optionsEl = document.getElementById('options');
+            optionsEl.innerHTML = "";
+            optionsEl.className = "options-bio";
+
+            let options = [biologyOrg.func];
+            const wrongPool = pool.filter(o => o.func !== biologyOrg.func);
+            while (options.length < 3 && wrongPool.length > 0) {
+                const r = Math.floor(Math.random() * wrongPool.length);
+                const candidate = wrongPool.splice(r, 1)[0].func;
+                if (!options.includes(candidate)) options.push(candidate);
+            }
+            options.sort(() => Math.random() - 0.5);
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'answer-btn-bio';
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(opt);
+                optionsEl.appendChild(btn);
+            });
+            startTimer();
+        }
+
+        // --- חשבון ---
+        function setupMathTurn(container) {
+            document.getElementById('options').className = "options-container";
+            const isAddition = Math.random() > 0.5;
+            let n1, n2;
+            if (isAddition) {
+                n1 = Math.floor(Math.random() * (currentLevel - 1)) + 1;
+                n2 = Math.floor(Math.random() * (currentLevel - n1));
+                if (n2 < 0) n2 = 0;
+                currentAnswer = n1 + n2;
+                container.innerHTML = `<div class="math-display">${n1} + ${n2} = ?</div>`;
+            } else {
+                n1 = Math.floor(Math.random() * (currentLevel - 2)) + 2;
+                n2 = Math.floor(Math.random() * n1);
+                currentAnswer = n1 - n2;
+                container.innerHTML = `<div class="math-display">${n1} - ${n2} = ?</div>`;
+            }
+            generateButtons(currentAnswer, 'math');
+            startTimer();
+        }
+
+        function generateButtons(correct, type) {
+            const container = document.getElementById('options');
+            container.innerHTML = "";
+            let options = [correct];
+
+            if (type === 'hebrew') {
+                const allLetters = "אבגדהוזחטיכלמנסעפצקרשתםןףךץ";
+                while (options.length < 3) {
+                    let rand = allLetters[Math.floor(Math.random() * allLetters.length)];
+                    if (!options.includes(rand)) options.push(rand);
+                }
+            } else {
+                while (options.length < 3) {
+                    let offset = Math.floor(Math.random() * 5) - 2;
+                    let rand = correct + offset;
+                    if (rand >= 0 && rand <= currentLevel + 5 && !options.includes(rand)) options.push(rand);
+                    else if (options.length < 3) {
+                        let rand2 = Math.floor(Math.random() * currentLevel);
+                        if (!options.includes(rand2)) options.push(rand2);
+                    }
+                }
+            }
+            options.sort(() => Math.random() - 0.5);
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'answer-btn';
+                btn.innerText = opt;
+                btn.style.borderColor = type === 'hebrew' ? '#42a5f5' : '#ef5350';
+                btn.onclick = () => checkAnswer(opt);
+                container.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(val) {
+            stopTimer();
+            const feedback = document.getElementById('feedback');
+            if (val === currentAnswer) {
+                score += 10;
+                questionCount++;
+                updateHud();
+                const randomMsg = positiveFeedback[Math.floor(Math.random() * positiveFeedback.length)];
+                feedback.innerText = randomMsg;
+                feedback.style.color = "#2e7d32";
+
+                if (currentGameType === 'hebrew') document.querySelector('.word-display').innerText = hebrewWordObj.full;
+                else if (currentGameType === 'math') document.querySelector('.math-display').innerText = document.querySelector('.math-display').innerText.replace('?', currentAnswer);
+                // biology: no extra reveal needed — the answer is already shown in the button text
+
+                setTimeout(newTurn, 1500);
+            } else {
+                score -= 5;
+                if (score < 0) score = 0;
+                updateHud();
+                feedback.innerText = "נְסִי שׁוּב... 🤔";
+                feedback.style.color = "#c62828";
+                const container = document.querySelector('.game-container');
+                container.classList.remove('shake');
+                void container.offsetWidth;
+                container.classList.add('shake');
+                startTimer(); // מחדש את השעון
+            }
+        }
+
+        // --- סיום משחק ---
+        function endGame() {
+            stopTimer();
+            hideAllScreens();
+            document.getElementById('final-score-display').innerText = score;
+            document.getElementById('end-screen').classList.add('active');
+            document.getElementById('save-score-area').style.display = 'block';
+            document.getElementById('leaderboard-area').style.display = 'none';
+            document.getElementById('player-name').value = "";
+        }
+
+        // --- טבלת שיאים ---
+        function saveScore() {
+            const name = document.getElementById('player-name').value.trim();
+            if (!name) {
+                alert("בְּבַקָּשָׁה כִּתְבִי אֶת הַשֵּׁם שֶׁלָּךְ");
+                return;
+            }
+
+            if (db) {
+                // שמירה ב-Firebase (משותפת לכל המשתמשים)
+                db.ref('scores').push({ name: name, score: score })
+                    .then(() => loadFirebaseLeaderboard())
+                    .catch(e => { console.error(e); saveToLocalStorage(name); });
+            } else {
+                // שמירה מקומית בדפדפן
+                saveToLocalStorage(name);
+            }
+        }
+
+        function saveToLocalStorage(name) {
+            let highscores = JSON.parse(localStorage.getItem('gaiaHighScores')) || [];
+            highscores.push({ name: name, score: score });
+            highscores.sort((a, b) => b.score - a.score);
+            highscores = highscores.slice(0, 10);
+            localStorage.setItem('gaiaHighScores', JSON.stringify(highscores));
+            showLeaderboard(highscores);
+        }
+
+        function loadFirebaseLeaderboard() {
+            db.ref('scores').orderByChild('score').limitToLast(10).once('value', snapshot => {
+                const scores = [];
+                snapshot.forEach(child => scores.push(child.val()));
+                scores.sort((a, b) => b.score - a.score);
+                showLeaderboard(scores);
+            });
+        }
+
+        function showLeaderboard(scores) {
+            document.getElementById('save-score-area').style.display = 'none';
+            document.getElementById('leaderboard-area').style.display = 'block';
+
+            const tbody = document.getElementById('highscore-body');
+            tbody.innerHTML = "";
+
+            scores.forEach((entry, index) => {
+                const medals = ["🥇","🥈","🥉","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣","🔟"];
+                let rankEmoji = medals[index] || (index + 1);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${rankEmoji}</td><td>${entry.name}</td><td>${entry.score}</td>`;
+                tbody.appendChild(tr);
+            });
+        }
+    </script>
+</body>
+</html>
