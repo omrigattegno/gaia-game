@@ -496,6 +496,19 @@
             direction: rtl;
         }
         .reading-category-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 rgba(0,0,0,0.2); }
+        .reading-story-pick-btn {
+            display: flex; align-items: center; gap: 10px; width: 100%;
+            padding: 14px 16px; margin: 7px 0; border-radius: 18px;
+            border: 3px solid #ce93d8; background: white; cursor: pointer;
+            font-family: 'Fredoka One', sans-serif; direction: rtl;
+            text-align: right; box-shadow: 0 4px 0 #ba68c8;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .reading-story-pick-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #ba68c8; }
+        .reading-story-pick-btn.done { border-color: #43a047; box-shadow: 0 4px 0 #2e7d32; background: #f1f8e9; }
+        .story-pick-icon { font-size: 1.5rem; flex-shrink: 0; }
+        .story-pick-title { font-size: 1.35rem; color: #333; flex: 1; }
+        .story-pick-score { font-size: 1.1rem; color: #ff8f00; font-weight: bold; margin-right: auto; flex-shrink: 0; }
         @keyframes readingComplete {
             0%   { transform: scale(1); }
             50%  { transform: scale(1.08); }
@@ -1146,6 +1159,8 @@ let currentReadingStoryIdx = 0;
 let currentReadingQuestionIdx = 0;
 let readingPhase = 'story'; // 'story' | 'quiz'
 let readingScore = 0;
+// { catIdx: [storyScore0, storyScore1, storyScore2] }  -1 = not done
+let readingProgress = {};
 
 function setGaiaStateReading(state) {
     const gaia = document.getElementById('gaia-char');
@@ -1186,11 +1201,49 @@ function showScreen(id) {
 
 function startReadingCategory(catIdx) {
     currentReadingCategoryIdx = catIdx;
-    currentReadingStoryIdx = 0;
     currentReadingQuestionIdx = 0;
-    readingPhase = 'story';
-    readingScore = 0;
+    readingPhase = 'select';
+    if (!readingProgress[catIdx]) readingProgress[catIdx] = [-1, -1, -1];
     showScreen('reading-screen');
+    renderStorySelection();
+}
+
+function renderStorySelection() {
+    const cat = readingData[currentReadingCategoryIdx];
+    const prog = readingProgress[currentReadingCategoryIdx] || [-1, -1, -1];
+    const totalScore = prog.reduce((s, v) => s + (v > 0 ? v : 0), 0);
+    const doneCount = prog.filter(v => v >= 0).length;
+
+    document.getElementById('reading-cat-label').textContent = cat.label;
+    document.getElementById('reading-story-progress').textContent = doneCount + '/3 הושלמו';
+    document.getElementById('reading-q-progress').textContent = '';
+
+    const content = document.getElementById('reading-content');
+    content.innerHTML = `
+        <div style="direction:rtl; margin-bottom:10px;">
+            <div class="reading-title" style="font-size:1.6rem;">בַּחֲרִי סִיפּוּר:</div>
+        </div>
+        ${cat.stories.map((story, i) => {
+            const done = prog[i] >= 0;
+            const score = done ? prog[i] : null;
+            return `
+            <button class="reading-story-pick-btn ${done ? 'done' : ''}" onclick="startReadingStory(${i})">
+                <span class="story-pick-icon">${done ? '✅' : '📖'}</span>
+                <span class="story-pick-title">${story.title}</span>
+                ${done ? `<span class="story-pick-score">⭐ ${score}/3</span>` : ''}
+            </button>`;
+        }).join('')}
+        ${doneCount === 3 ? `
+        <button class="big-btn btn-reading" onclick="showReadingCategoryComplete()" style="margin-top:14px;font-size:1.2rem;padding:12px;">
+            🏆 סִיכּוּם הַקָּטֶגוֹרְיָה
+        </button>` : ''}
+    `;
+    setGaiaStateReading('idle');
+}
+
+function startReadingStory(storyIdx) {
+    currentReadingStoryIdx = storyIdx;
+    readingPhase = 'story';
     renderReadingStory();
 }
 
@@ -1205,6 +1258,9 @@ function renderReadingStory() {
 
     const content = document.getElementById('reading-content');
     content.innerHTML = `
+        <button onclick="renderStorySelection()" style="background:none;border:none;font-size:1.1rem;color:#7b1fa2;cursor:pointer;direction:rtl;margin-bottom:6px;font-family:'Fredoka One',sans-serif;">
+            ← חֲזָרָה לְבַחִירַת סִיפּוּר
+        </button>
         <div class="reading-title">${story.title}</div>
         <div class="reading-story-box">
             ${story.sentences.map(s => `<div class="reading-text">${s}</div>`).join('')}
@@ -1218,6 +1274,7 @@ function renderReadingStory() {
 
 function startReadingQuiz() {
     currentReadingQuestionIdx = 0;
+    readingScore = 0;
     readingPhase = 'quiz';
     renderReadingQuestion();
 }
@@ -1268,20 +1325,18 @@ function answerReading(chosen) {
         if (currentReadingQuestionIdx < 3) {
             renderReadingQuestion();
         } else {
-            currentReadingStoryIdx++;
-            if (currentReadingStoryIdx < 3) {
-                currentReadingQuestionIdx = 0;
-                readingPhase = 'story';
-                renderReadingStory();
-            } else {
-                showReadingCategoryComplete();
-            }
+            if (!readingProgress[currentReadingCategoryIdx]) readingProgress[currentReadingCategoryIdx] = [-1, -1, -1];
+            readingProgress[currentReadingCategoryIdx][currentReadingStoryIdx] = readingScore;
+            readingPhase = 'select';
+            renderStorySelection();
         }
     }, 1200);
 }
 
 function showReadingCategoryComplete() {
     const cat = readingData[currentReadingCategoryIdx];
+    const prog = readingProgress[currentReadingCategoryIdx] || [0, 0, 0];
+    const totalScore = prog.reduce((s, v) => s + (v > 0 ? v : 0), 0);
     const content = document.getElementById('reading-content');
     document.getElementById('reading-q-progress').textContent = '';
     document.getElementById('reading-story-progress').textContent = 'הושלם! 🎉';
@@ -1294,7 +1349,7 @@ function showReadingCategoryComplete() {
                 סִיַּמְתְּ אֶת כָּל הַסִּיפּוּרִים בְּ${cat.label}!
             </div>
             <div style="font-size:1.6rem; color:#ff8f00; font-weight:bold; margin:8px 0;">
-                ⭐ ${readingScore} / 9 נְקֻדּוֹת
+                ⭐ ${totalScore} / 9 נְקֻדּוֹת
             </div>
             <button class="big-btn btn-reading" onclick="goToReadingMenu()" style="margin-top:12px; font-size:1.3rem;">
                 חֲזָרָה לְבַחִירַת נִיקּוּד 📖
