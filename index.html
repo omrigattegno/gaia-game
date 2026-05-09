@@ -508,6 +508,46 @@
         .reading-story-pick-btn.done { border-color: #43a047; box-shadow: 0 4px 0 #2e7d32; background: #f1f8e9; }
         .story-pick-icon { font-size: 1.5rem; flex-shrink: 0; }
         .story-pick-title { font-size: 1.35rem; color: #333; flex: 1; }
+
+        /* --- לוּחַ הַכֶּפֶל --- */
+        .mult-table-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 10px; margin-top: 6px;
+        }
+        .mult-table-btn {
+            aspect-ratio: 1/1; min-height: 70px; font-size: 2.6rem;
+            font-weight: bold; color: white; border: none; border-radius: 18px;
+            background: linear-gradient(135deg, #ff8a65, #c62828); cursor: pointer;
+            box-shadow: 0 5px 0 #b71c1c; font-family: 'Fredoka One', sans-serif;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .mult-table-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #b71c1c; }
+        .mult-all-btn {
+            margin-top: 14px !important;
+            background: linear-gradient(135deg, #7b1fa2, #4a148c) !important;
+            font-size: 1.4rem !important;
+        }
+        .mult-question {
+            font-size: 4.2rem; font-weight: bold; color: #333;
+            font-family: 'Courier New', monospace; margin: 24px 0 14px;
+            direction: ltr; unicode-bidi: bidi-override; text-align: center;
+            white-space: nowrap;
+        }
+        .mult-options {
+            display: grid; grid-template-columns: repeat(2, 1fr);
+            gap: 10px; padding: 0 16px; max-width: 360px; margin: 0 auto;
+        }
+        .mult-opt-btn {
+            background: white; border: 3px solid #ef9a9a; color: #333;
+            border-radius: 16px; font-size: 2rem; padding: 14px 8px;
+            cursor: pointer; box-shadow: 0 4px 0 #ef5350;
+            font-weight: bold; font-family: 'Fredoka One', sans-serif;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .mult-opt-btn:disabled { cursor: default; }
+        .mult-opt-btn:not(:disabled):active { transform: translateY(3px); box-shadow: 0 1px 0 #ef5350; }
+        .mult-opt-btn.correct { background: #e8f5e9; border-color: #43a047; box-shadow: 0 4px 0 #2e7d32; color: #1b5e20; }
+        .mult-opt-btn.wrong   { background: #ffebee; border-color: #e53935; box-shadow: 0 4px 0 #b71c1c; color: #b71c1c; }
         .story-pick-score { font-size: 1.1rem; color: #ff8f00; font-weight: bold; margin-right: auto; flex-shrink: 0; }
         @keyframes readingComplete {
             0%   { transform: scale(1); }
@@ -642,6 +682,7 @@
             <h2>בַּחֲרִי רָמָה 🔢</h2>
             <button class="big-btn btn-level-1" onclick="startMathGame(10)">חִבּוּר וְחִסּוּר עַד 10</button>
             <button class="big-btn btn-level-2" onclick="startMathGame(20)">חִבּוּר וְחִסּוּר עַד 20</button>
+            <button class="big-btn" style="background: linear-gradient(135deg, #ff7043, #c62828);" onclick="goToMultMenu()">לוּחַ הַכֶּפֶל ✖️</button>
         </div>
     </div>
 
@@ -795,6 +836,38 @@
                 <div class="reading-progress" id="reading-q-progress"></div>
             </div>
             <div id="reading-content" style="margin-top:55px; padding:8px 10px; overflow-y:auto; max-height:calc(100% - 110px);"></div>
+            <button class="home-btn" onclick="goHome()">🏠</button>
+        </div>
+    </div>
+
+    <div id="mult-menu" class="screen">
+        <div class="menu-box" style="border-color: #ef5350;">
+            <button class="home-btn" onclick="goHome()" style="position:relative; top:0; left:0; width:60px; margin-bottom:10px;">🔙</button>
+            <h2 style="color:#c62828;">בַּחֲרִי לוּחַ ✖️</h2>
+            <p style="color:#777; font-size:1rem; margin:0 0 10px;">תַּרְגּוּל לוּחַ הַכֶּפֶל</p>
+            <div class="mult-table-grid">
+                <button class="mult-table-btn" onclick="startMultGame(2)">2</button>
+                <button class="mult-table-btn" onclick="startMultGame(3)">3</button>
+                <button class="mult-table-btn" onclick="startMultGame(4)">4</button>
+                <button class="mult-table-btn" onclick="startMultGame(5)">5</button>
+                <button class="mult-table-btn" onclick="startMultGame(6)">6</button>
+                <button class="mult-table-btn" onclick="startMultGame(7)">7</button>
+                <button class="mult-table-btn" onclick="startMultGame(8)">8</button>
+                <button class="mult-table-btn" onclick="startMultGame(9)">9</button>
+                <button class="mult-table-btn" onclick="startMultGame(10)">10</button>
+            </div>
+            <button class="big-btn mult-all-btn" onclick="startMultGame('all')">כָּל הַלּוּחוֹת 🎲</button>
+        </div>
+    </div>
+
+    <div id="mult-screen" class="screen">
+        <div class="game-container" style="border-color:#ef5350; min-height:480px;">
+            <div class="hud-container" style="background:linear-gradient(135deg,#ffebee,#ffcdd2); border-bottom-color:#ef5350;">
+                <div style="color:#c62828; font-weight:bold;" id="mult-table-label">לוּחַ הַכֶּפֶל</div>
+                <div style="color:#1976d2; font-weight:bold;" id="mult-progress">1/10</div>
+                <div style="color:#ff8f00; font-weight:bold;" id="mult-score">⭐ 0</div>
+            </div>
+            <div id="mult-content" style="margin-top:60px; padding:8px 10px;"></div>
             <button class="home-btn" onclick="goHome()">🏠</button>
         </div>
     </div>
@@ -1372,6 +1445,418 @@ function showReadingCategoryComplete() {
         }
     }
 }
+</script>
+
+<script>
+// ===== MULTIPLICATION MODULE =====
+
+let multCurrentTable = 2;
+let multQuestions = [];
+let multIdx = 0;
+let multScore = 0;
+const MULT_QUESTIONS_PER_ROUND = 10;
+
+function goToMultMenu() {
+    showScreen('mult-menu');
+}
+
+function shuffleArr(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+function startMultGame(table) {
+    multCurrentTable = table;
+    multIdx = 0;
+    multScore = 0;
+    if (table === 'all') {
+        const pairs = [];
+        for (let a = 2; a <= 10; a++) {
+            for (let b = 1; b <= 10; b++) pairs.push([a, b]);
+        }
+        shuffleArr(pairs);
+        multQuestions = pairs.slice(0, MULT_QUESTIONS_PER_ROUND)
+            .map(([a, b]) => ({ a, b, answer: a * b }));
+    } else {
+        const multipliers = shuffleArr([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        multQuestions = multipliers.map(m => ({ a: table, b: m, answer: table * m }));
+    }
+    showScreen('mult-screen');
+    renderMultQuestion();
+}
+
+function buildMultOptions(correct, a, b) {
+    const opts = new Set([correct]);
+    let safety = 0;
+    while (opts.size < 4 && safety < 50) {
+        safety++;
+        const dice = Math.random();
+        let candidate;
+        if (dice < 0.4) {
+            candidate = correct + (Math.random() < 0.5 ? -1 : 1) * a;
+        } else if (dice < 0.75) {
+            candidate = correct + (Math.random() < 0.5 ? -1 : 1) * b;
+        } else {
+            candidate = correct + (Math.random() < 0.5 ? -2 : 2);
+        }
+        if (candidate > 0 && candidate !== correct) opts.add(candidate);
+    }
+    while (opts.size < 4) {
+        const fallback = correct + (Math.random() < 0.5 ? -1 : 1) * (Math.floor(Math.random() * 5) + 1);
+        if (fallback > 0 && fallback !== correct) opts.add(fallback);
+    }
+    return shuffleArr([...opts]);
+}
+
+function renderMultQuestion() {
+    const q = multQuestions[multIdx];
+    const label = multCurrentTable === 'all'
+        ? 'כָּל הַלּוּחוֹת 🎲'
+        : 'לוּחַ הַכֶּפֶל שֶׁל ' + multCurrentTable;
+    document.getElementById('mult-table-label').textContent = label;
+    document.getElementById('mult-progress').textContent = (multIdx + 1) + '/' + MULT_QUESTIONS_PER_ROUND;
+    document.getElementById('mult-score').textContent = '⭐ ' + multScore;
+
+    const opts = buildMultOptions(q.answer, q.a, q.b);
+    const content = document.getElementById('mult-content');
+    content.innerHTML = `
+        <div class="mult-question">${q.a} × ${q.b} = ?</div>
+        <div class="mult-options">
+            ${opts.map(opt =>
+                `<button class="mult-opt-btn" data-val="${opt}" onclick="answerMult(${opt}, this)">${opt}</button>`
+            ).join('')}
+        </div>
+    `;
+    if (typeof setGaiaStateReading === 'function') setGaiaStateReading('idle');
+}
+
+function answerMult(chosen, btnEl) {
+    const q = multQuestions[multIdx];
+    const correct = q.answer;
+    document.querySelectorAll('.mult-opt-btn').forEach(b => b.disabled = true);
+
+    if (chosen === correct) {
+        btnEl.classList.add('correct');
+        if (typeof playSound === 'function') playSound('correct');
+        if (typeof spawnStars === 'function') {
+            const rect = btnEl.getBoundingClientRect();
+            spawnStars({ clientX: rect.left + rect.width / 2, clientY: rect.top + rect.height / 2 });
+        }
+        if (typeof setGaiaStateReading === 'function') setGaiaStateReading('happy');
+        multScore++;
+        document.getElementById('mult-score').textContent = '⭐ ' + multScore;
+    } else {
+        btnEl.classList.add('wrong');
+        const correctBtn = document.querySelector('.mult-opt-btn[data-val="' + correct + '"]');
+        if (correctBtn) correctBtn.classList.add('correct');
+        if (typeof playSound === 'function') playSound('wrong');
+        if (typeof setGaiaStateReading === 'function') setGaiaStateReading('sad');
+    }
+
+    setTimeout(() => {
+        multIdx++;
+        if (multIdx < multQuestions.length) {
+            renderMultQuestion();
+        } else {
+            showMultSummary();
+        }
+    }, 1300);
+}
+
+function showMultSummary() {
+    document.getElementById('mult-progress').textContent = 'סִיַּמְתְּ! 🎉';
+    let msg, color;
+    if (multScore === 10)      { msg = 'מֻשְׁלָם! ⭐⭐⭐'; color = '#2e7d32'; }
+    else if (multScore >= 8)   { msg = 'מְצֻיָּן!';        color = '#43a047'; }
+    else if (multScore >= 5)   { msg = 'יָפֶה מְאֹד!';     color = '#ff8f00'; }
+    else                       { msg = 'נְסִי שׁוּב — אַתְּ יְכוֹלָה!'; color = '#c62828'; }
+
+    const content = document.getElementById('mult-content');
+    const subtitle = multCurrentTable === 'all'
+        ? 'כָּל הַלּוּחוֹת 🎲'
+        : 'לוּחַ הַכֶּפֶל שֶׁל ' + multCurrentTable;
+    const replayArg = multCurrentTable === 'all' ? "'all'" : multCurrentTable;
+    content.innerHTML = `
+        <div style="text-align:center; padding:20px 10px;">
+            <div style="font-size:4.5rem; animation:popIn 0.5s;">🏆</div>
+            <div style="font-size:2rem; font-weight:900; color:${color}; direction:rtl; margin-top:6px;">${msg}</div>
+            <div style="font-size:1.6rem; color:#ff8f00; font-weight:bold; margin:14px 0;">
+                ⭐ ${multScore} / ${MULT_QUESTIONS_PER_ROUND} נְקֻדּוֹת
+            </div>
+            <div style="font-size:1.1rem; color:#777; direction:rtl; margin-bottom:12px;">
+                ${subtitle}
+            </div>
+            <button class="big-btn btn-math" onclick="startMultGame(${replayArg})" style="margin-top:6px;font-size:1.3rem;">סִיבּוּב נוֹסָף 🔁</button>
+            <button class="big-btn" style="background:#7986cb;margin-top:8px;font-size:1.2rem;" onclick="goToMultMenu()">לוּחַ אַחֵר ✖️</button>
+        </div>
+    `;
+    if (typeof setGaiaStateReading === 'function') setGaiaStateReading(multScore >= 8 ? 'dance' : 'idle');
+    if (typeof spawnStars === 'function' && multScore >= 8) {
+        for (let i = 0; i < 5; i++) {
+            setTimeout(() => spawnStars({
+                clientX: Math.random() * window.innerWidth,
+                clientY: Math.random() * window.innerHeight * 0.6
+            }), i * 200);
+        }
+    }
+}
+</script>
+
+<script>
+// ===== ANONYMOUS ANALYTICS MODULE =====
+// Logs to Firebase Realtime DB under /analytics/sessions/{sessionId}/
+// Privacy: no names, no PII. Session ID is per-tab (sessionStorage), not cross-session.
+
+(function() {
+    // Note: startReadingStory is intentionally NOT wrapped — transitioning between
+    // stories within a category is internal navigation, not a new game.
+    const SUBJECT_FOR_FN = {
+        startMathGame:        args => ({ subject: 'math',           level: 'add_sub_' + args[0] }),
+        startEnglishGame:     args => ({ subject: 'english',        level: 'level_'   + args[0] }),
+        startHebrewGame:      args => ({ subject: 'hebrew',         level: 'level_'   + args[0] }),
+        startBiologyGame:     args => ({ subject: 'biology',        level: 'level_'   + args[0] }),
+        startGeographyGame:   args => ({ subject: 'geography',      level: 'level_'   + args[0] }),
+        startMemoryGame:      args => ({ subject: 'memory',         level: (args[0] || '') + '_' + (args[1] || '') }),
+        startReadingCategory: args => ({ subject: 'reading',        level: 'cat_'     + args[0] }),
+        startMultGame:        args => ({ subject: 'multiplication', level: 'table_'   + args[0] }),
+        startPuzzle:          args => ({ subject: 'puzzle',         level: args[0] + 'x' + args[1] })
+    };
+
+    const A = {
+        sessionId: null,
+        sessionRef: null,
+        eventsRef: null,
+        currentGame: null,     // { subject, level, startTime, answers: [], correct: 0 }
+        lastInteractionAt: null,
+        lastScreen: null,
+        sessionEnded: false,
+        ready: false,
+
+        init() {
+            if (typeof firebase === 'undefined' || !firebase.database) {
+                console.warn('[analytics] firebase not available, skipping');
+                return;
+            }
+            const sessionInfo = this._getOrCreateSession();
+            this.sessionId = sessionInfo.id;
+            const db = firebase.database();
+            this.sessionRef = db.ref('analytics/sessions/' + this.sessionId);
+            this.eventsRef = this.sessionRef.child('events');
+            this.lastInteractionAt = Date.now();
+
+            // Detect actually-active screen at init
+            const activeEl = document.querySelector('.screen.active');
+            this.lastScreen = activeEl ? activeEl.id : 'main-menu';
+
+            // Write meta only on a brand-new session (avoids needing read permission)
+            if (sessionInfo.isNew) {
+                try {
+                    this.sessionRef.child('meta').set({
+                        started: firebase.database.ServerValue.TIMESTAMP,
+                        clientStartedAt: Date.now(),
+                        userAgent: navigator.userAgent,
+                        language: navigator.language || '',
+                        viewport: window.innerWidth + 'x' + window.innerHeight,
+                        screen: (screen.width || 0) + 'x' + (screen.height || 0),
+                        timezoneOffset: new Date().getTimezoneOffset()
+                    });
+                } catch (e) { console.warn('[analytics] meta write failed', e); }
+            }
+
+            this._wrap();
+            this._bindLifecycle();
+            this.ready = true;
+            this._log('session_start', { initialScreen: this.lastScreen, isNewSession: sessionInfo.isNew });
+            console.info('[analytics] session', this.sessionId, sessionInfo.isNew ? '(new)' : '(resumed)');
+        },
+
+        _getOrCreateSession() {
+            try {
+                let id = sessionStorage.getItem('analytics_sid');
+                if (id) return { id, isNew: false };
+                id = 'sess_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10);
+                sessionStorage.setItem('analytics_sid', id);
+                return { id, isNew: true };
+            } catch (e) {
+                return {
+                    id: 'sess_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10),
+                    isNew: true
+                };
+            }
+        },
+
+        _log(type, data) {
+            if (!this.eventsRef) return;
+            try {
+                const payload = Object.assign({
+                    type: type,
+                    ts: firebase.database.ServerValue.TIMESTAMP,
+                    clientTs: Date.now()
+                }, data || {});
+                this.eventsRef.push(payload);
+                this.sessionRef.child('meta/lastActivity').set(firebase.database.ServerValue.TIMESTAMP);
+            } catch (e) {
+                console.warn('[analytics] log failed', e);
+            }
+        },
+
+        _wrap() {
+            const self = this;
+
+            // Wrap showScreen for navigation tracking
+            const origShowScreen = window.showScreen;
+            if (typeof origShowScreen === 'function') {
+                window.showScreen = function(id) {
+                    if (id !== self.lastScreen) {
+                        self._log('nav', { from: self.lastScreen, to: id });
+                        self.lastScreen = id;
+                    }
+                    self.lastInteractionAt = Date.now();
+                    return origShowScreen.apply(this, arguments);
+                };
+            }
+
+            // Wrap goHome — abandon current game if any
+            const origGoHome = window.goHome;
+            if (typeof origGoHome === 'function') {
+                window.goHome = function() {
+                    if (self.currentGame) self._gameAbandoned();
+                    return origGoHome.apply(this, arguments);
+                };
+            }
+
+            // Wrap all start* functions
+            Object.keys(SUBJECT_FOR_FN).forEach(name => {
+                const orig = window[name];
+                if (typeof orig !== 'function') return;
+                window[name] = function() {
+                    try {
+                        const meta = SUBJECT_FOR_FN[name](arguments);
+                        self._gameStart(meta.subject, meta.level);
+                    } catch (e) { console.warn('[analytics] wrap', name, e); }
+                    return orig.apply(this, arguments);
+                };
+            });
+
+            // Wrap playSound to capture answer correctness + response time
+            const origPlaySound = window.playSound;
+            if (typeof origPlaySound === 'function') {
+                window.playSound = function(type) {
+                    if (type === 'correct' || type === 'wrong') {
+                        const now = Date.now();
+                        const responseMs = self.lastInteractionAt ? now - self.lastInteractionAt : null;
+                        const correct = type === 'correct';
+                        self._log('answer', {
+                            correct: correct,
+                            responseMs: responseMs,
+                            subject: self.currentGame ? self.currentGame.subject : null,
+                            level:   self.currentGame ? self.currentGame.level   : null
+                        });
+                        if (self.currentGame) {
+                            self.currentGame.answers.push({ correct: correct, ms: responseMs });
+                            if (correct) self.currentGame.correct++;
+                        }
+                        self.lastInteractionAt = now;
+                    }
+                    return origPlaySound.apply(this, arguments);
+                };
+            }
+
+            // Wrap endGame (obfuscated module's game-over)
+            const origEndGame = window.endGame;
+            if (typeof origEndGame === 'function') {
+                window.endGame = function() {
+                    self._gameEnd('completed');
+                    return origEndGame.apply(this, arguments);
+                };
+            }
+
+            // Hook multiplication summary explicitly (not covered by endGame)
+            const origMultSummary = window.showMultSummary;
+            if (typeof origMultSummary === 'function') {
+                window.showMultSummary = function() {
+                    self._gameEnd('completed');
+                    return origMultSummary.apply(this, arguments);
+                };
+            }
+
+            // Hook reading category complete
+            const origReadingComplete = window.showReadingCategoryComplete;
+            if (typeof origReadingComplete === 'function') {
+                window.showReadingCategoryComplete = function() {
+                    self._gameEnd('completed');
+                    return origReadingComplete.apply(this, arguments);
+                };
+            }
+        },
+
+        _bindLifecycle() {
+            // Tab close / page hide — flush a session_end event (once)
+            const onLeave = () => {
+                if (this.sessionEnded) return;
+                this.sessionEnded = true;
+                if (this.currentGame) this._gameAbandoned();
+                this._log('session_end', { durationMs: Date.now() - (this.lastInteractionAt || Date.now()) });
+            };
+            window.addEventListener('pagehide', onLeave);
+            window.addEventListener('beforeunload', onLeave);
+        },
+
+        _gameStart(subject, level) {
+            if (this.currentGame) this._gameAbandoned();
+            this.currentGame = {
+                subject: subject,
+                level: level,
+                startTime: Date.now(),
+                answers: [],
+                correct: 0
+            };
+            this.lastInteractionAt = Date.now();
+            this._log('game_start', { subject: subject, level: level });
+        },
+
+        _gameEnd(reason) {
+            if (!this.currentGame) return;
+            const g = this.currentGame;
+            const total = g.answers.length;
+            const validResponses = g.answers.filter(a => a.ms != null).map(a => a.ms);
+            const avgMs = validResponses.length
+                ? Math.round(validResponses.reduce((s, v) => s + v, 0) / validResponses.length)
+                : null;
+            this._log('game_end', {
+                subject: g.subject,
+                level: g.level,
+                outcome: reason || 'completed',
+                durationMs: Date.now() - g.startTime,
+                answers: total,
+                correct: g.correct,
+                accuracy: total ? Math.round(100 * g.correct / total) : null,
+                avgResponseMs: avgMs
+            });
+            this.currentGame = null;
+        },
+
+        _gameAbandoned() {
+            this._gameEnd('abandoned');
+        }
+    };
+
+    // Init after window load so all module scripts are registered
+    function bootAnalytics() {
+        try { A.init(); } catch (e) { console.warn('[analytics] init error', e); }
+    }
+    if (document.readyState === 'complete') {
+        bootAnalytics();
+    } else {
+        window.addEventListener('load', bootAnalytics);
+    }
+
+    // Expose for debugging
+    window.__analytics = A;
+})();
 </script>
 </body>
 </html>
