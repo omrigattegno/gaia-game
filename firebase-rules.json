@@ -1,0 +1,33 @@
+{
+  "rules": {
+    "scores": {
+      ".read": true,
+      ".indexOn": ["score"],
+      "$entry": {
+        ".write": "!data.exists() && newData.exists()",
+        ".validate": "newData.hasChildren(['name','score']) && newData.child('name').isString() && newData.child('name').val().length >= 1 && newData.child('name').val().length <= 20 && newData.child('score').isNumber() && newData.child('score').val() >= 0 && newData.child('score').val() <= 200",
+        "name": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 20" },
+        "score": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 200" },
+        "$other": { ".validate": false }
+      }
+    },
+
+    "analytics": {
+      ".read": false,
+      "sessions": {
+        "$sid": {
+          "meta": {
+            ".write": true,
+            ".validate": "newData.hasChildren()"
+          },
+          "events": {
+            "$eventId": {
+              ".write": "!data.exists()",
+              ".validate": "newData.hasChild('type')"
+            }
+          }
+        }
+      }
+    }
+  }
+}
