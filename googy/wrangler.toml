@@ -1,0 +1,16 @@
+# Googy — Cloudflare Worker that lets the game talk to Claude.
+# Deployed from GitHub by Cloudflare (Workers & Pages → Import a repository, root: googy).
+# The Claude API key is a secret set in the Cloudflare dashboard: ANTHROPIC_API_KEY.
+name = "googy"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+
+[vars]
+ALLOWED_ORIGINS = "https://omrigattegno.github.io"
+FIREBASE_PROJECT_ID = "gaia-game-a32c0"
+
+# At most 10 chat turns a minute per player.
+[[ratelimits]]
+name = "PER_PLAYER"
+namespace_id = "1001"
+simple = { limit = 10, period = 60 }

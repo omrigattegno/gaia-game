@@ -663,6 +663,90 @@
             #map-title { font-size: 1.2rem; }
         }
 
+        /* =========================================================
+           GOOGY — English conversation friend
+           ========================================================= */
+        .btn-googy { background: linear-gradient(135deg, oklch(0.66 0.12 180), oklch(0.50 0.11 185)); }
+        .googy-avatar { display: block; flex-shrink: 0; }
+        .googy-avatar .g-mouth { transform-box: fill-box; transform-origin: center; }
+        .googy-avatar.talking .g-mouth { animation: googy-talk 0.18s ease-in-out infinite alternate; }
+        @keyframes googy-talk { from { transform: scaleY(0.5); } to { transform: scaleY(1.9); } }
+        .googy-hello { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 6px; direction: rtl; }
+        .googy-hello h2 { margin: 0; }
+        .googy-topic-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+        .googy-topic-btn {
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+            min-height: 84px; padding: 8px 4px; border-radius: 18px; cursor: pointer;
+            border: 3px solid oklch(0.80 0.08 180); background: var(--surface);
+            box-shadow: 0 4px 0 oklch(0.72 0.10 180); font-family: 'Varela Round', 'Fredoka', sans-serif;
+            transition: transform var(--t-ui) var(--ease-out-quint), box-shadow var(--t-ui);
+        }
+        .googy-topic-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 oklch(0.72 0.10 180); }
+        .googy-topic-btn .gt-emoji { font-size: 1.9rem; line-height: 1.1; }
+        .googy-topic-btn .gt-he { font-size: 0.95rem; font-weight: 700; color: var(--ink); }
+        .googy-topic-btn .gt-en { font-size: 0.8rem; color: var(--ink-soft); font-family: 'Fredoka', sans-serif; direction: ltr; }
+
+        #googy-screen .game-container { min-height: 520px; justify-content: flex-start; border-color: oklch(0.66 0.12 180); }
+        #googy-head {
+            display: flex; align-items: center; gap: 10px; padding: 4px 4px 8px;
+            border-bottom: 2px solid oklch(0.88 0.06 180); direction: rtl;
+        }
+        #googy-head .gh-text { flex: 1; text-align: right; }
+        #googy-head .gh-name { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 1.3rem; color: oklch(0.45 0.10 185); }
+        #googy-head .gh-topic { font-size: 0.95rem; color: var(--ink-soft); }
+        #googy-progress { font-weight: 700; color: oklch(0.55 0.15 255); font-size: 1.05rem; white-space: nowrap; }
+        #googy-log {
+            direction: ltr; text-align: left; overflow-y: auto; flex: 1;
+            max-height: 46vh; min-height: 200px; padding: 10px 4px; scroll-behavior: smooth;
+        }
+        .gchat-row { display: flex; align-items: flex-end; gap: 6px; margin: 8px 0; }
+        .gchat-row.kid { justify-content: flex-end; }
+        .gchat-bubble {
+            max-width: 82%; padding: 9px 13px; border-radius: 18px; font-size: 1.2rem; line-height: 1.45;
+            font-family: 'Fredoka', 'Varela Round', sans-serif; word-wrap: break-word;
+        }
+        .gchat-row.googy .gchat-bubble { background: oklch(0.97 0.03 180); border: 2px solid oklch(0.80 0.08 180); border-bottom-left-radius: 6px; }
+        .gchat-row.kid .gchat-bubble { background: oklch(0.93 0.05 300); border: 2px solid oklch(0.82 0.08 300); border-bottom-right-radius: 6px; }
+        .gchat-tools { display: flex; gap: 6px; margin-top: 6px; }
+        .gchat-tools button {
+            border: none; border-radius: 12px; padding: 3px 9px; cursor: pointer; font-size: 0.85rem;
+            background: oklch(0.90 0.05 180); color: oklch(0.35 0.08 185); font-family: 'Varela Round', sans-serif;
+        }
+        .gchat-hebrew { display: none; direction: rtl; text-align: right; font-family: 'Varela Round', sans-serif; font-size: 1rem; color: var(--ink-soft); margin-top: 6px; }
+        .gchat-hebrew.show { display: block; }
+        .gchat-feedback { direction: rtl; text-align: right; font-family: 'Varela Round', sans-serif; font-size: 0.95rem; color: oklch(0.45 0.13 150); margin: 2px 40px 0 0; }
+        .gchat-note { direction: rtl; text-align: center; font-family: 'Varela Round', sans-serif; font-size: 1rem; color: oklch(0.50 0.18 25); margin: 8px 0; }
+        .gchat-note button { margin-right: 6px; border: none; border-radius: 12px; padding: 5px 12px; background: oklch(0.66 0.12 180); color: white; cursor: pointer; font-family: inherit; }
+        .gchat-typing span { display: inline-block; width: 8px; height: 8px; margin: 0 2px; border-radius: 50%; background: oklch(0.66 0.12 180); animation: gtyping 1s infinite ease-in-out; }
+        .gchat-typing span:nth-child(2) { animation-delay: 0.15s; }
+        .gchat-typing span:nth-child(3) { animation-delay: 0.3s; }
+        @keyframes gtyping { 0%, 80%, 100% { transform: translateY(0); opacity: 0.4; } 40% { transform: translateY(-5px); opacity: 1; } }
+        #googy-suggestions { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; direction: ltr; margin: 6px 0; min-height: 8px; }
+        .googy-chip {
+            border: 2px solid oklch(0.80 0.08 180); background: var(--surface); color: var(--ink);
+            border-radius: 999px; padding: 6px 12px; font-size: 1rem; cursor: pointer; font-family: 'Fredoka', sans-serif;
+        }
+        #googy-inputbar { display: flex; align-items: center; gap: 8px; direction: ltr; padding: 4px 0 52px; }
+        #googy-mic {
+            width: 60px; height: 60px; border-radius: 50%; border: none; flex-shrink: 0; cursor: pointer;
+            background: oklch(0.66 0.12 180); color: white; font-size: 1.7rem; box-shadow: 0 4px 0 oklch(0.50 0.11 185);
+        }
+        #googy-mic.listening { background: oklch(0.62 0.20 25); animation: pulse 1s infinite; }
+        #googy-text {
+            flex: 1; min-width: 0; font-size: 1.1rem; padding: 12px; border-radius: 16px; direction: ltr;
+            border: 2px solid oklch(0.85 0.05 180); font-family: 'Fredoka', sans-serif;
+        }
+        #googy-send {
+            width: 50px; height: 50px; border-radius: 50%; border: none; flex-shrink: 0; cursor: pointer;
+            background: oklch(0.58 0.20 300); color: white; font-size: 1.3rem;
+        }
+        #googy-screen button:disabled, #googy-text:disabled { opacity: 0.5; cursor: default; }
+        #googy-hint { direction: rtl; font-size: 0.95rem; color: var(--ink-soft); min-height: 1.2em; margin: 2px 0; }
+        #googy-end { display: none; text-align: center; padding: 10px 6px 56px; direction: rtl; }
+        #googy-end.show { display: block; }
+        /* Gaia would cover the topic buttons and the chat's input bar */
+        body:has(#googy-screen.active) #gaia-char, body:has(#googy-topics.active) #gaia-char { display: none; }
+
         /* --- reduced motion: collapse map/parallax/character motion to instant --- */
         @media (prefers-reduced-motion: reduce) {
             #gaia-char, .kg-cloud, .kg-sparkle, .kg-star, .map-cloud { animation: none !important; }
@@ -671,6 +755,7 @@
             .big-btn, .answer-btn, .mult-opt-btn, .reading-opt-btn,
             #land-panel, #land-scrim, .land-icon-circle,
             .btn-squash { transition: none !important; animation: none !important; }
+            .googy-avatar .g-mouth, .gchat-typing span, #googy-mic { animation: none !important; }
         }
     </style>
 </head>
@@ -926,6 +1011,36 @@
                 <div style="color:#ff8f00; font-weight:bold;" id="mult-score">⭐ 0</div>
             </div>
             <div id="mult-content" style="margin-top:60px; padding:8px 10px;"></div>
+            <button class="home-btn" onclick="goHome()">🏠</button>
+        </div>
+    </div>
+
+    <!-- ===== GOOGY: English conversation ===== -->
+    <div id="googy-topics" class="screen">
+        <div class="menu-box" style="border-color: oklch(0.66 0.12 180);">
+            <button class="home-btn" onclick="goHome()" style="position:relative; top:0; left:0; width:60px; margin-bottom:10px;">🔙</button>
+            <div class="googy-hello"><span class="googy-avatar-slot" data-size="72"></span><h2 style="color:oklch(0.45 0.10 185);">עַל מָה נְדַבֵּר הַיּוֹם? 💬</h2></div>
+            <p style="color:var(--ink-soft); margin:0 0 4px;">Googy מְדַבֶּרֶת רַק אַנְגְּלִית. אֶפְשָׁר לְדַבֵּר, לְהַקְלִיד אוֹ לִבְחֹר תְּשׁוּבָה.</p>
+            <div class="googy-topic-grid" id="googy-topic-grid"></div>
+        </div>
+    </div>
+
+    <div id="googy-screen" class="screen">
+        <div class="game-container">
+            <div id="googy-head">
+                <span class="googy-avatar-slot" id="googy-head-avatar" data-size="52"></span>
+                <div class="gh-text"><div class="gh-name">Googy</div><div class="gh-topic" id="googy-topic-label"></div></div>
+                <div id="googy-progress"></div>
+            </div>
+            <div id="googy-log" aria-live="polite"></div>
+            <div id="googy-suggestions"></div>
+            <div id="googy-hint"></div>
+            <div id="googy-inputbar">
+                <button id="googy-mic" aria-label="לְדַבֵּר בְּאַנְגְּלִית">🎤</button>
+                <input type="text" id="googy-text" maxlength="300" placeholder="Type in English..." autocomplete="off" autocapitalize="sentences">
+                <button id="googy-send" aria-label="לִשְׁלֹחַ">➤</button>
+            </div>
+            <div id="googy-end"></div>
             <button class="home-btn" onclick="goHome()">🏠</button>
         </div>
     </div>
@@ -3428,6 +3543,401 @@ function showMultSummary() {
 }
 </script>
 <script>
+// ===== GOOGY — ENGLISH CONVERSATION MODULE =====
+// The child chats in simple English with Googy, a friendly girl character. Her replies
+// come from Claude through the Googy worker (googy/ in this repo), which holds the API
+// key and checks that the request comes from a signed-in player of this game.
+// While GOOGY_API_URL is empty, Googy stays hidden on the map.
+
+const GOOGY_API_URL = '';          // e.g. 'https://googy.<account>.workers.dev/chat'
+const GOOGY_TURNS = 8;             // the child's lines in one chat
+const GOOGY_OPENING = 'Hi Googy!';
+
+// Topic ids must match TOPICS in googy/src/googy.js.
+const GOOGY_TOPICS = [
+    { id: 'animals',  emoji: '🐶', he: 'חַיּוֹת',               en: 'Animals' },
+    { id: 'food',     emoji: '🍕', he: 'אֹכֶל',                 en: 'Food' },
+    { id: 'family',   emoji: '👨‍👩‍👧', he: 'מִשְׁפָּחָה וַחֲבֵרִים', en: 'Family & friends' },
+    { id: 'colors',   emoji: '🎨', he: 'צְבָעִים וְצִיּוּר',        en: 'Colors & drawing' },
+    { id: 'sports',   emoji: '⚽', he: 'סְפּוֹרְט וּמִשְׂחָקִים',     en: 'Sports & games' },
+    { id: 'school',   emoji: '🏫', he: 'בֵּית סֵפֶר',             en: 'School' },
+    { id: 'weather',  emoji: '🌦️', he: 'מֶזֶג אֲוִיר',           en: 'Weather' },
+    { id: 'magic',    emoji: '🦄', he: 'קְסָמִים וְאַגָּדוֹת',       en: 'Magic & fairy tales' },
+    { id: 'space',    emoji: '🚀', he: 'חָלָל',                 en: 'Space' },
+    { id: 'holidays', emoji: '🎉', he: 'חַגִּים וּמְסִבּוֹת',        en: 'Holidays & parties' },
+    { id: 'trips',    emoji: '🏖️', he: 'חֻפְשָׁה וְטִיּוּלִים',       en: 'Vacations & trips' },
+    { id: 'music',    emoji: '🎵', he: 'מוּזִיקָה וְרִקּוּד',         en: 'Music & dance' },
+    { id: 'free',     emoji: '💬', he: 'מָה שֶׁבָּא לִי',           en: 'Anything!' }
+];
+
+const GOOGY_ERRORS = {
+    unauthorized: 'Googy לא מצליחה להתחבר (צריך להפעיל ב-Firebase התחברות אנונימית).',
+    not_configured: 'Googy עוד לא מוכנה — צריך להשלים את ההגדרה שלה.',
+    rate_limited: 'וואו, כמה מהר! חכי רגע ונסי שוב.',
+    busy: 'Googy קצת עסוקה. נסי שוב עוד רגע.',
+    timeout: 'Googy לא ענתה בזמן. נסי שוב.',
+    network: 'אין חיבור לאינטרנט. נסי שוב.',
+    upstream: 'אופס, משהו השתבש. נסי שוב.'
+};
+
+const Googy = {
+    level: 'easy', topic: null, messages: [], childTurns: 0, englishTurns: 0,
+    chat: 0,   // increases with every new chat, so a late reply never lands in the next one
+    active: false, busy: false, failed: false, done: false,
+    controller: null, recognizer: null, listening: false
+};
+const GoogySpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+function googyAvailable() { return !!GOOGY_API_URL; }
+
+function googyAvatarSVG(size) {
+    return '<svg class="googy-avatar" viewBox="0 0 100 100" width="' + size + '" height="' + size + '" aria-hidden="true">' +
+        '<ellipse cx="50" cy="50" rx="33" ry="35" fill="#6D4C2F"/>' +
+        '<ellipse cx="15" cy="66" rx="9" ry="17" fill="#6D4C2F"/><ellipse cx="85" cy="66" rx="9" ry="17" fill="#6D4C2F"/>' +
+        '<circle cx="19" cy="49" r="4.5" fill="#FF6FA5"/><circle cx="81" cy="49" r="4.5" fill="#FF6FA5"/>' +
+        '<path d="M28 90 Q50 102 72 90 L76 100 L24 100 Z" fill="#26A69A"/>' +
+        '<circle cx="50" cy="55" r="27" fill="#F3C9A6"/>' +
+        '<path d="M23 50 Q27 25 50 25 Q73 25 77 50 Q70 37 58 36 Q54 42 44 40 Q34 38 23 50 Z" fill="#6D4C2F"/>' +
+        '<path d="M60 20 L70 14 L70 26 Z M60 20 L50 14 L50 26 Z" fill="#FF6FA5"/><circle cx="60" cy="20" r="3" fill="#E91E63"/>' +
+        '<circle cx="40" cy="56" r="4.6" fill="#3E2723"/><circle cx="60" cy="56" r="4.6" fill="#3E2723"/>' +
+        '<circle cx="41.6" cy="54.4" r="1.6" fill="#fff"/><circle cx="61.6" cy="54.4" r="1.6" fill="#fff"/>' +
+        '<ellipse cx="32" cy="65" rx="5" ry="3" fill="#F48FB1" opacity="0.7"/><ellipse cx="68" cy="65" rx="5" ry="3" fill="#F48FB1" opacity="0.7"/>' +
+        '<ellipse class="g-mouth" cx="50" cy="70" rx="6.5" ry="3" fill="#C2185B"/>' +
+        '</svg>';
+}
+
+function fillGoogyAvatars() {
+    document.querySelectorAll('.googy-avatar-slot').forEach(slot => {
+        if (!slot.firstChild) slot.innerHTML = googyAvatarSVG(Number(slot.dataset.size) || 52);
+    });
+}
+
+function googyEl(tag, className, text) {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+}
+
+function googyScrollDown() {
+    const log = document.getElementById('googy-log');
+    log.scrollTop = log.scrollHeight;
+}
+
+function setGoogyHint(text) { document.getElementById('googy-hint').textContent = text; }
+
+// --- screens ---
+function goToGoogy(level) {
+    googyStop();
+    stopAllGames();
+    Googy.level = level === 'medium' ? 'medium' : 'easy';
+    const grid = document.getElementById('googy-topic-grid');
+    grid.textContent = '';
+    GOOGY_TOPICS.forEach(topic => {
+        const btn = googyEl('button', 'googy-topic-btn');
+        btn.append(googyEl('span', 'gt-emoji', topic.emoji), googyEl('span', 'gt-he', topic.he), googyEl('span', 'gt-en', topic.en));
+        btn.onclick = () => startGoogyChat(topic.id);
+        grid.appendChild(btn);
+    });
+    fillGoogyAvatars();
+    showScreen('googy-topics');
+}
+
+function startGoogyChat(topicId) {
+    const topic = GOOGY_TOPICS.find(t => t.id === topicId);
+    if (!topic) return;
+    stopAllGames();
+    googyStop();
+    googyUnlockSpeech();
+    Object.assign(Googy, { topic, messages: [], childTurns: 0, englishTurns: 0, chat: Googy.chat + 1, active: true, busy: false, failed: false, done: false });
+    GaiaHooks.emit('game_start', { subject: 'googy', level: topic.id + '_' + Googy.level });
+    document.getElementById('googy-topic-label').textContent = topic.emoji + ' ' + topic.he;
+    document.getElementById('googy-log').textContent = '';
+    document.getElementById('googy-suggestions').textContent = '';
+    document.getElementById('googy-end').textContent = '';
+    document.getElementById('googy-end').classList.remove('show');
+    document.getElementById('googy-inputbar').style.display = '';
+    document.getElementById('googy-mic').style.display = GoogySpeechRecognition ? '' : 'none';
+    setGoogyHint(GoogySpeechRecognition
+        ? 'לְחַצִי עַל 🎤 וְדַבְּרִי בְּאַנְגְּלִית, הַקְלִידִי, אוֹ בַּחֲרִי תְּשׁוּבָה'
+        : 'הַקְלִידִי בְּאַנְגְּלִית אוֹ בַּחֲרִי תְּשׁוּבָה');
+    updateGoogyProgress();
+    fillGoogyAvatars();
+    showScreen('googy-screen');
+    setGaiaState('idle');
+    googySend(GOOGY_OPENING, { opening: true });
+}
+
+function updateGoogyProgress() {
+    document.getElementById('googy-progress').textContent = '💬 ' + Googy.childTurns + '/' + GOOGY_TURNS;
+}
+
+// Leaving the chat (🏠 or any other screen) stops the request, the mic and the voice.
+function googyStop() {
+    Googy.active = false;
+    if (Googy.controller) Googy.controller.abort();
+    googyStopListening();
+    if (window.speechSynthesis) speechSynthesis.cancel();
+}
+GaiaHooks.on((type, data) => {
+    if (type === 'nav' && data.screen !== 'googy-screen' && Googy.active) googyStop();
+});
+
+// --- conversation ---
+function isMostlyEnglish(text) {
+    const latin = (text.match(/[A-Za-z]/g) || []).length;
+    const hebrew = (text.match(/[֐-׿]/g) || []).length;
+    return latin > 0 && hebrew <= latin * 0.25;
+}
+
+function googySend(text, opts = {}) {
+    text = String(text || '').trim().slice(0, 300);
+    if (!text || !Googy.active || Googy.busy || Googy.failed || Googy.done) return;
+    googyStopListening();
+    if (window.speechSynthesis) speechSynthesis.cancel();
+    const row = googyEl('div', 'gchat-row kid');
+    row.appendChild(googyEl('div', 'gchat-bubble', text));
+    document.getElementById('googy-log').appendChild(row);
+    document.getElementById('googy-text').value = '';
+    document.getElementById('googy-suggestions').textContent = '';
+    Googy.messages.push({ role: 'user', content: text });
+    if (!opts.opening) {
+        Googy.childTurns++;
+        if (isMostlyEnglish(text)) Googy.englishTurns++;
+    }
+    updateGoogyProgress();
+    googyScrollDown();
+    googyAsk();
+}
+
+async function googyAsk() {
+    const chat = Googy.chat;
+    const current = () => Googy.active && Googy.chat === chat;
+    const final = Googy.childTurns >= GOOGY_TURNS;
+    setGoogyBusy(true);
+    const typing = googyEl('div', 'gchat-row googy');
+    typing.innerHTML = googyAvatarSVG(34) + '<div class="gchat-bubble gchat-typing"><span></span><span></span><span></span></div>';
+    document.getElementById('googy-log').appendChild(typing);
+    googyScrollDown();
+    try {
+        const turn = await callGoogy(final);
+        typing.remove();
+        if (!current()) return;
+        Googy.messages.push({ role: 'assistant', content: turn.reply });
+        addGoogyTurn(turn);
+        googySpeak(turn.reply);
+        if (final) finishGoogyChat();
+        else renderGoogySuggestions(turn.suggestions);
+    } catch (err) {
+        typing.remove();
+        if (!current()) return;
+        showGoogyError(err.code || 'upstream');
+    } finally {
+        if (current()) setGoogyBusy(false);
+    }
+}
+
+async function callGoogy(final) {
+    const fail = code => Object.assign(new Error('googy: ' + code), { code });
+    const user = await withTimeout(authReady, 6000);
+    if (!user) throw fail('unauthorized');
+    const token = await user.getIdToken();
+    const controller = Googy.controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 40000);
+    try {
+        const res = await fetch(GOOGY_API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+            body: JSON.stringify({ topic: Googy.topic.id, level: Googy.level, messages: Googy.messages, final }),
+            signal: controller.signal
+        });
+        const data = await res.json().catch(() => null);
+        if (!res.ok) throw fail((data && data.error) || 'upstream');
+        if (!data || typeof data.reply !== 'string' || !data.reply) throw fail('upstream');
+        return data;
+    } catch (err) {
+        if (err.code) throw err;
+        throw fail(err.name === 'AbortError' ? 'timeout' : 'network');
+    } finally {
+        clearTimeout(timer);
+    }
+}
+
+function addGoogyTurn(turn) {
+    const log = document.getElementById('googy-log');
+    if (turn.feedback) log.appendChild(googyEl('div', 'gchat-feedback', '💡 ' + turn.feedback));
+    const row = googyEl('div', 'gchat-row googy');
+    row.innerHTML = googyAvatarSVG(34);
+    const bubble = googyEl('div', 'gchat-bubble');
+    bubble.appendChild(googyEl('div', '', turn.reply));
+    const tools = googyEl('div', 'gchat-tools');
+    const say = googyEl('button', '', '🔊');
+    say.setAttribute('aria-label', 'לִשְׁמֹעַ שׁוּב');
+    say.onclick = () => googySpeak(turn.reply);
+    tools.appendChild(say);
+    if (turn.hebrew) {
+        const hebrew = googyEl('div', 'gchat-hebrew', turn.hebrew);
+        const toggle = googyEl('button', '', 'עִבְרִית');
+        toggle.onclick = () => { hebrew.classList.toggle('show'); googyScrollDown(); };
+        tools.appendChild(toggle);
+        bubble.append(tools, hebrew);
+    } else {
+        bubble.appendChild(tools);
+    }
+    row.appendChild(bubble);
+    log.appendChild(row);
+    googyScrollDown();
+}
+
+function renderGoogySuggestions(list) {
+    const box = document.getElementById('googy-suggestions');
+    box.textContent = '';
+    (Array.isArray(list) ? list : []).slice(0, 3).forEach(text => {
+        const chip = googyEl('button', 'googy-chip', text);
+        chip.onclick = () => googySend(text);
+        box.appendChild(chip);
+    });
+}
+
+function setGoogyBusy(busy) {
+    Googy.busy = busy;
+    const locked = busy || Googy.failed || Googy.done;
+    document.querySelectorAll('#googy-mic, #googy-send, #googy-text, .googy-chip').forEach(el => { el.disabled = locked; });
+}
+
+function showGoogyError(code) {
+    Googy.failed = true;
+    setGoogyBusy(false);
+    const note = googyEl('div', 'gchat-note', (GOOGY_ERRORS[code] || GOOGY_ERRORS.upstream) + ' ');
+    if (code !== 'not_configured' && code !== 'unauthorized') {
+        const retry = googyEl('button', '', 'נסי שוב 🔄');
+        retry.onclick = () => { note.remove(); Googy.failed = false; googyAsk(); };
+        note.appendChild(retry);
+    }
+    document.getElementById('googy-log').appendChild(note);
+    googyScrollDown();
+}
+
+function finishGoogyChat() {
+    Googy.done = true;
+    setGoogyBusy(false);
+    document.getElementById('googy-suggestions').textContent = '';
+    document.getElementById('googy-inputbar').style.display = 'none';
+    setGoogyHint('');
+    // stars for speaking English: every line in English earns the full 3
+    const stars = Math.max(1, GaiaProgress.starsFor(Googy.englishTurns, GOOGY_TURNS));
+    GaiaHooks.emit('game_end');
+    try { GaiaProgress.recordGame('english', 'googy_' + Googy.level, stars); }
+    catch (e) { console.warn('[progress] googy hook', e); }
+    const end = document.getElementById('googy-end');
+    end.textContent = '';
+    end.appendChild(googyEl('div', 'reading-title', 'כָּל הַכָּבוֹד! 🎉'));
+    end.appendChild(googyEl('div', '', 'דִּבַּרְתְּ עִם Googy עַל ' + Googy.topic.he));
+    const starsEl = googyEl('div', 'stars-earned');
+    renderStarsEarned(starsEl, stars);
+    end.appendChild(starsEl);
+    const again = googyEl('button', 'big-btn btn-english', 'שִׂיחָה חֲדָשָׁה 💬');
+    again.onclick = () => goToGoogy(Googy.level);
+    const home = googyEl('button', 'big-btn btn-home', 'חֲזָרָה לַמַּפָּה 🏠');
+    home.onclick = () => goHome();
+    end.append(again, home);
+    end.classList.add('show');
+    setGaiaState('dance');
+    later(() => { playSound('victory'); googyScrollDown(); }, 600);
+}
+
+// --- Googy's voice ---
+function pickGoogyVoice() {
+    const all = (typeof _cachedVoices !== 'undefined' && _cachedVoices.length) ? _cachedVoices
+        : (window.speechSynthesis ? speechSynthesis.getVoices() : []);
+    const english = all.filter(v => /^en[-_]/i.test(v.lang));
+    const girlish = /samantha|google us english|zira|aria|jenny|ava|allison|susan|karen|moira|tessa|victoria|female/i;
+    return english.find(v => girlish.test(v.name) && /us/i.test(v.lang))
+        || english.find(v => girlish.test(v.name))
+        || english.find(v => /^en[-_]us/i.test(v.lang))
+        || english[0] || null;
+}
+
+function googySpeak(text) {
+    if (!window.speechSynthesis || !text) return;
+    speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US';
+    utterance.rate = Googy.level === 'easy' ? 0.85 : 0.95;
+    utterance.pitch = 1.3;
+    const voice = pickGoogyVoice();
+    if (voice) utterance.voice = voice;
+    const face = document.querySelector('#googy-head-avatar .googy-avatar');
+    utterance.onstart = () => face && face.classList.add('talking');
+    utterance.onend = utterance.onerror = () => face && face.classList.remove('talking');
+    speechSynthesis.speak(utterance);
+}
+
+// iOS only lets a page speak after speech was started from a tap once.
+function googyUnlockSpeech() {
+    if (!window.speechSynthesis) return;
+    const silent = new SpeechSynthesisUtterance(' ');
+    silent.volume = 0;
+    speechSynthesis.speak(silent);
+}
+
+// --- the child's voice ---
+function googyStopListening() {
+    const rec = Googy.recognizer;
+    Googy.recognizer = null;
+    Googy.listening = false;
+    document.getElementById('googy-mic').classList.remove('listening');
+    if (rec) { try { rec.abort(); } catch (e) { /* already stopped */ } }
+}
+
+function googyToggleMic() {
+    if (!GoogySpeechRecognition || !Googy.active || Googy.busy || Googy.failed || Googy.done) return;
+    if (Googy.listening) { if (Googy.recognizer) Googy.recognizer.stop(); return; }
+    if (window.speechSynthesis) speechSynthesis.cancel();
+    const mic = document.getElementById('googy-mic');
+    const input = document.getElementById('googy-text');
+    const rec = new GoogySpeechRecognition();
+    rec.lang = 'en-US';
+    rec.interimResults = true;
+    rec.continuous = false;
+    rec.maxAlternatives = 1;
+    let heard = '';
+    rec.onresult = event => {
+        let interim = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            if (event.results[i].isFinal) heard += event.results[i][0].transcript;
+            else interim += event.results[i][0].transcript;
+        }
+        input.value = (heard + interim).trim();
+    };
+    rec.onerror = event => {
+        if (event.error === 'not-allowed' || event.error === 'service-not-allowed') setGoogyHint('צריך לאשר לדפדפן גישה למיקרופון 🎤');
+        else if (event.error === 'no-speech') setGoogyHint('לֹא שָׁמַעְתִּי — נַסִּי שׁוּב 🎤');
+        else if (event.error !== 'aborted') setGoogyHint('הַמִּיקְרוֹפוֹן לֹא עָבַד — אֶפְשָׁר לְהַקְלִיד');
+    };
+    rec.onend = () => {
+        if (Googy.recognizer !== rec) return;   // stopped on purpose
+        Googy.recognizer = null;
+        Googy.listening = false;
+        mic.classList.remove('listening');
+        const said = heard.trim();
+        if (said) googySend(said);
+    };
+    Googy.recognizer = rec;
+    Googy.listening = true;
+    mic.classList.add('listening');
+    setGoogyHint('🎤 דַּבְּרִי בְּאַנְגְּלִית...');
+    try { rec.start(); } catch (e) { googyStopListening(); }
+}
+
+document.getElementById('googy-mic').addEventListener('click', googyToggleMic);
+document.getElementById('googy-send').addEventListener('click', () => googySend(document.getElementById('googy-text').value));
+document.getElementById('googy-text').addEventListener('keydown', event => {
+    if (event.key === 'Enter') { event.preventDefault(); googySend(event.target.value); }
+});
+fillGoogyAvatars();
+</script>
+<script>
 // ===== ADVENTURE MAP MODULE =====
 // Builds a tall scrolling SVG "kingdom" scene, places themed lands along a
 // winding RTL path, renders star badges from GaiaProgress, animates Gaia's
@@ -3487,7 +3997,9 @@ function showMultSummary() {
                 { cls: 'btn-level-1', label: 'כְּתִיב מִילָה (קַל) 🖼️',   fn: () => startEnglishGame(0), levelKey: '0' },
                 { cls: 'btn-level-2', label: 'אוֹת רִאשׁוֹנָה',           fn: () => startEnglishGame(1), levelKey: '1' },
                 { cls: 'btn-level-3', label: 'אוֹת אַחֲרוֹנָה',           fn: () => startEnglishGame(2), levelKey: '2' },
-                { cls: 'btn-english', label: 'אוֹת חֲסֵרָה (קָשֶׁה)',      fn: () => startEnglishGame(3), levelKey: '3' }
+                { cls: 'btn-english', label: 'אוֹת חֲסֵרָה (קָשֶׁה)',      fn: () => startEnglishGame(3), levelKey: '3' },
+                { cls: 'btn-googy', label: 'שִׂיחָה עִם Googy 💬 (קַל)', fn: () => goToGoogy('easy'), levelKey: 'googy_easy', when: googyAvailable },
+                { cls: 'btn-googy', label: 'שִׂיחָה עִם Googy 💬 (קְצָת יוֹתֵר)', fn: () => goToGoogy('medium'), levelKey: 'googy_medium', when: googyAvailable }
             ]
         },
         geography: {
@@ -3733,7 +4245,7 @@ function showMultSummary() {
             note.textContent = conf.note;
             bodyEl.appendChild(note);
         }
-        conf.buttons.forEach(function (b) {
+        conf.buttons.filter(function (b) { return !b.when || b.when(); }).forEach(function (b) {
             const btn = document.createElement('button');
             btn.className = 'big-btn ' + b.cls;
             btn.textContent = b.label;
