@@ -4,11 +4,18 @@
       ".read": true,
       ".indexOn": ["score"],
       "$entry": {
-        ".write": "!data.exists() && newData.exists()",
-        ".validate": "newData.hasChildren(['name','score']) && newData.child('name').isString() && newData.child('name').val().length >= 1 && newData.child('name').val().length <= 20 && newData.child('score').isNumber() && newData.child('score').val() >= 0 && newData.child('score').val() <= 200",
+        ".write": "auth != null && !data.exists() && newData.exists() && newData.parent().parent().child('scoreRate').child(auth.uid).val() == now",
+        ".validate": "newData.hasChildren(['name', 'score'])",
         "name": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 20" },
-        "score": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 200" },
+        "score": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 150" },
         "$other": { ".validate": false }
+      }
+    },
+
+    "scoreRate": {
+      "$uid": {
+        ".write": "auth != null && auth.uid == $uid",
+        ".validate": "newData.isNumber() && newData.val() == now && (!data.exists() || now - data.val() >= 5000)"
       }
     },
 
@@ -17,13 +24,42 @@
       "sessions": {
         "$sid": {
           "meta": {
-            ".write": true,
-            ".validate": "newData.hasChildren()"
+            ".write": "auth != null && !data.exists() && $sid.matches(/^sess_[a-z0-9]{1,16}_[a-z0-9]{1,16}$/)",
+            ".validate": "newData.hasChildren(['started'])",
+            "started": { ".validate": "newData.val() == now" },
+            "clientStartedAt": { ".validate": "newData.isNumber()" },
+            "userAgent": { ".validate": "newData.isString() && newData.val().length <= 400" },
+            "language": { ".validate": "newData.isString() && newData.val().length <= 20" },
+            "viewport": { ".validate": "newData.isString() && newData.val().length <= 20" },
+            "screen": { ".validate": "newData.isString() && newData.val().length <= 20" },
+            "timezoneOffset": { ".validate": "newData.isNumber()" },
+            "lastActivity": {
+              ".write": "auth != null && data.parent().exists()",
+              ".validate": "newData.val() == now"
+            },
+            "$other": { ".validate": false }
           },
           "events": {
             "$eventId": {
-              ".write": "!data.exists()",
-              ".validate": "newData.hasChild('type')"
+              ".write": "auth != null && !data.exists() && $sid.matches(/^sess_[a-z0-9]{1,16}_[a-z0-9]{1,16}$/)",
+              ".validate": "newData.hasChildren(['type', 'ts'])",
+              "type": { ".validate": "newData.isString() && newData.val().length <= 32" },
+              "ts": { ".validate": "newData.val() == now" },
+              "clientTs": { ".validate": "newData.isNumber()" },
+              "initialScreen": { ".validate": "newData.isString() && newData.val().length <= 40" },
+              "isNewSession": { ".validate": "newData.isBoolean()" },
+              "from": { ".validate": "newData.isString() && newData.val().length <= 40" },
+              "to": { ".validate": "newData.isString() && newData.val().length <= 40" },
+              "subject": { ".validate": "newData.isString() && newData.val().length <= 40" },
+              "level": { ".validate": "newData.isString() && newData.val().length <= 40" },
+              "outcome": { ".validate": "newData.isString() && newData.val().length <= 20" },
+              "correct": { ".validate": "newData.isBoolean() || newData.isNumber()" },
+              "responseMs": { ".validate": "newData.isNumber()" },
+              "durationMs": { ".validate": "newData.isNumber()" },
+              "answers": { ".validate": "newData.isNumber()" },
+              "accuracy": { ".validate": "newData.isNumber()" },
+              "avgResponseMs": { ".validate": "newData.isNumber()" },
+              "$other": { ".validate": false }
             }
           }
         }
