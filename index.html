@@ -2,12 +2,13 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Gaia Game - לומדים בכיף</title>
 
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+    <!-- Firebase (deferred: never blocks the first paint; initialised on DOMContentLoaded) -->
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 
     <!-- Fonts: Fredoka (variable, Latin/digits) + Varela Round (full Hebrew coverage) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,7 +34,6 @@
             /* Sky (updated at runtime by time of day) */
             --sky-top:      oklch(0.86 0.09 235);
             --sky-bottom:   oklch(0.95 0.03 235);
-            --bg-app:       oklch(0.97 0.015 90);
 
             /* Per-land signature hues */
             --land-math:      oklch(0.62 0.20 25);
@@ -152,7 +152,6 @@
             user-select: none;
             touch-action: manipulation;
             color: var(--ink);
-            transition: background-color 0.3s ease;
         }
         /* Latin & digits prefer Fredoka; Hebrew stays on Varela Round via body fallback */
         .lat { font-family: 'Fredoka', sans-serif; }
@@ -232,9 +231,7 @@
             100% { transform: scale(1, 1); }
         }
 
-        .btn-hebrew { background: linear-gradient(135deg, oklch(0.68 0.15 250), oklch(0.55 0.17 255)); }
         .btn-math { background: linear-gradient(135deg, oklch(0.68 0.19 30), oklch(0.55 0.20 28)); }
-        .btn-biology { background: linear-gradient(135deg, oklch(0.66 0.12 180), oklch(0.50 0.11 185)); }
         .btn-level-1 { background: oklch(0.70 0.16 145); }
         .btn-level-2 { background: oklch(0.75 0.16 70); }
         .btn-level-3 { background: oklch(0.62 0.18 310); }
@@ -325,6 +322,17 @@
 
         .feedback { font-size: 1.8rem; height: 40px; margin-top: 5px; font-weight: bold; line-height: 40px; }
 
+        /* answered / timed-out options are locked; the right answer stays highlighted */
+        #options button:disabled { opacity: 0.45; cursor: default; }
+        #options button.opt-correct {
+            opacity: 1; background: oklch(0.95 0.05 145);
+            border-color: oklch(0.60 0.14 150) !important; box-shadow: 0 4px 0 oklch(0.50 0.13 150);
+        }
+
+        /* 0-3 stars earned for the map, shown on end / summary screens */
+        .stars-earned { font-size: 2.4rem; letter-spacing: 6px; margin: 4px 0 8px; }
+        .stars-earned .star-off { opacity: 0.25; filter: grayscale(1); }
+
         /* --- טבלת שיאים --- */
         .highscore-table {
             width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 1.1rem;
@@ -357,7 +365,6 @@
         /* --- כפתורי תפריט נוספים --- */
         .btn-english   { background: linear-gradient(135deg, oklch(0.72 0.16 150), oklch(0.55 0.15 155)); }
         .btn-geography { background: linear-gradient(135deg, oklch(0.72 0.17 55), oklch(0.55 0.16 45)); }
-        .btn-memory    { background: linear-gradient(135deg, oklch(0.72 0.14 205), oklch(0.52 0.12 215)); }
         .btn-puzzle    { background: linear-gradient(135deg, oklch(0.76 0.16 70), oklch(0.60 0.17 55)); }
 
         /* --- פאזל --- */
@@ -497,14 +504,6 @@
         .reading-opt-btn.correct { background: oklch(0.95 0.05 145); border-color: oklch(0.60 0.14 150); box-shadow: 0 4px 0 oklch(0.50 0.13 150); }
         .reading-opt-btn.wrong   { background: oklch(0.94 0.05 25); border-color: oklch(0.60 0.18 25); box-shadow: 0 4px 0 oklch(0.50 0.18 25); }
         .reading-progress { font-size: 1.1rem; color: var(--brand); font-weight: bold; margin: 4px 0; }
-        .reading-category-btn {
-            display: block; width: 100%; padding: 14px; margin: 8px 0;
-            font-size: 1.3rem; border: none; border-radius: 20px; color: white;
-            cursor: pointer; font-weight: bold; font-family: 'Varela Round', 'Fredoka', sans-serif;
-            box-shadow: 0 5px 0 oklch(0.3 0.05 300 / 0.35); transition: transform var(--t-ui) var(--ease-out-quart), box-shadow var(--t-ui);
-            direction: rtl; min-height: 56px;
-        }
-        .reading-category-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 oklch(0.3 0.05 300 / 0.35); }
         .reading-story-pick-btn {
             display: flex; align-items: center; gap: 10px; width: 100%;
             padding: 14px 16px; margin: 7px 0; border-radius: 18px;
@@ -560,9 +559,6 @@
         #map-viewport {
             position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden;
             -webkit-overflow-scrolling: touch; z-index: 1;
-        }
-        #map-sky {
-            position: sticky; top: 0; height: 0; z-index: 0; pointer-events: none;
         }
         #map-sky-fill {
             position: fixed; inset: 0; z-index: 0; pointer-events: none;
@@ -791,68 +787,6 @@
             <div id="land-panel-body"></div>
         </div>
     </div>
-    <div id="hebrew-menu" class="screen">
-        <div class="menu-box" style="border-color: #42a5f5;">
-            <button class="home-btn" onclick="goHome()" style="position:relative; top:0; left:0; width:60px; margin-bottom:10px;">🔙</button>
-            <h2>בַּחֲרִי מִשְׂחָק 🔡</h2>
-            <button class="big-btn btn-level-1" onclick="startHebrewGame(1)">אוֹת רִאשׁוֹנָה</button>
-            <button class="big-btn btn-level-2" onclick="startHebrewGame(2)">אוֹת אַחֲרוֹנָה</button>
-            <button class="big-btn btn-level-3" onclick="startHebrewGame(3)">מִילָה מְבֻלְבֶּלֶת</button>
-        </div>
-    </div>
-
-    <div id="biology-menu" class="screen">
-        <div class="menu-box" style="border-color: #26a69a;">
-            <button class="home-btn" onclick="goHome()" style="position:relative; top:0; left:0; width:60px; margin-bottom:10px;">🔙</button>
-            <h2 style="color:#00695c;">בַּחֲרִי רָמָה 🫁</h2>
-            <button class="big-btn btn-level-1" onclick="startBiologyGame(1)">אֵיבָרִים עִיקָרִיִּים</button>
-            <button class="big-btn btn-level-2" onclick="startBiologyGame(2)">כָּל הָאֵיבָרִים</button>
-        </div>
-    </div>
-
-    <div id="math-menu" class="screen">
-        <div class="menu-box" style="border-color: #ef5350;">
-            <button class="home-btn" onclick="goHome()" style="position:relative; top:0; left:0; width:60px; margin-bottom:10px;">🔙</button>
-            <h2>בַּחֲרִי רָמָה 🔢</h2>
-            <button class="big-btn btn-level-1" onclick="startMathGame(10)">חִבּוּר וְחִסּוּר עַד 10</button>
-            <button class="big-btn btn-level-2" onclick="startMathGame(20)">חִבּוּר וְחִסּוּר עַד 20</button>
-            <button class="big-btn" style="background: linear-gradient(135deg, #ff7043, #c62828);" onclick="goToMultMenu()">לוּחַ הַכֶּפֶל ✖️</button>
-        </div>
-    </div>
-
-    <div id="english-menu" class="screen">
-        <div class="menu-box" style="border-color: #43a047;">
-            <button class="home-btn" onclick="goHome()" style="position:relative; top:0; left:0; width:60px; margin-bottom:10px;">🔙</button>
-            <h2 style="color:#2e7d32;">בַּחֲרִי רָמָה 🔤</h2>
-            <button class="big-btn" style="background: linear-gradient(135deg, #f06292, #ad1457);" onclick="startEnglishGame(4)">אַלְפָּבֵית וְצְלִילִים 🔡 (הַכִּי קַל)</button>
-            <button class="big-btn btn-level-1" onclick="startEnglishGame(0)">כְּתִיב מִילָה (קַל) 🖼️</button>
-            <button class="big-btn btn-level-2" onclick="startEnglishGame(1)">אוֹת רִאשׁוֹנָה</button>
-            <button class="big-btn btn-level-3" onclick="startEnglishGame(2)">אוֹת אַחֲרוֹנָה</button>
-            <button class="big-btn" style="background:#7b1fa2;" onclick="startEnglishGame(3)">אוֹת חֲסֵרָה (קָשֶׁה)</button>
-        </div>
-    </div>
-
-    <div id="geography-menu" class="screen">
-        <div class="menu-box" style="border-color: #ff7043;">
-            <button class="home-btn" onclick="goHome()" style="position:relative; top:0; left:0; width:60px; margin-bottom:10px;">🔙</button>
-            <h2 style="color:#bf360c;">בַּחֲרִי רָמָה 🌍</h2>
-            <button class="big-btn btn-level-1" onclick="startGeographyGame(1)">מְדִינוֹת מֻכָּרוֹת</button>
-            <button class="big-btn btn-level-2" onclick="startGeographyGame(2)">כָּל הַמְּדִינוֹת</button>
-        </div>
-    </div>
-
-    <div id="memory-menu" class="screen">
-        <div class="menu-box" style="border-color: #00acc1;">
-            <button class="home-btn" onclick="goHome()" style="position:relative; top:0; left:0; width:60px; margin-bottom:10px;">🔙</button>
-            <h2 style="color:#006064;">מִשְׂחַק זִכָּרוֹן 🃏</h2>
-            <p style="color:#555; font-size:1.1rem;">בַּחֲרִי נוֹשֵׂא:</p>
-            <button class="big-btn btn-level-1" onclick="startMemoryGame('words','easy')">מִילִים עִבְרִיּוֹת – קַל (6 זוּגוֹת)</button>
-            <button class="big-btn btn-level-2" onclick="startMemoryGame('words','hard')">מִילִים עִבְרִיּוֹת – קָשֶׁה (8 זוּגוֹת)</button>
-            <button class="big-btn" style="background:#ff7043;" onclick="startMemoryGame('flags','easy')">דְּגָלִים – קַל (6 זוּגוֹת)</button>
-            <button class="big-btn" style="background:#ff5722;" onclick="startMemoryGame('flags','hard')">דְּגָלִים – קָשֶׁה (8 זוּגוֹת)</button>
-        </div>
-    </div>
-
     <div id="memory-screen" class="screen">
         <div class="game-container" id="memory-container" style="border-color: #00acc1; min-height: 520px;">
             <div class="hud-container" style="border-bottom-color: #00acc1; background: #e0f7fa;">
@@ -921,15 +855,17 @@
         <div class="menu-box" style="border-color: #ffd700; background: #fffde7;">
             <div style="font-size: 4rem;">🏆</div>
             <h1>סִיַּמְתְּ אֶת הַמִּשְׂחָק!</h1>
-            <p style="font-size: 1.5rem; margin: 10px 0;">צָבַרְתְּ: <strong id="final-score-display" style="color:#ff8f00; font-size: 2rem;">0</strong> כּוֹכָבִים!</p>
+            <p style="font-size: 1.5rem; margin: 10px 0 0;">צָבַרְתְּ: <strong id="final-score-display" style="color:#ff8f00; font-size: 2rem;">0</strong> נְקֻדּוֹת!</p>
+            <div id="final-stars" class="stars-earned" aria-label="כּוֹכָבִים שֶׁהִרְוַחְתְּ בַּמַּפָּה"></div>
 
             <div id="save-score-area">
                 <p>כִּתְבִי אֶת הַשֵּׁם שֶׁלָּךְ:</p>
-                <input type="text" id="player-name" class="name-input" placeholder="שֵׁם...">
+                <input type="text" id="player-name" class="name-input" placeholder="שֵׁם..." maxlength="20">
                 <br>
-                <button class="big-btn btn-save" onclick="saveScore()">שְׁמוֹר בַּטַּבְלָה 💾</button>
-                <p id="save-status" style="margin:8px 0; font-size:0.95rem;"></p>
+                <button class="big-btn btn-save" id="save-btn" onclick="saveScore()">שְׁמוֹר בַּטַּבְלָה 💾</button>
             </div>
+            <!-- outside #save-score-area so it stays visible after the area is hidden -->
+            <p id="save-status" style="margin:8px 0; font-size:0.95rem;"></p>
 
             <div id="leaderboard-area" style="display:none; margin-top:20px;">
                 <h2>👑 טַבְלַת הָאֲלוּפִים 👑</h2>
@@ -938,7 +874,7 @@
                         <tr>
                             <th>מָקוֹם</th>
                             <th>שֵׁם</th>
-                            <th>כּוֹכָבִים</th>
+                            <th>נְקֻדּוֹת</th>
                         </tr>
                     </thead>
                     <tbody id="highscore-body"></tbody>
@@ -950,18 +886,6 @@
     </div>
 
     <!-- ===== READING MODULE ===== -->
-    <div id="reading-menu" class="screen">
-        <div class="menu-box" style="border-color: #8e24aa;">
-            <button class="home-btn" onclick="goHome()" style="position:relative;top:0;left:0;width:60px;margin-bottom:10px;">🔙</button>
-            <h2 style="color:#4a148c;">בַּחֲרִי קָטֶגוֹרְיַת נִיקּוּד 📖</h2>
-            <button class="reading-category-btn" style="background:linear-gradient(135deg,#42a5f5,#1565c0);" onclick="startReadingCategory(0)">קָמַץ וּפַתַּח (ָ ַ)</button>
-            <button class="reading-category-btn" style="background:linear-gradient(135deg,#ef5350,#b71c1c);" onclick="startReadingCategory(1)">סֶגּוֹל וְצֵירֵי (ֶ ֵ)</button>
-            <button class="reading-category-btn" style="background:linear-gradient(135deg,#26a69a,#004d40);" onclick="startReadingCategory(2)">חִירִיק (ִ)</button>
-            <button class="reading-category-btn" style="background:linear-gradient(135deg,#ff8f00,#e65100);" onclick="startReadingCategory(3)">חוֹלָם (וֹ ֹ)</button>
-            <button class="reading-category-btn" style="background:linear-gradient(135deg,#8e24aa,#4a148c);" onclick="startReadingCategory(4)">שׁוּרוּק וְקֻבּוּץ (וּ ֻ)</button>
-        </div>
-    </div>
-
     <div id="reading-screen" class="screen">
         <div class="game-container" style="border-color:#8e24aa; min-height:480px;">
             <div class="hud-container" style="background:linear-gradient(135deg,#f3e5f5,#ede7f6); border-bottom-color:#8e24aa;">
@@ -1006,12 +930,28 @@
         </div>
     </div>
 <script>
+// ===== GAME EVENT HOOKS =====
+// Game code reports what happens (game_start / answer / game_end / game_exit / nav);
+// optional modules (analytics) subscribe. No module patches another's functions.
+(function () {
+    const listeners = [];
+    window.GaiaHooks = {
+        on(fn) { listeners.push(fn); },
+        emit(type, data) {
+            listeners.forEach(fn => {
+                try { fn(type, data || {}); } catch (e) { console.warn('[hooks]', type, e); }
+            });
+        }
+    };
+})();
+
 // ===== PROGRESS PERSISTENCE MODULE (loads before the engine) =====
 // localStorage key gaiaProgress (versioned). Tracks cumulative stars per land,
-// per-level best score, reading progress, and last-played land.
+// per-level best stars, reading progress, and last-played land.
+// Every finished game / story is worth 0-3 stars (see starsFor).
 (function () {
     const KEY = 'gaiaProgress';
-    const VERSION = 1;
+    const VERSION = 2;
 
     function freshState() {
         return {
@@ -1023,6 +963,33 @@
         };
     }
 
+    // 0-3 stars from a score and the best possible score for that game.
+    function starsFor(score, maxScore) {
+        const ratio = maxScore > 0 ? score / maxScore : 0;
+        if (ratio >= 0.9) return 3;
+        if (ratio >= 0.7) return 2;
+        if (ratio >= 0.4) return 1;
+        return 0;
+    }
+
+    // v1 stored raw points as "stars". Land totals are kept (medals already earned
+    // stay); per-level bests move to the 0-3 scale. v1 memory/puzzle bests were
+    // keyed by the previous game's level, so they are dropped.
+    function migrate(parsed) {
+        if (parsed.v !== 1) return parsed;
+        const levelBest = parsed.levelBest || {};
+        Object.keys(levelBest).forEach(land => {
+            if (land === 'memory' || land === 'puzzle') { delete levelBest[land]; return; }
+            Object.keys(levelBest[land] || {}).forEach(level => {
+                const max = level.indexOf('mult_') === 0 ? 10 : 150;
+                levelBest[land][level] = starsFor(levelBest[land][level], max);
+            });
+        });
+        parsed.levelBest = levelBest;
+        parsed.v = 2;
+        return parsed;
+    }
+
     let state = freshState();
 
     function load() {
@@ -1030,11 +997,13 @@
             const raw = localStorage.getItem(KEY);
             if (raw) {
                 const parsed = JSON.parse(raw);
-                if (parsed && parsed.v === VERSION) {
-                    state = Object.assign(freshState(), parsed);
+                const wasV1 = parsed && parsed.v === 1;
+                if (parsed && (parsed.v === VERSION || wasV1)) {
+                    state = Object.assign(freshState(), migrate(parsed));
                     state.stars = state.stars || {};
                     state.levelBest = state.levelBest || {};
                     state.reading = state.reading || {};
+                    if (wasV1) save();
                 }
             }
         } catch (e) { console.warn('[progress] load failed', e); }
@@ -1046,8 +1015,10 @@
     }
 
     const GaiaProgress = {
-        // Record a finished game: add earned stars to the land bucket,
-        // and keep the best-per-level score.
+        starsFor,
+
+        // Record a finished game: add its 0-3 stars to the land bucket,
+        // and keep the best-per-level stars.
         recordGame(landKey, levelKey, stars) {
             stars = Math.max(0, Math.round(stars || 0));
             state.stars[landKey] = (state.stars[landKey] || 0) + stars;
@@ -1058,11 +1029,12 @@
             save();
         },
 
-        // Reading stores its own progress object; we mirror it and credit delta stars.
-        recordReadingStory(readingProgressObj, catIdx, deltaStars) {
+        // Reading stores its own progress object (best result per story); we mirror it
+        // and credit the stars of this read-through, like any other finished game.
+        recordReadingStory(readingProgressObj, catIdx, stars) {
             state.reading = JSON.parse(JSON.stringify(readingProgressObj || {}));
-            deltaStars = Math.max(0, Math.round(deltaStars || 0));
-            if (deltaStars > 0) state.stars['reading'] = (state.stars['reading'] || 0) + deltaStars;
+            stars = Math.max(0, Math.round(stars || 0));
+            if (stars > 0) state.stars['reading'] = (state.stars['reading'] || 0) + stars;
             state.lastPlayedLand = 'reading';
             save();
         },
@@ -1093,12 +1065,11 @@
 </script>
     <script>
         // ====== הגדרות Firebase ======
-        // כדי לאפשר טבלת שיאים משותפת בין כל המשתמשים:
-        // 1. היכנסו ל-console.firebase.google.com
-        // 2. צרו פרויקט חדש בשם "GaiaGame"
-        // 3. הוסיפו Web App והעתיקו את ה-firebaseConfig
-        // 4. לכו ל-Realtime Database → צרו מסד נתונים → בחרו "Test mode"
-        // 5. הדביקו את הנתונים כאן במקום ה-YOUR_... הנוכחי
+        // ה-config הזה ציבורי מטבעו (כך עובד Firebase Web) — ההגנה היא בחוקי ה-DB, לא בהסתרתו.
+        // הגדרה ב-console.firebase.google.com (פרויקט gaia-game-a32c0):
+        // 1. Authentication → Sign-in method → להפעיל Anonymous (החוקים דורשים משתמש אנונימי).
+        // 2. Realtime Database → Rules → להדביק את firebase-rules.json מהריפו ולפרסם.
+        //    לא להשתמש ב-"Test mode" — הוא פותח את כל ה-DB לקריאה ולכתיבה לכל אחד.
         const firebaseConfig = {
             apiKey: "AIzaSyD0fwRCfuG0oceW2q0CP2GmC03Dn6bJ14k",
             authDomain: "gaia-game-a32c0.firebaseapp.com",
@@ -1110,17 +1081,32 @@
         };
 
         let db = null;
-        const FIREBASE_CONFIGURED = firebaseConfig.apiKey !== "YOUR_API_KEY";
-        if (FIREBASE_CONFIGURED) {
+        // Resolves to the anonymous user, or null when Firebase / anonymous auth is unavailable.
+        let authReady = Promise.resolve(null);
+
+        function withTimeout(promise, ms) {
+            return Promise.race([promise, new Promise(resolve => setTimeout(() => resolve(null), ms))]);
+        }
+
+        // The SDK scripts are deferred, so they have run by DOMContentLoaded.
+        function initFirebase() {
+            if (typeof firebase === 'undefined' || !firebase.initializeApp) return;
             try {
                 firebase.initializeApp(firebaseConfig);
                 db = firebase.database();
-            } catch(e) {
+                if (firebase.auth) {
+                    authReady = firebase.auth().signInAnonymously()
+                        .then(cred => cred.user)
+                        .catch(e => { console.warn('Anonymous sign-in unavailable:', e.code || e.message); return null; });
+                }
+            } catch (e) {
                 console.warn("Firebase init failed:", e);
+                db = null;
             }
         }
+        document.addEventListener('DOMContentLoaded', initFirebase);
 
-        // --- מאגר 200 מילים ---
+        // --- מאגר 250 מילים ---
         const words = [
             // חיות (20)
             { full: "כלב", emoji: "🐶" }, { full: "חתול", emoji: "🐱" }, { full: "פיל", emoji: "🐘" }, { full: "אריה", emoji: "🦁" },
@@ -1137,7 +1123,7 @@
             { full: "עגבניה", emoji: "🍅" }, { full: "מלפפון", emoji: "🥒" }, { full: "תירס", emoji: "🌽" }, { full: "דובדבן", emoji: "🍒" },
 
             // חפצים וצעצועים (20)
-            { full: "כדור", emoji: "⚽" }, { full: "בלון", emoji: "🎈" }, { full: "בובה", emoji: "🧸" }, { full: "ספר", emoji: "📚" },
+            { full: "כדור", emoji: "🥎" }, { full: "בלון", emoji: "🎈" }, { full: "בובה", emoji: "🧸" }, { full: "ספר", emoji: "📚" },
             { full: "עפרון", emoji: "✏️" }, { full: "מספריים", emoji: "✂️" }, { full: "שעון", emoji: "⌚" }, { full: "משקפיים", emoji: "👓" },
             { full: "מפתח", emoji: "🔑" }, { full: "מתנה", emoji: "🎁" }, { full: "כתר", emoji: "👑" }, { full: "מטריה", emoji: "☂️" },
             { full: "תיק", emoji: "🎒" }, { full: "מצלמה", emoji: "📷" }, { full: "טלפון", emoji: "📱" }, { full: "נר", emoji: "🕯️" },
@@ -1179,7 +1165,7 @@
 
             // בית ספר (7)
             { full: "מורה", emoji: "👩‍🏫" }, { full: "עט", emoji: "🖊️" }, { full: "סרגל", emoji: "📏" }, { full: "מחברת", emoji: "📓" },
-            { full: "כיתה", emoji: "🏫" }, { full: "מדבקה", emoji: "⭐" }, { full: "דף", emoji: "📄" },
+            { full: "כיתה", emoji: "🏫" }, { full: "חשבוניה", emoji: "🧮" }, { full: "דף", emoji: "📄" },
 
             // ספורט (8)
             { full: "כדורסל", emoji: "🏀" }, { full: "כדורעף", emoji: "🏐" }, { full: "טניס", emoji: "🎾" }, { full: "שחייה", emoji: "🏊" },
@@ -1191,7 +1177,7 @@
             { full: "ורוד", emoji: "🩷" }, { full: "חום", emoji: "🟤" },
 
             // טכנולוגיה וחפצים (7)
-            { full: "מחשב", emoji: "💻" }, { full: "טלוויזיה", emoji: "📺" }, { full: "מקרר", emoji: "🧊" }, { full: "מנורה", emoji: "💡" },
+            { full: "מחשב", emoji: "💻" }, { full: "טלוויזיה", emoji: "📺" }, { full: "רדיו", emoji: "📻" }, { full: "מנורה", emoji: "💡" },
             { full: "כוס", emoji: "🥤" }, { full: "מאוורר", emoji: "🌀" }, { full: "פנס", emoji: "🔦" },
 
             // טבע ומקומות (10)
@@ -1229,7 +1215,7 @@
             // כלי בית ומטבח (12)
             { full: "מחבת", emoji: "🍳" }, { full: "קומקום", emoji: "☕" }, { full: "מראה", emoji: "🪞" },
             { full: "אמבטיה", emoji: "🛁" }, { full: "מקלחת", emoji: "🚿" }, { full: "כרית", emoji: "🛌" },
-            { full: "שמיכה", emoji: "🛏️" }, { full: "חלון", emoji: "🪟" }, { full: "מטאטא", emoji: "🧹" },
+            { full: "סבון", emoji: "🧼" }, { full: "חלון", emoji: "🪟" }, { full: "מטאטא", emoji: "🧹" },
             { full: "דלי", emoji: "🪣" }, { full: "צלחת", emoji: "🍽️" }, { full: "מגבת", emoji: "🧻" },
 
             // מקומות ובילוי (10)
@@ -1251,7 +1237,7 @@
             { emoji: "👃", name: "אַף",        func: "עוֹזֵר לָנוּ לְהָרִיחַ",                level: 1 },
             { emoji: "🦷", name: "שִׁינַּיִם", func: "עוֹזְרוֹת לָנוּ לִלְעוֹס אוֹכֶל",       level: 1 },
             // רמה 2 — כל האיברים
-            { emoji: "🫀", name: "כָּבֵד",    func: "מְנַקֶּה אֶת הַדָּם מֵרַעֲלִים",         level: 2 },
+            { emoji: "🟤", name: "כָּבֵד",    func: "מְנַקֶּה אֶת הַדָּם מֵרַעֲלִים",         level: 2 },
             { emoji: "🟡", name: "קֵיבָה",    func: "מְפָרֶקֶת אֶת הָאוֹכֶל אַחֲרֵי הָאֲכִילָה", level: 2 },
             { emoji: "🫘", name: "כְּלָיוֹת",  func: "מְסַנְּנוֹת פְּסוֹלֶת מֵהַדָּם",          level: 2 },
             { emoji: "💪", name: "שְׁרִירִים", func: "מְאַפְשְׁרִים תְּנוּעָה שֶׁל הַגּוּף",     level: 2 },
@@ -1267,7 +1253,7 @@
             // רגל
             { emoji: "🦶", name: "כַּף רֶגֶל",           func: "עוֹזֶרֶת לָנוּ לַעֲמוֹד וְלָרוּץ",                       level: 2 },
             { emoji: "🦿", name: "קַרְסֹל",              func: "מְחַבֵּר אֶת כַּף הָרֶגֶל לָרֶגֶל",                      level: 2 },
-            { emoji: "🫦", name: "בֶּרֶךְ",              func: "מַפְרֵק שֶׁמַּכְפִּיף אֶת הָרֶגֶל",                       level: 2 },
+            { emoji: "🧎", name: "בֶּרֶךְ",              func: "מַפְרֵק שֶׁמַּכְפִּיף אֶת הָרֶגֶל",                       level: 2 },
             // ראש וצוואר
             { emoji: "👄", name: "שְׂפָתַיִם",            func: "עוֹזְרוֹת לָנוּ לְדַבֵּר וְלֶאֱכוֹל",                    level: 2 },
             { emoji: "🗣️", name: "גָּרוֹן",              func: "מַעֲבִיר אוֹכֶל וַאֲוִויר מֵהַפֶּה לַגּוּף",             level: 2 },
@@ -1277,7 +1263,7 @@
             { emoji: "👁️", name: "עַפְעַפַּיִם",         func: "מְגִינִים עַל הָעֵינַיִם וּמַרְטִיבִים אוֹתָן",           level: 2 },
             // גב ובטן
             { emoji: "🦴", name: "עַמּוּד הַשִּׁדְרָה",    func: "תּוֹמֵךְ בַּגּוּף וּמָגֵן עַל חוּט הַשִּׁדְרָה",         level: 2 },
-            { emoji: "🤸", name: "גַּב",                  func: "תּוֹמֵךְ בַּגּוּף וּמַאֲפִשֵּׁר עֲמִידָה זְקוּפָה",       level: 2 },
+            { emoji: "🤸", name: "גַּב",                  func: "תּוֹמֵךְ בַּגּוּף וּמְאַפְשֵׁר עֲמִידָה זְקוּפָה",       level: 2 },
             { emoji: "🫃", name: "בֶּטֶן",               func: "מְכִילָה אֶת אֵיבְרֵי הָעִיכּוּל",                        level: 2 },
             // מערכת עיכול
             { emoji: "🌀", name: "מֵעִי דַּק",            func: "סוֹפֵג חֳמָרֵי תְּזוּנָה מֵהָאוֹכֶל לַגּוּף",            level: 2 },
@@ -1371,7 +1357,7 @@
             // רמה 1 — מדינות מוכרות
             { code: "il", name: "יִשְׂרָאֵל",           level: 1 },
             { code: "us", name: "אַרְצוֹת הַבְּרִית",   level: 1 },
-            { code: "gb", name: "אַנְגְלִיָּה",          level: 1 },
+            { code: "gb", name: "בְּרִיטַנְיָה",         level: 1 },
             { code: "fr", name: "צָרְפַת",              level: 1 },
             { code: "de", name: "גֶּרְמַנְיָה",         level: 1 },
             { code: "it", name: "אִיטַלְיָה",           level: 1 },
@@ -1439,22 +1425,20 @@
 
         let biologyOrg = {};
 
-        // מיפוי סוג משחק ← אֶרֶץ בַּמַּפָּה (לצבירת כוכבים)
-        const GAME_TYPE_TO_LAND = {
-            math: 'math', hebrew: 'hebrew', english: 'english',
-            geography: 'geography', biology: 'biology',
-            memory: 'memory', puzzle: 'puzzle'
-        };
-
         // משתנים גלובליים
-        let currentGameType = "";
-        let currentLevel = 0;
+        let currentGameType = "";   // also the map land that gets the stars
+        let currentLevel = 0;       // also the level key for the per-level best
         let currentAnswer = "";
         let hebrewWordObj = {};
         let englishWordObj = {};
         let score = 0;
         let questionCount = 0;
         const MAX_QUESTIONS = 15;
+        // best possible score of the running game, and the stars a completed game always earns
+        let scoreMax = MAX_QUESTIONS * 10;
+        let minStars = 0;
+        // set once a question is answered or timed out, so extra taps can't score again
+        let answerLocked = false;
         function getTimerSeconds() {
             if (currentGameType === 'biology') return 30;
             if (currentGameType === 'english' && currentLevel === 4) return 25;
@@ -1480,28 +1464,50 @@
         // אודיו
         let audioCtx = null;
 
-        // --- הודעת פתיחה לפי שעה ---
+        // --- הודעת פתיחה לפי שעה (בשישי ובשבת — הודעת היום, חוץ מבלילה המאוחר) ---
         (function setWelcomeMessage() {
             const hour = new Date().getHours();
             const day  = new Date().getDay(); // 0=ראשון, 6=שבת
-            const messages = [];
+            let message;
 
-            if (hour >= 6  && hour < 10) messages.push("בֹּקֶר טוֹב גַּאְיָה! ☀️ מוּכָנָה לִלְמוֹד?");
-            if (hour >= 10 && hour < 13) messages.push("בֹּקֶר נֶהְדָּר! 🌟 בּוֹאִי נִשְׁחַק!");
-            if (hour >= 13 && hour < 16) messages.push("צָהֳרַיִם טוֹבִים! 🌞 זְמַן מִשְׂחָק!");
-            if (hour >= 16 && hour < 19) messages.push("אַחַר הַצָּהֳרַיִם טוֹבִים! 🎮");
-            if (hour >= 19 && hour < 22) messages.push("עֶרֶב טוֹב גַּאְיָה! 🌙 עוֹד מְעַט שֵׁינָה...");
-            if (hour >= 22 || hour < 6)  messages.push("מְאֻחָר מְאוֹד! 😴 שֵׁינָה טוֹבָה אַחֲרֵי מִשְׂחָק אֶחָד!");
-            if (day === 6) messages.push("שַׁבָּת שָׁלוֹם! ✡️ שַׁבָּת שֶׁל לִמּוּד");
-            if (day === 5) messages.push("יוֹם שִׁישִּׁי! 🎉 נִגְמָר שָׁבוּעַ, בּוֹאִי נִשְׁחַק!");
+            if (hour >= 22 || hour < 6)  message = "מְאֻחָר מְאוֹד! 😴 שֵׁינָה טוֹבָה אַחֲרֵי מִשְׂחָק אֶחָד!";
+            else if (day === 6)          message = "שַׁבָּת שָׁלוֹם! ✡️ שַׁבָּת שֶׁל לִמּוּד";
+            else if (day === 5)          message = "יוֹם שִׁישִּׁי! 🎉 נִגְמָר שָׁבוּעַ, בּוֹאִי נִשְׁחַק!";
+            else if (hour < 10)          message = "בֹּקֶר טוֹב גַּאְיָה! ☀️ מוּכָנָה לִלְמוֹד?";
+            else if (hour < 13)          message = "בֹּקֶר נֶהְדָּר! 🌟 בּוֹאִי נִשְׁחַק!";
+            else if (hour < 16)          message = "צָהֳרַיִם טוֹבִים! 🌞 זְמַן מִשְׂחָק!";
+            else if (hour < 19)          message = "אַחַר הַצָּהֳרַיִם טוֹבִים! 🎮";
+            else                         message = "עֶרֶב טוֹב גַּאְיָה! 🌙 עוֹד מְעַט שֵׁינָה...";
 
             const el = document.getElementById('welcome-text');
-            if (el && messages.length > 0) el.innerText = messages[0];
+            if (el) el.innerText = message;
         })();
 
+        // --- טיימרים של מהלך המשחק ---
+        // Every delayed game step goes through later(), so leaving a game
+        // (goHome / starting another game) cancels whatever is still pending.
+        const pendingTimeouts = new Set();
+        function later(fn, ms) {
+            const id = setTimeout(() => { pendingTimeouts.delete(id); fn(); }, ms);
+            pendingTimeouts.add(id);
+            return id;
+        }
+
+        // Stops everything the previous game left running.
+        function stopAllGames() {
+            pendingTimeouts.forEach(clearTimeout);
+            pendingTimeouts.clear();
+            stopTimer();
+            clearInterval(puzzleTimerInterval);
+            answerLocked = false;
+            memoryLocked = false;
+            memoryFlipped = [];
+        }
+
         // --- ניהול מסכים ---
-        function hideAllScreens() {
-            document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(el => el.classList.toggle('active', el.id === id));
+            GaiaHooks.emit('nav', { screen: id });
         }
 
         function startGameApp() {
@@ -1516,19 +1522,15 @@
                 }
             })();
             initAudio();
-            hideAllScreens();
-            document.getElementById('main-menu').classList.add('active');
-            document.body.style.backgroundColor = "var(--bg-app)";
+            showScreen('main-menu');
             if (window.initAdventureMap) initAdventureMap();
         }
 
         function goHome() {
-            stopTimer();
-            clearInterval(puzzleTimerInterval);
+            stopAllGames();
+            GaiaHooks.emit('game_exit');
             if (window.closeLandPanel) closeLandPanel();
-            hideAllScreens();
-            document.getElementById('main-menu').classList.add('active');
-            document.body.style.backgroundColor = "var(--bg-app)";
+            showScreen('main-menu');
             if (window.refreshMapBadges) refreshMapBadges();
         }
 
@@ -1572,16 +1574,10 @@
             window.speechSynthesis.speak(u2);
         }
 
-        // --- כניסות לְאֲרָצוֹת: פותחות את פאנל האֶרֶץ במפה (thin wrappers) ---
-        function goToHebrewMenu()    { if (window.openLandPanel) openLandPanel('hebrew'); }
-        function goToMathMenu()      { if (window.openLandPanel) openLandPanel('math'); }
-        function goToBiologyMenu()   { if (window.openLandPanel) openLandPanel('biology'); }
-        function goToEnglishMenu()   { if (window.openLandPanel) openLandPanel('english'); }
-        function goToGeographyMenu() { if (window.openLandPanel) openLandPanel('geography'); }
-        function goToMemoryMenu()    { if (window.openLandPanel) openLandPanel('memory'); }
-        function goToPuzzleMenu()    {
-            setPuzzleMode(puzzleMode); // refresh puzzle mode UI state
-            if (window.openLandPanel) openLandPanel('puzzle');
+        // מסך בחירת הפאזל (מצב מספרים / תמונה, בחירת תמונה וקושי) — נפתח מפאנל גשר הפאזל
+        function goToPuzzleMenu(mode) {
+            setPuzzleMode(mode || puzzleMode);
+            showScreen('puzzle-menu');
         }
 
         // ===== פאזל =====
@@ -1768,24 +1764,30 @@
         let puzzleTimerInterval = null;
         let puzzleSeconds = 0;
         let puzzleSolved = false;
+        // best score per board size — a bigger board is worth more on the leaderboard
+        const PUZZLE_MAX_SCORE = { '2x2': 40, '3x3': 100, '3x4': 150 };
 
-        function startPuzzle(rows, cols) {
+        function startPuzzle(rows, cols, mode) {
+            stopAllGames();
+            if (mode) puzzleMode = mode;
             currentGameType = 'puzzle';
+            currentLevel = rows + 'x' + cols;
+            scoreMax = PUZZLE_MAX_SCORE[currentLevel] || rows * cols * 10;
+            minStars = 1;
+            GaiaHooks.emit('game_start', { subject: 'puzzle', level: rows + 'x' + cols });
             puzzleRows = rows; puzzleCols = cols;
             puzzleMoves = 0; puzzleSeconds = 0; puzzleSolved = false;
-            clearInterval(puzzleTimerInterval);
 
             const total = rows * cols;
-            // מצב פתור: 1,2,...,N-1,0
+            // מצב פתור: 1,2,...,N-1,0 — ומערבבים עד שהלוח לא פתור
             puzzleGrid = Array.from({length: total}, (_, i) => i < total - 1 ? i + 1 : 0);
-            shufflePuzzleBoard();
+            do { shufflePuzzleBoard(); } while (isPuzzleSolved());
 
-            hideAllScreens();
-            document.getElementById('puzzle-screen').classList.add('active');
-            document.body.style.backgroundColor = "#fff3e0";
+            showScreen('puzzle-screen');
             document.getElementById('puzzle-moves').innerText = 0;
             document.getElementById('puzzle-timer').innerText = 0;
             document.getElementById('puzzle-status').innerText = puzzleMode === 'image' ? '🖼️ סַדְּרִי!' : '🔢 סַדְּרִי!';
+            document.getElementById('puzzle-grid').classList.remove('puzzle-solved');
 
             puzzleTimerInterval = setInterval(() => {
                 if (!puzzleSolved) {
@@ -1874,12 +1876,16 @@
             checkPuzzleSolved();
         }
 
-        function checkPuzzleSolved() {
+        function isPuzzleSolved() {
             const n = puzzleGrid.length;
             for (let i = 0; i < n - 1; i++) {
-                if (puzzleGrid[i] !== i + 1) return;
+                if (puzzleGrid[i] !== i + 1) return false;
             }
-            if (puzzleGrid[n - 1] !== 0) return;
+            return puzzleGrid[n - 1] === 0;
+        }
+
+        function checkPuzzleSolved() {
+            if (!isPuzzleSolved()) return;
 
             // פתור!
             puzzleSolved = true;
@@ -1889,8 +1895,10 @@
             document.getElementById('puzzle-status').innerText = puzzleMode === 'image' ? '🏆 פָּתַרְתְּ אֶת הַתְּמוּנָה!' : '🏆 פָּתַרְתְּ!';
             document.getElementById('puzzle-grid').classList.add('puzzle-solved');
 
-            setTimeout(() => {
-                score = Math.max(10, 150 - puzzleMoves - puzzleSeconds);
+            later(() => {
+                // moves + seconds per tile, taken off the board's best score
+                const penalty = Math.round((puzzleMoves + puzzleSeconds) / (puzzleRows * puzzleCols));
+                score = Math.max(10, scoreMax - penalty);
                 questionCount = MAX_QUESTIONS;
                 endGame();
             }, 1200);
@@ -1902,6 +1910,11 @@
                 try {
                     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 } catch(e) { console.warn("AudioContext not available:", e); }
+            }
+            // iOS suspends/interrupts the context when the app goes to the background;
+            // resuming from the next tap brings the sounds back.
+            if (audioCtx && audioCtx.state !== 'running' && audioCtx.resume) {
+                audioCtx.resume().catch(() => {});
             }
         }
 
@@ -1921,14 +1934,21 @@
             } catch(e) {}
         }
 
+        // Gaia's mood: 'idle' | 'happy' | 'sad' | 'dance'. happy/sad fall back to idle.
+        let gaiaResetTimer = null;
         function setGaiaState(state) {
             const el = document.getElementById('gaia-char');
             if (!el) return;
-            el.className = 'gaia-' + state;
-            document.getElementById('gaia-eyes-happy').setAttribute('display', state === 'sad' ? 'none' : 'inline');
-            document.getElementById('gaia-eyes-sad').setAttribute('display', state === 'sad' ? 'inline' : 'none');
-            document.getElementById('gaia-mouth-happy').setAttribute('display', state === 'sad' ? 'none' : 'inline');
-            document.getElementById('gaia-mouth-sad').setAttribute('display', state === 'sad' ? 'inline' : 'none');
+            clearTimeout(gaiaResetTimer);
+            const showFace = sad => {
+                document.getElementById('gaia-eyes-happy').setAttribute('display', sad ? 'none' : 'inline');
+                document.getElementById('gaia-eyes-sad').setAttribute('display', sad ? 'inline' : 'none');
+                document.getElementById('gaia-mouth-happy').setAttribute('display', sad ? 'none' : 'inline');
+                document.getElementById('gaia-mouth-sad').setAttribute('display', sad ? 'inline' : 'none');
+            };
+            // <svg>.className is read-only (SVGAnimatedString) — assigning it is silently ignored
+            el.setAttribute('class', 'gaia-' + state);
+            showFace(state === 'sad');
             if (state === 'happy') {
                 const rect = el.getBoundingClientRect();
                 const cx = rect.left + rect.width / 2;
@@ -1944,12 +1964,9 @@
                 });
             }
             if (state === 'happy' || state === 'sad') {
-                setTimeout(() => {
-                    el.className = 'gaia-idle';
-                    document.getElementById('gaia-eyes-happy').setAttribute('display', 'inline');
-                    document.getElementById('gaia-eyes-sad').setAttribute('display', 'none');
-                    document.getElementById('gaia-mouth-happy').setAttribute('display', 'inline');
-                    document.getElementById('gaia-mouth-sad').setAttribute('display', 'none');
+                gaiaResetTimer = setTimeout(() => {
+                    el.setAttribute('class', 'gaia-idle');
+                    showFace(false);
                 }, state === 'happy' ? 1200 : 900);
             }
         }
@@ -1988,7 +2005,7 @@
                 x = event.clientX;
                 y = event.clientY;
             } else {
-                const container = document.querySelector('.game-container');
+                const container = document.querySelector('.screen.active .game-container');
                 if (container) {
                     const rect = container.getBoundingClientRect();
                     x = rect.left + rect.width / 2;
@@ -2047,6 +2064,8 @@
         }
 
         function timeoutAnswer() {
+            answerLocked = true;
+            lockOptions();
             playSound('timeout');
             score -= 5;
             if (score < 0) score = 0;
@@ -2063,6 +2082,7 @@
             } else if (currentGameType === 'english') {
                 const display = document.querySelector('.english-word-display');
                 if (display) display.innerText = englishWordObj.word;
+                else feedback.innerText = `הזמן נגמר! ⏰  התשובה: ${currentAnswer}`;
             } else if (currentGameType === 'math') {
                 const mathDisplay = document.querySelector('.math-display');
                 if (mathDisplay) mathDisplay.innerText = mathDisplay.innerText.replace('?', currentAnswer);
@@ -2070,11 +2090,23 @@
                 feedback.innerText = `הזמן נגמר! ⏰  התשובה: ${currentAnswer}`;
             }
 
-            const container = document.querySelector('.game-container');
+            shakeGameContainer();
+            later(newTurn, 1500);
+        }
+
+        function shakeGameContainer() {
+            const container = document.querySelector('#game-screen .game-container');
             container.classList.remove('shake');
             void container.offsetWidth;
             container.classList.add('shake');
-            setTimeout(newTurn, 1500);
+        }
+
+        // Locks the answer buttons (after an answer or a timeout) and highlights the right one.
+        function lockOptions() {
+            document.querySelectorAll('#options button').forEach(b => {
+                b.disabled = true;
+                if (b._val === currentAnswer) b.classList.add('opt-correct');
+            });
         }
 
         // --- לוגיקת המשחק ---
@@ -2091,68 +2123,43 @@
             document.getElementById('q-num').innerText = displayQ;
         }
 
-        function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+        // Fisher–Yates on a copy (sort() with a random comparator gives a biased order)
+        function shuffle(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
 
-        function startHebrewGame(level) {
-            currentGameType = 'hebrew';
+        // Shared start for the 15-question games (hebrew / biology / math / english / geography).
+        function startQuiz(type, level, pool, analyticsLevel) {
+            stopAllGames();
+            currentGameType = type;
             currentLevel = level;
-            questionQueue = shuffle(words);
+            scoreMax = MAX_QUESTIONS * 10;
+            minStars = 0;
+            questionQueue = shuffle(pool);
             questionQueueIdx = 0;
+            GaiaHooks.emit('game_start', { subject: type, level: analyticsLevel });
             resetGameStats();
-            hideAllScreens();
-            document.getElementById('game-screen').classList.add('active');
+            showScreen('game-screen');
             newTurn();
         }
 
-        function startBiologyGame(level) {
-            currentGameType = 'biology';
-            currentLevel = level;
-            questionQueue = shuffle(biologyData.filter(o => o.level <= level));
-            questionQueueIdx = 0;
-            resetGameStats();
-            hideAllScreens();
-            document.getElementById('game-screen').classList.add('active');
-            newTurn();
-        }
-
-        function startMathGame(maxNum) {
-            currentGameType = 'math';
-            currentLevel = maxNum;
-            questionQueue = [];
-            questionQueueIdx = 0;
-            resetGameStats();
-            hideAllScreens();
-            document.getElementById('game-screen').classList.add('active');
-            newTurn();
-        }
-
-        function startEnglishGame(level) {
-            currentGameType = 'english';
-            currentLevel = level;
-            questionQueue = shuffle(level === 4 ? phonicsData : englishWords);
-            questionQueueIdx = 0;
-            resetGameStats();
-            hideAllScreens();
-            document.getElementById('game-screen').classList.add('active');
-            newTurn();
-        }
-
-        function startGeographyGame(level) {
-            currentGameType = 'geography';
-            currentLevel = level;
-            questionQueue = shuffle(geographyData.filter(c => c.level <= level));
-            questionQueueIdx = 0;
-            resetGameStats();
-            hideAllScreens();
-            document.getElementById('game-screen').classList.add('active');
-            newTurn();
-        }
+        function startHebrewGame(level)    { startQuiz('hebrew', level, words, 'level_' + level); }
+        function startBiologyGame(level)   { startQuiz('biology', level, biologyData.filter(o => o.level <= level), 'level_' + level); }
+        function startMathGame(maxNum)     { startQuiz('math', maxNum, [], 'add_sub_' + maxNum); }
+        function startEnglishGame(level)   { startQuiz('english', level, level === 4 ? phonicsData : englishWords, 'level_' + level); }
+        function startGeographyGame(level) { startQuiz('geography', level, geographyData.filter(c => c.level <= level), 'level_' + level); }
 
         function newTurn() {
             if (questionCount >= MAX_QUESTIONS) {
                 endGame();
                 return;
             }
+            answerLocked = false;
             updateHud();
             document.getElementById('feedback').innerText = "";
             const contentDiv = document.getElementById('game-content');
@@ -2220,11 +2227,12 @@
                 const candidate = wrongPool.splice(r, 1)[0].func;
                 if (!options.includes(candidate)) options.push(candidate);
             }
-            options.sort(() => Math.random() - 0.5);
+            options = shuffle(options);
             options.forEach(opt => {
                 const btn = document.createElement('button');
                 btn.className = 'answer-btn-bio';
                 btn.innerText = opt;
+                btn._val = opt;
                 btn.onmouseenter = () => speakHebrew(opt);
                 btn.onclick = (e) => checkAnswer(opt, e);
                 optionsEl.appendChild(btn);
@@ -2238,14 +2246,13 @@
             const isAddition = Math.random() > 0.5;
             let n1, n2;
             if (isAddition) {
-                n1 = Math.floor(Math.random() * (currentLevel - 1)) + 1;
-                n2 = Math.floor(Math.random() * (currentLevel - n1));
-                if (n2 < 0) n2 = 0;
+                n1 = Math.floor(Math.random() * (currentLevel - 1)) + 1;   // 1..N-1
+                n2 = Math.floor(Math.random() * (currentLevel - n1 + 1));  // 0..N-n1 → sum ≤ N
                 currentAnswer = n1 + n2;
                 container.innerHTML = `<div class="math-display">${n1} + ${n2} = ?</div>`;
             } else {
-                n1 = Math.floor(Math.random() * (currentLevel - 2)) + 2;
-                n2 = Math.floor(Math.random() * n1);
+                n1 = Math.floor(Math.random() * (currentLevel - 1)) + 2;   // 2..N
+                n2 = Math.floor(Math.random() * n1);                       // 0..n1-1
                 currentAnswer = n1 - n2;
                 container.innerHTML = `<div class="math-display">${n1} - ${n2} = ?</div>`;
             }
@@ -2275,11 +2282,12 @@
                 let letters = [item.letter];
                 const others = shuffle(phonicsData.filter(p => p.letter !== item.letter));
                 while (letters.length < 3) letters.push(others[letters.length - 1].letter);
-                letters.sort(() => Math.random() - 0.5);
+                letters = shuffle(letters);
                 letters.forEach(letter => {
                     const btn = document.createElement('button');
                     btn.className = 'answer-btn-letter';
                     btn.innerHTML = `<span class="ltr-big">${letter}</span><span class="ltr-small">${letter.toLowerCase()}</span>`;
+                    btn._val = letter;
                     btn.onclick = (e) => checkAnswer(letter, e);
                     optionsEl.appendChild(btn);
                 });
@@ -2302,24 +2310,29 @@
                 let opts = [englishWordObj.word];
                 const wp = shuffle(englishWords.filter(w => w.word !== englishWordObj.word));
                 while (opts.length < 3) opts.push(wp[opts.length - 1].word);
-                opts.sort(() => Math.random() - 0.5);
+                opts = shuffle(opts);
                 opts.forEach(opt => {
                     const btn = document.createElement('button');
                     btn.className = 'answer-btn-bio';
                     btn.style.borderColor = '#43a047';
                     btn.style.boxShadow = '0 4px 0 #c8e6c9';
                     btn.innerText = opt;
+                    btn._val = opt;
                     btn.onclick = () => {
+                        if (answerLocked) return;
+                        answerLocked = true;
                         stopTimer();
+                        lockOptions();
                         const correct = (opt === currentAnswer);
                         if (correct) { score += 10; } else { score = Math.max(0, score - 5); }
                         questionCount++;
                         updateHud();
-                        try { playSound(correct ? 'correct' : 'wrong'); setGaiaState(correct ? 'happy' : 'sad'); } catch(ex) {}
+                        GaiaHooks.emit('answer', { correct });
+                        playSound(correct ? 'correct' : 'wrong'); setGaiaState(correct ? 'happy' : 'sad');
                         const fb = document.getElementById('feedback');
                         fb.innerText = correct ? positiveFeedback[Math.floor(Math.random() * positiveFeedback.length)] : ('✅ ' + currentAnswer);
                         fb.style.color = correct ? '#2e7d32' : '#c62828';
-                        setTimeout(newTurn, 1500);
+                        later(newTurn, 1500);
                     };
                     optionsEl.appendChild(btn);
                 });
@@ -2367,11 +2380,12 @@
                 const candidate = wrongPool.splice(r, 1)[0].name;
                 if (!options.includes(candidate)) options.push(candidate);
             }
-            options.sort(() => Math.random() - 0.5);
+            options = shuffle(options);
             options.forEach(opt => {
                 const btn = document.createElement('button');
                 btn.className = 'answer-btn-geo';
                 btn.innerText = opt;
+                btn._val = opt;
                 btn.onclick = (e) => checkAnswer(opt, e);
                 optionsEl.appendChild(btn);
             });
@@ -2380,24 +2394,27 @@
 
         // --- משחק זיכרון ---
         function startMemoryGame(theme, difficulty) {
+            stopAllGames();
             currentGameType = 'memory';
+            currentLevel = theme + '_' + difficulty;
+            GaiaHooks.emit('game_start', { subject: 'memory', level: theme + '_' + difficulty });
             const pairCount = difficulty === 'easy' ? 6 : 8;
+            scoreMax = pairCount * 10;
+            minStars = 1;
             memoryTotalPairs = pairCount;
             memoryMatched = 0;
             memoryFlips = 0;
-            memoryFlipped = [];
-            memoryLocked = false;
             memoryCards = [];
             score = 0;
 
             let pool = [];
             if (theme === 'words') {
-                const shuffled = [...words].sort(() => Math.random() - 0.5);
+                const shuffled = shuffle(words);
                 for (let i = 0; i < pairCount; i++) {
                     pool.push({ id: i, emojiVal: shuffled[i].emoji, textVal: shuffled[i].full });
                 }
             } else {
-                const shuffled = [...geographyData].sort(() => Math.random() - 0.5);
+                const shuffled = shuffle(geographyData);
                 for (let i = 0; i < pairCount; i++) {
                     const c = shuffled[i];
                     pool.push({ id: i, emojiVal: `<img src="https://flagcdn.com/w80/${c.code}.png" class="flag-img-small" alt="${c.code}">`, textVal: c.name });
@@ -2408,11 +2425,9 @@
                 memoryCards.push({ pairId: pair.id, type: 'emoji', display: pair.emojiVal, cardId: pair.id * 2 });
                 memoryCards.push({ pairId: pair.id, type: 'text',  display: pair.textVal,  cardId: pair.id * 2 + 1 });
             });
-            memoryCards.sort(() => Math.random() - 0.5);
+            memoryCards = shuffle(memoryCards);
 
-            hideAllScreens();
-            document.getElementById('memory-screen').classList.add('active');
-            document.body.style.backgroundColor = "#e0f7fa";
+            showScreen('memory-screen');
 
             document.getElementById('mem-pairs-found').innerText = 0;
             document.getElementById('mem-pairs-total').innerText = pairCount;
@@ -2426,7 +2441,6 @@
             memoryCards.forEach(card => {
                 const el = document.createElement('div');
                 el.className = 'memory-card';
-                if (card.type === 'text') el.dataset.isText = '1';
                 el.id = 'mcard-' + card.cardId;
                 el.innerHTML = "❓";
                 el.dataset.cardId = card.cardId;
@@ -2451,11 +2465,12 @@
 
             if (memoryFlipped.length === 2) {
                 memoryLocked = true;
-                setTimeout(checkMemoryMatch, 900);
+                later(checkMemoryMatch, 900);
             }
         }
 
         function checkMemoryMatch() {
+            if (memoryFlipped.length < 2) return;
             const [a, b] = memoryFlipped;
             const elA = document.getElementById('mcard-' + a.cardId);
             const elB = document.getElementById('mcard-' + b.cardId);
@@ -2472,22 +2487,21 @@
                 memoryLocked = false;
 
                 if (memoryMatched === memoryTotalPairs) {
-                    setTimeout(() => {
+                    later(() => {
+                        // one point off per flip beyond a perfect game
                         const perfectFlips = memoryTotalPairs * 2;
-                        score = Math.max(0, memoryTotalPairs * 10 - Math.max(0, memoryFlips - perfectFlips) * 2);
+                        score = Math.max(0, memoryTotalPairs * 10 - Math.max(0, memoryFlips - perfectFlips));
                         questionCount = MAX_QUESTIONS;
                         endGame();
                     }, 800);
                 }
             } else {
-                setTimeout(() => {
-                    elA.classList.remove('flipped', 'text-card');
-                    elB.classList.remove('flipped', 'text-card');
-                    elA.innerHTML = "❓";
-                    elB.innerHTML = "❓";
-                    memoryFlipped = [];
-                    memoryLocked = false;
-                }, 0);
+                elA.classList.remove('flipped', 'text-card');
+                elB.classList.remove('flipped', 'text-card');
+                elA.innerHTML = "❓";
+                elB.innerHTML = "❓";
+                memoryFlipped = [];
+                memoryLocked = false;
             }
         }
 
@@ -2519,11 +2533,12 @@
                     }
                 }
             }
-            options.sort(() => Math.random() - 0.5);
+            options = shuffle(options);
             options.forEach(opt => {
                 const btn = document.createElement('button');
                 btn.className = 'answer-btn';
                 btn.innerText = opt;
+                btn._val = opt;
                 btn.style.borderColor = type === 'hebrew' ? '#42a5f5' : type === 'english' ? '#43a047' : '#ef5350';
                 btn.onclick = (e) => checkAnswer(opt, e);
                 container.appendChild(btn);
@@ -2531,9 +2546,13 @@
         }
 
         function checkAnswer(val, event) {
-            stopTimer();
+            if (answerLocked) return;   // already answered / timed out — extra taps don't count
             const feedback = document.getElementById('feedback');
+            GaiaHooks.emit('answer', { correct: val === currentAnswer });
             if (val === currentAnswer) {
+                answerLocked = true;
+                stopTimer();
+                lockOptions();
                 score += 10;
                 questionCount++;
                 updateHud();
@@ -2553,107 +2572,130 @@
                 }
                 // biology / geography: no extra reveal needed
 
-                setTimeout(newTurn, 1500);
+                later(newTurn, 1500);
             } else {
+                // that option is used up, and the clock keeps running — a wrong guess buys no extra time
+                if (event && event.currentTarget) event.currentTarget.disabled = true;
                 score -= 5;
                 if (score < 0) score = 0;
                 updateHud();
                 playSound('wrong'); setGaiaState('sad');
                 feedback.innerText = "נְסִי שׁוּב... 🤔";
                 feedback.style.color = "#c62828";
-                const container = document.querySelector('.game-container');
-                container.classList.remove('shake');
-                void container.offsetWidth;
-                container.classList.add('shake');
-                startTimer();
+                shakeGameContainer();
             }
         }
 
         // --- סיום משחק ---
         function endGame() {
+            stopAllGames();
+            GaiaHooks.emit('game_end');
             playSound('victory'); setGaiaState('dance');
-            stopTimer();
-            // --- Progress persistence: credit stars to the land that was played ---
+            // --- Progress persistence: 0-3 stars to the land that was played ---
+            const stars = Math.max(minStars, GaiaProgress.starsFor(score, scoreMax));
             try {
-                if (window.GaiaProgress && currentGameType) {
-                    // memory & puzzle set currentGameType elsewhere; map via a lookup
-                    const landKey = GAME_TYPE_TO_LAND[currentGameType] || currentGameType;
-                    const levelKey = String(currentLevel);
-                    window.GaiaProgress.recordGame(landKey, levelKey, score);
-                }
+                GaiaProgress.recordGame(currentGameType, String(currentLevel), stars);
             } catch (e) { console.warn('[progress] endGame hook', e); }
-            hideAllScreens();
+            showScreen('end-screen');
             document.getElementById('final-score-display').innerText = score;
-            document.getElementById('end-screen').classList.add('active');
+            renderStarsEarned(document.getElementById('final-stars'), stars);
             document.getElementById('save-score-area').style.display = 'block';
+            document.getElementById('save-btn').disabled = false;
+            document.getElementById('save-status').innerText = '';
             document.getElementById('leaderboard-area').style.display = 'block';
             document.getElementById('player-name').value = "";
             // טען טבלה קיימת
             if (db) {
                 loadFirebaseLeaderboard();
             } else {
-                const hs = JSON.parse(localStorage.getItem('gaiaHighScores')) || [];
+                const hs = readLocalScores();
                 if (hs.length) showLeaderboard(hs);
+            }
+        }
+
+        // ⭐⭐☆ — the stars a finished game added to the map
+        function renderStarsEarned(el, stars) {
+            el.textContent = '';
+            for (let i = 0; i < 3; i++) {
+                const star = document.createElement('span');
+                star.textContent = '⭐';
+                if (i >= stars) star.className = 'star-off';
+                el.appendChild(star);
             }
         }
 
         // --- טבלת שיאים ---
         function saveScore() {
-            const name = document.getElementById('player-name').value.trim();
+            const name = document.getElementById('player-name').value.trim().slice(0, 20);
             if (!name) {
                 alert("בְּבַקָּשָׁה כִּתְבִי אֶת הַשֵּׁם שֶׁלָּךְ");
                 return;
             }
+            const btn = document.getElementById('save-btn');
+            if (btn.disabled) return;   // a double tap must not save twice
+            btn.disabled = true;
+            const entry = { name: name, score: score };
 
             if (db) {
                 // שמירה ב-Firebase (משותפת לכל המשתמשים)
                 const statusEl = document.getElementById('save-status');
-                if (statusEl) { statusEl.innerText = 'שומר...'; statusEl.style.color = '#888'; }
-                db.ref('scores').push({ name: name, score: score })
+                statusEl.innerText = 'שומר...'; statusEl.style.color = '#888';
+                pushScore(entry)
                     .then(() => {
+                        statusEl.innerText = '';
                         document.getElementById('save-score-area').style.display = 'none';
                         loadFirebaseLeaderboard();
                     })
                     .catch(e => {
                         console.error('Firebase save error:', e);
-                        if (statusEl) { statusEl.innerText = '⚠️ שגיאה: ' + e.message; statusEl.style.color = 'red'; }
-                        saveToLocalStorage(name);
+                        saveToLocalStorage(entry);
+                        statusEl.innerText = '⚠️ לא נשמר בטבלה המשותפת (' + (e.code || e.message) + ') — נשמר רק במכשיר הזה';
+                        statusEl.style.color = 'red';
                     });
             } else {
                 // שמירה מקומית בדפדפן
-                saveToLocalStorage(name);
+                saveToLocalStorage(entry);
             }
         }
 
-        function saveToLocalStorage(name) {
-            let highscores = JSON.parse(localStorage.getItem('gaiaHighScores')) || [];
-            highscores.push({ name: name, score: score });
+        // Shared leaderboard write. firebase-rules.json accepts a score only together with a
+        // per-user rate-limit stamp (scoreRate/<uid>), written by the anonymous user in one
+        // atomic update. If that is refused (e.g. the console still has the older rules),
+        // fall back to the plain push those rules expect.
+        function pushScore(entry) {
+            return withTimeout(authReady, 5000).then(user => {
+                if (!user) return db.ref('scores').push(entry);
+                const key = db.ref('scores').push().key;
+                return db.ref().update({
+                    ['scores/' + key]: entry,
+                    ['scoreRate/' + user.uid]: firebase.database.ServerValue.TIMESTAMP
+                }).catch(e => {
+                    if (!/permission/i.test(String(e.code || e.message))) throw e;
+                    return db.ref('scores').push(entry);
+                });
+            });
+        }
+
+        function readLocalScores() {
+            try {
+                const list = JSON.parse(localStorage.getItem('gaiaHighScores'));
+                return Array.isArray(list) ? list : [];
+            } catch (e) { return []; }
+        }
+
+        function saveToLocalStorage(entry) {
+            let highscores = readLocalScores();
+            highscores.push(entry);
             highscores.sort((a, b) => b.score - a.score);
             highscores = highscores.slice(0, 10);
-            localStorage.setItem('gaiaHighScores', JSON.stringify(highscores));
+            try { localStorage.setItem('gaiaHighScores', JSON.stringify(highscores)); }
+            catch (e) { console.warn('[scores] local save failed', e); }
             document.getElementById('save-score-area').style.display = 'none';
             showLeaderboard(highscores);
         }
 
+        // Every saved result is its own row (not collapsed by player name).
         function loadFirebaseLeaderboard() {
-            db.ref('scores').orderByChild('score').limitToLast(50).once('value', snapshot => {
-                const all = [];
-                snapshot.forEach(child => all.push(child.val()));
-                // שמור רק את הניקוד הגבוה ביותר לכל שם
-                const best = {};
-                all.forEach(s => {
-                    if (!best[s.name] || s.score > best[s.name]) best[s.name] = s.score;
-                });
-                const scores = Object.entries(best)
-                    .map(([name, score]) => ({ name, score }))
-                    .sort((a, b) => b.score - a.score)
-                    .slice(0, 10);
-                showLeaderboard(scores);
-            });
-        }
-
-        // Keep every saved result in the leaderboard instead of collapsing by player name.
-        loadFirebaseLeaderboard = function() {
             db.ref('scores').orderByChild('score').limitToLast(50).once('value', snapshot => {
                 const scores = [];
                 snapshot.forEach(child => {
@@ -2664,8 +2706,11 @@
                 scores.sort((a, b) => b.score - a.score);
                 scores.splice(10);
                 showLeaderboard(scores);
+            }, err => {
+                console.warn('Leaderboard load failed:', err);
+                showLeaderboard(readLocalScores());
             });
-        };
+        }
 
         function showLeaderboard(scores) {
             document.getElementById('leaderboard-area').style.display = 'block';
@@ -2800,15 +2845,15 @@ const readingData = [
           "הוּא קוֹרֵא כָּל יוֹם.",
           "יוּבָל קָרָא אֶת הַסֵּפֶר.",
           "הוּא אָהַב אֶת הַסֵּפֶר מְאֹד.",
-          "הַסֵּפֶר מָלֵא בְּתְמוּנוֹת יָפוֹת.",
+          "הַסֵּפֶר מָלֵא בִּתְמוּנוֹת יָפוֹת.",
           "כָּל עֶרֶב יוּבָל קוֹרֵא לִפְנֵי שֵׁנָה.",
-          "הַמּוֹרֶה שָׁבְחָה אֶת יוּבָל.",
+          "הַמּוֹרָה שִׁבְּחָה אֶת יוּבָל.",
           "קְרִיאָה הִיא כֵּיף גָּדוֹל!"
         ],
         questions: [
           { q: "עַל מָה הַסֵּפֶר?", options: ["כֶּלֶב וְחָתוּל", "יֶלֶד וְכֶלֶב", "דֹּב וְיַעַר"], a: 1 },
           { q: "מָתַי יוּבָל קוֹרֵא לִפְנֵי שֵׁנָה?", options: ["בַּבֹּקֶר", "כָּל עֶרֶב", "רַק בְּשַׁבָּת"], a: 1 },
-          { q: "מִי שָׁבְחָה אֶת יוּבָל?", options: ["אִמָּא", "אַבָּא", "הַמּוֹרֶה"], a: 2 }
+          { q: "מִי שִׁבְּחָה אֶת יוּבָל?", options: ["אִמָּא", "אַבָּא", "הַמּוֹרָה"], a: 2 }
         ]
       },
       {
@@ -2952,7 +2997,7 @@ const readingData = [
           "דֶּרֶךְ הַחַלּוֹן רוֹאִים אֶת הַשֶּׁמֶשׁ.",
           "אוֹר אוֹהֵב לִקְרֹא סְפָרִים.",
           "הוּא קוֹרֵא לְאוֹר הַשֶּׁמֶשׁ.",
-          "הַמּוֹרֶה שָׁבַח אֶת אוֹר.",
+          "הַמּוֹרֶה שִׁבֵּחַ אֶת אוֹר.",
           "אוֹר קוֹרֵא גַּם בַּלַּיְלָה.",
           "יֵשׁ לוֹ אוֹר גָּדוֹל בַּחֶדֶר.",
           "אוֹר אוֹהֵב אוֹר!"
@@ -3025,7 +3070,7 @@ const readingData = [
         ],
         questions: [
           { q: "מִי בִּישְּׁלָה אֶת הַמָּרָק?", options: ["אַבָּא", "יוּבָל", "אִמָּא"], a: 2 },
-          { q: "אֵיךְ שָׁתָה יוּבָל?", options: ["בְּמַהֵר", "לְאַט לְאַט", "בְּשִׂמְחָה"], a: 1 },
+          { q: "אֵיךְ שָׁתָה יוּבָל?", options: ["מַהֵר", "לְאַט לְאַט", "בְּשִׂמְחָה"], a: 1 },
           { q: "מָה הַמָּרָק עָשָׂה לַגּוּף?", options: ["קֵרֵר", "חִמֵּם", "כָּאַב"], a: 1 }
         ]
       }
@@ -3036,54 +3081,21 @@ const readingData = [
 let currentReadingCategoryIdx = 0;
 let currentReadingStoryIdx = 0;
 let currentReadingQuestionIdx = 0;
-let readingPhase = 'story'; // 'story' | 'quiz'
 let readingScore = 0;
-// { catIdx: [storyScore0, storyScore1, storyScore2] }  -1 = not done
-let readingProgress = (window.GaiaProgress && window.GaiaProgress.getReadingProgress())
-    ? window.GaiaProgress.getReadingProgress() : {};
+// { catIdx: [bestStoryScore0, bestStoryScore1, bestStoryScore2] }  -1 = not done
+let readingProgress = GaiaProgress.getReadingProgress();
 
-function setGaiaStateReading(state) {
-    const gaia = document.getElementById('gaia-char');
-    if (!gaia) return;
-    gaia.className = '';
-    if (state === 'happy') {
-        gaia.classList.add('gaia-happy');
-        setTimeout(() => { gaia.className = ''; gaia.classList.add('gaia-idle'); }, 700);
-    } else if (state === 'sad') {
-        gaia.classList.add('gaia-sad');
-        setTimeout(() => { gaia.className = ''; gaia.classList.add('gaia-idle'); }, 600);
-    } else if (state === 'dance') {
-        gaia.classList.add('gaia-dance');
-    } else {
-        gaia.classList.add('gaia-idle');
-    }
-    const happyEyes = document.getElementById('gaia-eyes-happy');
-    const sadEyes = document.getElementById('gaia-eyes-sad');
-    const happyMouth = document.getElementById('gaia-mouth-happy');
-    const sadMouth = document.getElementById('gaia-mouth-sad');
-    if (happyEyes && sadEyes && happyMouth && sadMouth) {
-        const isSad = state === 'sad';
-        happyEyes.setAttribute('display', isSad ? 'none' : '');
-        sadEyes.setAttribute('display', isSad ? '' : 'none');
-        happyMouth.setAttribute('display', isSad ? 'none' : '');
-        sadMouth.setAttribute('display', isSad ? '' : 'none');
-    }
-}
-
+// back to the map, with the reading land's category panel open
 function goToReadingMenu() {
-    if (window.openLandPanel) openLandPanel('reading');
-    else showScreen('reading-menu');
-}
-
-function showScreen(id) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
+    goHome();
+    openLandPanel('reading');
 }
 
 function startReadingCategory(catIdx) {
+    stopAllGames();
+    GaiaHooks.emit('game_start', { subject: 'reading', level: 'cat_' + catIdx });
     currentReadingCategoryIdx = catIdx;
     currentReadingQuestionIdx = 0;
-    readingPhase = 'select';
     if (!readingProgress[catIdx]) readingProgress[catIdx] = [-1, -1, -1];
     showScreen('reading-screen');
     renderStorySelection();
@@ -3092,7 +3104,6 @@ function startReadingCategory(catIdx) {
 function renderStorySelection() {
     const cat = readingData[currentReadingCategoryIdx];
     const prog = readingProgress[currentReadingCategoryIdx] || [-1, -1, -1];
-    const totalScore = prog.reduce((s, v) => s + (v > 0 ? v : 0), 0);
     const doneCount = prog.filter(v => v >= 0).length;
 
     document.getElementById('reading-cat-label').textContent = cat.label;
@@ -3119,12 +3130,11 @@ function renderStorySelection() {
             🏆 סִיכּוּם הַקָּטֶגוֹרְיָה
         </button>` : ''}
     `;
-    setGaiaStateReading('idle');
+    setGaiaState('idle');
 }
 
 function startReadingStory(storyIdx) {
     currentReadingStoryIdx = storyIdx;
-    readingPhase = 'story';
     renderReadingStory();
 }
 
@@ -3150,13 +3160,12 @@ function renderReadingStory() {
             סִיַּמְתִּי לִקְרֹא ✅
         </button>
     `;
-    setGaiaStateReading('idle');
+    setGaiaState('idle');
 }
 
 function startReadingQuiz() {
     currentReadingQuestionIdx = 0;
     readingScore = 0;
-    readingPhase = 'quiz';
     renderReadingQuestion();
 }
 
@@ -3186,44 +3195,43 @@ function answerReading(chosen) {
     const q = story.questions[currentReadingQuestionIdx];
     const correct = q.a;
 
+    if (document.getElementById('ropt-' + chosen).disabled) return;
     document.querySelectorAll('.reading-opt-btn').forEach(b => b.disabled = true);
+    GaiaHooks.emit('answer', { correct: chosen === correct });
 
     if (chosen === correct) {
         document.getElementById('ropt-' + chosen).classList.add('correct');
-        if (typeof playSound === 'function') playSound('correct');
-        setGaiaStateReading('happy');
-        if (typeof spawnStars === 'function') spawnStars({ clientX: window.innerWidth / 2, clientY: window.innerHeight / 2 });
+        playSound('correct');
+        setGaiaState('happy');
+        spawnStars({ clientX: window.innerWidth / 2, clientY: window.innerHeight / 2 });
         readingScore++;
     } else {
         document.getElementById('ropt-' + chosen).classList.add('wrong');
         document.getElementById('ropt-' + correct).classList.add('correct');
-        if (typeof playSound === 'function') playSound('wrong');
-        setGaiaStateReading('sad');
+        playSound('wrong');
+        setGaiaState('sad');
     }
 
-    setTimeout(() => {
+    later(() => {
         currentReadingQuestionIdx++;
         if (currentReadingQuestionIdx < 3) {
             renderReadingQuestion();
         } else {
             if (!readingProgress[currentReadingCategoryIdx]) readingProgress[currentReadingCategoryIdx] = [-1, -1, -1];
-            const prevBest = readingProgress[currentReadingCategoryIdx][currentReadingStoryIdx];
-            readingProgress[currentReadingCategoryIdx][currentReadingStoryIdx] = readingScore;
-            // --- Progress persistence: reading credits the reading land ---
+            const prog = readingProgress[currentReadingCategoryIdx];
+            // the story keeps its best result; a weaker re-read doesn't lower it
+            prog[currentReadingStoryIdx] = Math.max(prog[currentReadingStoryIdx], readingScore);
+            // --- Progress persistence: each read-through earns its 0-3 stars (like any game) ---
             try {
-                if (window.GaiaProgress) {
-                    // Only credit newly-earned stars (best-effort: credit delta vs previous)
-                    const delta = Math.max(0, readingScore - (prevBest > 0 ? prevBest : 0));
-                    window.GaiaProgress.recordReadingStory(readingProgress, currentReadingCategoryIdx, delta);
-                }
+                GaiaProgress.recordReadingStory(readingProgress, currentReadingCategoryIdx, readingScore);
             } catch (e) { console.warn('[progress] reading hook', e); }
-            readingPhase = 'select';
             renderStorySelection();
         }
     }, 1200);
 }
 
 function showReadingCategoryComplete() {
+    GaiaHooks.emit('game_end');
     const cat = readingData[currentReadingCategoryIdx];
     const prog = readingProgress[currentReadingCategoryIdx] || [0, 0, 0];
     const totalScore = prog.reduce((s, v) => s + (v > 0 ? v : 0), 0);
@@ -3252,14 +3260,12 @@ function showReadingCategoryComplete() {
         container.classList.add('reading-complete-anim');
         setTimeout(() => container.classList.remove('reading-complete-anim'), 600);
     }
-    setGaiaStateReading('dance');
-    if (typeof spawnStars === 'function') {
-        for (let i = 0; i < 5; i++) {
-            setTimeout(() => spawnStars({
-                clientX: Math.random() * window.innerWidth,
-                clientY: Math.random() * window.innerHeight * 0.6
-            }), i * 200);
-        }
+    setGaiaState('dance');
+    for (let i = 0; i < 5; i++) {
+        setTimeout(() => spawnStars({
+            clientX: Math.random() * window.innerWidth,
+            clientY: Math.random() * window.innerHeight * 0.6
+        }), i * 200);
     }
 }
 </script>
@@ -3276,15 +3282,9 @@ function goToMultMenu() {
     showScreen('mult-menu');
 }
 
-function shuffleArr(arr) {
-    for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-    return arr;
-}
-
 function startMultGame(table) {
+    stopAllGames();
+    GaiaHooks.emit('game_start', { subject: 'multiplication', level: 'table_' + table });
     multCurrentTable = table;
     multIdx = 0;
     multScore = 0;
@@ -3293,11 +3293,10 @@ function startMultGame(table) {
         for (let a = 2; a <= 10; a++) {
             for (let b = 1; b <= 10; b++) pairs.push([a, b]);
         }
-        shuffleArr(pairs);
-        multQuestions = pairs.slice(0, MULT_QUESTIONS_PER_ROUND)
+        multQuestions = shuffle(pairs).slice(0, MULT_QUESTIONS_PER_ROUND)
             .map(([a, b]) => ({ a, b, answer: a * b }));
     } else {
-        const multipliers = shuffleArr([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        const multipliers = shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
         multQuestions = multipliers.map(m => ({ a: table, b: m, answer: table * m }));
     }
     showScreen('mult-screen');
@@ -3324,7 +3323,7 @@ function buildMultOptions(correct, a, b) {
         const fallback = correct + (Math.random() < 0.5 ? -1 : 1) * (Math.floor(Math.random() * 5) + 1);
         if (fallback > 0 && fallback !== correct) opts.add(fallback);
     }
-    return shuffleArr([...opts]);
+    return shuffle([...opts]);
 }
 
 function renderMultQuestion() {
@@ -3346,33 +3345,33 @@ function renderMultQuestion() {
             ).join('')}
         </div>
     `;
-    if (typeof setGaiaStateReading === 'function') setGaiaStateReading('idle');
+    setGaiaState('idle');
 }
 
 function answerMult(chosen, btnEl) {
+    if (btnEl.disabled) return;
     const q = multQuestions[multIdx];
     const correct = q.answer;
     document.querySelectorAll('.mult-opt-btn').forEach(b => b.disabled = true);
+    GaiaHooks.emit('answer', { correct: chosen === correct });
 
     if (chosen === correct) {
         btnEl.classList.add('correct');
-        if (typeof playSound === 'function') playSound('correct');
-        if (typeof spawnStars === 'function') {
-            const rect = btnEl.getBoundingClientRect();
-            spawnStars({ clientX: rect.left + rect.width / 2, clientY: rect.top + rect.height / 2 });
-        }
-        if (typeof setGaiaStateReading === 'function') setGaiaStateReading('happy');
+        playSound('correct');
+        const rect = btnEl.getBoundingClientRect();
+        spawnStars({ clientX: rect.left + rect.width / 2, clientY: rect.top + rect.height / 2 });
+        setGaiaState('happy');
         multScore++;
         document.getElementById('mult-score').textContent = '⭐ ' + multScore;
     } else {
         btnEl.classList.add('wrong');
         const correctBtn = document.querySelector('.mult-opt-btn[data-val="' + correct + '"]');
         if (correctBtn) correctBtn.classList.add('correct');
-        if (typeof playSound === 'function') playSound('wrong');
-        if (typeof setGaiaStateReading === 'function') setGaiaStateReading('sad');
+        playSound('wrong');
+        setGaiaState('sad');
     }
 
-    setTimeout(() => {
+    later(() => {
         multIdx++;
         if (multIdx < multQuestions.length) {
             renderMultQuestion();
@@ -3383,16 +3382,15 @@ function answerMult(chosen, btnEl) {
 }
 
 function showMultSummary() {
-    // --- Progress persistence: multiplication credits the math land ---
+    GaiaHooks.emit('game_end');
+    // --- Progress persistence: multiplication credits the math land (0-3 stars) ---
+    const stars = GaiaProgress.starsFor(multScore, MULT_QUESTIONS_PER_ROUND);
     try {
-        if (window.GaiaProgress) {
-            const stars = multScore; // 0..10
-            window.GaiaProgress.recordGame('math', 'mult_' + multCurrentTable, stars);
-        }
+        GaiaProgress.recordGame('math', 'mult_' + multCurrentTable, stars);
     } catch (e) { console.warn('[progress] mult hook', e); }
     document.getElementById('mult-progress').textContent = 'סִיַּמְתְּ! 🎉';
     let msg, color;
-    if (multScore === 10)      { msg = 'מֻשְׁלָם! ⭐⭐⭐'; color = '#2e7d32'; }
+    if (multScore === 10)      { msg = 'מֻשְׁלָם!';        color = '#2e7d32'; }
     else if (multScore >= 8)   { msg = 'מְצֻיָּן!';        color = '#43a047'; }
     else if (multScore >= 5)   { msg = 'יָפֶה מְאֹד!';     color = '#ff8f00'; }
     else                       { msg = 'נְסִי שׁוּב — אַתְּ יְכוֹלָה!'; color = '#c62828'; }
@@ -3406,9 +3404,10 @@ function showMultSummary() {
         <div style="text-align:center; padding:20px 10px;">
             <div style="font-size:4.5rem; animation:popIn 0.5s;">🏆</div>
             <div style="font-size:2rem; font-weight:900; color:${color}; direction:rtl; margin-top:6px;">${msg}</div>
-            <div style="font-size:1.6rem; color:#ff8f00; font-weight:bold; margin:14px 0;">
+            <div style="font-size:1.6rem; color:#ff8f00; font-weight:bold; margin:14px 0 4px;">
                 ⭐ ${multScore} / ${MULT_QUESTIONS_PER_ROUND} נְקֻדּוֹת
             </div>
+            <div class="stars-earned" id="mult-stars"></div>
             <div style="font-size:1.1rem; color:#777; direction:rtl; margin-bottom:12px;">
                 ${subtitle}
             </div>
@@ -3416,8 +3415,9 @@ function showMultSummary() {
             <button class="big-btn" style="background:#7986cb;margin-top:8px;font-size:1.2rem;" onclick="goToMultMenu()">לוּחַ אַחֵר ✖️</button>
         </div>
     `;
-    if (typeof setGaiaStateReading === 'function') setGaiaStateReading(multScore >= 8 ? 'dance' : 'idle');
-    if (typeof spawnStars === 'function' && multScore >= 8) {
+    renderStarsEarned(document.getElementById('mult-stars'), stars);
+    setGaiaState(multScore >= 8 ? 'dance' : 'idle');
+    if (multScore >= 8) {
         for (let i = 0; i < 5; i++) {
             setTimeout(() => spawnStars({
                 clientX: Math.random() * window.innerWidth,
@@ -3467,7 +3467,7 @@ function showMultSummary() {
             buttons: [
                 { cls: 'btn-level-1', label: 'אוֹת רִאשׁוֹנָה',  fn: () => startHebrewGame(1), levelKey: '1' },
                 { cls: 'btn-level-2', label: 'אוֹת אַחֲרוֹנָה',  fn: () => startHebrewGame(2), levelKey: '2' },
-                { cls: 'btn-level-3', label: 'מִילָה מְבֻלְבֶּלֶת', fn: () => startHebrewGame(3), levelKey: '3' }
+                { cls: 'btn-level-3', label: 'אוֹת חֲסֵרָה (קָשֶׁה)', fn: () => startHebrewGame(3), levelKey: '3' }
             ]
         },
         reading: {
@@ -3507,19 +3507,19 @@ function showMultSummary() {
         memory: {
             title: '🃏 אִי הַזִּכָּרוֹן', hue: '--land-memory',
             buttons: [
-                { cls: 'btn-level-1', label: 'מִילִים – קַל (6 זוּגוֹת)',  fn: () => startMemoryGame('words', 'easy') },
-                { cls: 'btn-level-2', label: 'מִילִים – קָשֶׁה (8 זוּגוֹת)', fn: () => startMemoryGame('words', 'hard') },
-                { cls: 'btn-geography', label: 'דְּגָלִים – קַל (6 זוּגוֹת)',  fn: () => startMemoryGame('flags', 'easy') },
-                { cls: 'btn-geography', label: 'דְּגָלִים – קָשֶׁה (8 זוּגוֹת)', fn: () => startMemoryGame('flags', 'hard') }
+                { cls: 'btn-level-1', label: 'מִילִים – קַל (6 זוּגוֹת)',  fn: () => startMemoryGame('words', 'easy'), levelKey: 'words_easy' },
+                { cls: 'btn-level-2', label: 'מִילִים – קָשֶׁה (8 זוּגוֹת)', fn: () => startMemoryGame('words', 'hard'), levelKey: 'words_hard' },
+                { cls: 'btn-geography', label: 'דְּגָלִים – קַל (6 זוּגוֹת)',  fn: () => startMemoryGame('flags', 'easy'), levelKey: 'flags_easy' },
+                { cls: 'btn-geography', label: 'דְּגָלִים – קָשֶׁה (8 זוּגוֹת)', fn: () => startMemoryGame('flags', 'hard'), levelKey: 'flags_hard' }
             ]
         },
         puzzle: {
             title: '🔢 גֶּשֶׁר הַפָּאזֶל', hue: '--land-puzzle',
-            note: 'בְּחִירַת מַצָּב וְקוֹשִׁי בַּמָּסָךְ הַבָּא',
             buttons: [
-                { cls: 'btn-puzzle', label: 'קַל — 2×2',      fn: () => startPuzzle(2, 2) },
-                { cls: 'btn-puzzle', label: 'בֵּינוֹנִי — 3×3', fn: () => startPuzzle(3, 3) },
-                { cls: 'btn-puzzle', label: 'קָשֶׁה — 3×4',    fn: () => startPuzzle(3, 4) }
+                { cls: 'btn-puzzle', label: 'קַל — 2×2',      fn: () => startPuzzle(2, 2, 'numbers'), levelKey: '2x2' },
+                { cls: 'btn-puzzle', label: 'בֵּינוֹנִי — 3×3', fn: () => startPuzzle(3, 3, 'numbers'), levelKey: '3x3' },
+                { cls: 'btn-puzzle', label: 'קָשֶׁה — 3×4',    fn: () => startPuzzle(3, 4, 'numbers'), levelKey: '3x4' },
+                { cls: 'btn-level-3', label: 'פַּאזֶל תְּמוּנָה 🖼️', fn: () => goToPuzzleMenu('image') }
             ]
         }
     };
@@ -3687,6 +3687,8 @@ function showMultSummary() {
         if (reduceMotion) return;
         const vp = document.getElementById('map-viewport');
         const clouds = Array.prototype.slice.call(document.querySelectorAll('.map-cloud'));
+        // keep each cloud's own inline scale() under the scroll offset
+        const baseTransforms = clouds.map(function (c) { return c.style.transform || ''; });
         if (!vp) return;
         let ticking = false;
         vp.addEventListener('scroll', function () {
@@ -3694,9 +3696,9 @@ function showMultSummary() {
             ticking = true;
             requestAnimationFrame(function () {
                 const y = vp.scrollTop;
-                clouds.forEach(function (c) {
+                clouds.forEach(function (c, i) {
                     const sp = parseFloat(c.getAttribute('data-speed')) || 0.3;
-                    c.style.transform = 'translateY(' + (-y * sp) + 'px)';
+                    c.style.transform = 'translateY(' + (-y * sp) + 'px) ' + baseTransforms[i];
                 });
                 ticking = false;
             });
@@ -3781,24 +3783,13 @@ function showMultSummary() {
 // ===== ANONYMOUS ANALYTICS MODULE =====
 // Logs to Firebase Realtime DB under /analytics/sessions/{sessionId}/
 // Privacy: no names, no PII. Session ID is per-tab (sessionStorage), not cross-session.
+// Listens to GaiaHooks (game_start / answer / game_end / game_exit / nav) — the game
+// code reports those events itself; nothing here patches game functions.
 
 (function() {
-    // Note: startReadingStory is intentionally NOT wrapped — transitioning between
-    // stories within a category is internal navigation, not a new game.
-    const SUBJECT_FOR_FN = {
-        startMathGame:        args => ({ subject: 'math',           level: 'add_sub_' + args[0] }),
-        startEnglishGame:     args => ({ subject: 'english',        level: 'level_'   + args[0] }),
-        startHebrewGame:      args => ({ subject: 'hebrew',         level: 'level_'   + args[0] }),
-        startBiologyGame:     args => ({ subject: 'biology',        level: 'level_'   + args[0] }),
-        startGeographyGame:   args => ({ subject: 'geography',      level: 'level_'   + args[0] }),
-        startMemoryGame:      args => ({ subject: 'memory',         level: (args[0] || '') + '_' + (args[1] || '') }),
-        startReadingCategory: args => ({ subject: 'reading',        level: 'cat_'     + args[0] }),
-        startMultGame:        args => ({ subject: 'multiplication', level: 'table_'   + args[0] }),
-        startPuzzle:          args => ({ subject: 'puzzle',         level: args[0] + 'x' + args[1] })
-    };
-
     const A = {
         sessionId: null,
+        sessionStartedAt: null,
         sessionRef: null,
         eventsRef: null,
         currentGame: null,     // { subject, level, startTime, answers: [], correct: 0 }
@@ -3808,55 +3799,61 @@ function showMultSummary() {
         ready: false,
 
         init() {
-            if (typeof firebase === 'undefined' || !firebase.database) {
+            if (!db) {
                 console.warn('[analytics] firebase not available, skipping');
                 return;
             }
             const sessionInfo = this._getOrCreateSession();
             this.sessionId = sessionInfo.id;
-            const db = firebase.database();
-            this.sessionRef = db.ref('analytics/sessions/' + this.sessionId);
-            this.eventsRef = this.sessionRef.child('events');
+            this.sessionStartedAt = sessionInfo.startedAt;
             this.lastInteractionAt = Date.now();
 
             // Detect actually-active screen at init
             const activeEl = document.querySelector('.screen.active');
             this.lastScreen = activeEl ? activeEl.id : 'main-menu';
 
-            // Write meta only on a brand-new session (avoids needing read permission)
-            if (sessionInfo.isNew) {
-                try {
-                    this.sessionRef.child('meta').set({
-                        started: firebase.database.ServerValue.TIMESTAMP,
-                        clientStartedAt: Date.now(),
-                        userAgent: navigator.userAgent,
-                        language: navigator.language || '',
-                        viewport: window.innerWidth + 'x' + window.innerHeight,
-                        screen: (screen.width || 0) + 'x' + (screen.height || 0),
-                        timezoneOffset: new Date().getTimezoneOffset()
-                    });
-                } catch (e) { console.warn('[analytics] meta write failed', e); }
-            }
-
-            this._wrap();
+            // Track game state right away; writes start once the anonymous user is signed in
+            // (the DB rules require it) — or after 5s without it, for older rules.
+            GaiaHooks.on((type, data) => this._onGameEvent(type, data));
             this._bindLifecycle();
-            this.ready = true;
-            this._log('session_start', { initialScreen: this.lastScreen, isNewSession: sessionInfo.isNew });
-            console.info('[analytics] session', this.sessionId, sessionInfo.isNew ? '(new)' : '(resumed)');
+
+            withTimeout(authReady, 5000).then(() => {
+                this.sessionRef = db.ref('analytics/sessions/' + this.sessionId);
+                this.eventsRef = this.sessionRef.child('events');
+
+                // Write meta only on a brand-new session (avoids needing read permission)
+                if (sessionInfo.isNew) {
+                    try {
+                        this.sessionRef.child('meta').set({
+                            started: firebase.database.ServerValue.TIMESTAMP,
+                            clientStartedAt: this.sessionStartedAt,
+                            userAgent: navigator.userAgent.slice(0, 400),
+                            language: (navigator.language || '').slice(0, 20),
+                            viewport: window.innerWidth + 'x' + window.innerHeight,
+                            screen: (screen.width || 0) + 'x' + (screen.height || 0),
+                            timezoneOffset: new Date().getTimezoneOffset()
+                        }).catch(e => console.warn('[analytics] meta write failed', e));
+                    } catch (e) { console.warn('[analytics] meta write failed', e); }
+                }
+
+                this.ready = true;
+                this._log('session_start', { initialScreen: this.lastScreen, isNewSession: sessionInfo.isNew });
+                console.info('[analytics] session', this.sessionId, sessionInfo.isNew ? '(new)' : '(resumed)');
+            });
         },
 
         _getOrCreateSession() {
+            const newId = () => 'sess_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10);
             try {
                 let id = sessionStorage.getItem('analytics_sid');
-                if (id) return { id, isNew: false };
-                id = 'sess_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10);
+                const started = Number(sessionStorage.getItem('analytics_sid_started')) || Date.now();
+                if (id) return { id, isNew: false, startedAt: started };
+                id = newId();
                 sessionStorage.setItem('analytics_sid', id);
-                return { id, isNew: true };
+                sessionStorage.setItem('analytics_sid_started', String(Date.now()));
+                return { id, isNew: true, startedAt: Date.now() };
             } catch (e) {
-                return {
-                    id: 'sess_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10),
-                    isNew: true
-                };
+                return { id: newId(), isNew: true, startedAt: Date.now() };
             }
         },
 
@@ -3868,100 +3865,43 @@ function showMultSummary() {
                     ts: firebase.database.ServerValue.TIMESTAMP,
                     clientTs: Date.now()
                 }, data || {});
-                this.eventsRef.push(payload);
-                this.sessionRef.child('meta/lastActivity').set(firebase.database.ServerValue.TIMESTAMP);
+                // RTDB drops null fields anyway; strip them so the payload matches the rules
+                Object.keys(payload).forEach(k => { if (payload[k] === null || payload[k] === undefined) delete payload[k]; });
+                this.eventsRef.push(payload).catch(e => console.warn('[analytics] log failed', e));
+                this.sessionRef.child('meta/lastActivity').set(firebase.database.ServerValue.TIMESTAMP).catch(() => {});
             } catch (e) {
                 console.warn('[analytics] log failed', e);
             }
         },
 
-        _wrap() {
-            const self = this;
-
-            // Wrap showScreen for navigation tracking
-            const origShowScreen = window.showScreen;
-            if (typeof origShowScreen === 'function') {
-                window.showScreen = function(id) {
-                    if (id !== self.lastScreen) {
-                        self._log('nav', { from: self.lastScreen, to: id });
-                        self.lastScreen = id;
-                    }
-                    self.lastInteractionAt = Date.now();
-                    return origShowScreen.apply(this, arguments);
-                };
-            }
-
-            // Wrap goHome — abandon current game if any
-            const origGoHome = window.goHome;
-            if (typeof origGoHome === 'function') {
-                window.goHome = function() {
-                    if (self.currentGame) self._gameAbandoned();
-                    return origGoHome.apply(this, arguments);
-                };
-            }
-
-            // Wrap all start* functions
-            Object.keys(SUBJECT_FOR_FN).forEach(name => {
-                const orig = window[name];
-                if (typeof orig !== 'function') return;
-                window[name] = function() {
-                    try {
-                        const meta = SUBJECT_FOR_FN[name](arguments);
-                        self._gameStart(meta.subject, meta.level);
-                    } catch (e) { console.warn('[analytics] wrap', name, e); }
-                    return orig.apply(this, arguments);
-                };
-            });
-
-            // Wrap playSound to capture answer correctness + response time
-            const origPlaySound = window.playSound;
-            if (typeof origPlaySound === 'function') {
-                window.playSound = function(type) {
-                    if (type === 'correct' || type === 'wrong') {
-                        const now = Date.now();
-                        const responseMs = self.lastInteractionAt ? now - self.lastInteractionAt : null;
-                        const correct = type === 'correct';
-                        self._log('answer', {
-                            correct: correct,
-                            responseMs: responseMs,
-                            subject: self.currentGame ? self.currentGame.subject : null,
-                            level:   self.currentGame ? self.currentGame.level   : null
-                        });
-                        if (self.currentGame) {
-                            self.currentGame.answers.push({ correct: correct, ms: responseMs });
-                            if (correct) self.currentGame.correct++;
-                        }
-                        self.lastInteractionAt = now;
-                    }
-                    return origPlaySound.apply(this, arguments);
-                };
-            }
-
-            // Wrap endGame (obfuscated module's game-over)
-            const origEndGame = window.endGame;
-            if (typeof origEndGame === 'function') {
-                window.endGame = function() {
-                    self._gameEnd('completed');
-                    return origEndGame.apply(this, arguments);
-                };
-            }
-
-            // Hook multiplication summary explicitly (not covered by endGame)
-            const origMultSummary = window.showMultSummary;
-            if (typeof origMultSummary === 'function') {
-                window.showMultSummary = function() {
-                    self._gameEnd('completed');
-                    return origMultSummary.apply(this, arguments);
-                };
-            }
-
-            // Hook reading category complete
-            const origReadingComplete = window.showReadingCategoryComplete;
-            if (typeof origReadingComplete === 'function') {
-                window.showReadingCategoryComplete = function() {
-                    self._gameEnd('completed');
-                    return origReadingComplete.apply(this, arguments);
-                };
+        _onGameEvent(type, data) {
+            if (type === 'nav') {
+                if (data.screen !== this.lastScreen) {
+                    this._log('nav', { from: this.lastScreen, to: data.screen });
+                    this.lastScreen = data.screen;
+                }
+                this.lastInteractionAt = Date.now();
+            } else if (type === 'game_start') {
+                this._gameStart(data.subject, data.level);
+            } else if (type === 'answer') {
+                const now = Date.now();
+                const responseMs = this.lastInteractionAt ? now - this.lastInteractionAt : null;
+                const correct = !!data.correct;
+                this._log('answer', {
+                    correct: correct,
+                    responseMs: responseMs,
+                    subject: this.currentGame ? this.currentGame.subject : null,
+                    level:   this.currentGame ? this.currentGame.level   : null
+                });
+                if (this.currentGame) {
+                    this.currentGame.answers.push({ correct: correct, ms: responseMs });
+                    if (correct) this.currentGame.correct++;
+                }
+                this.lastInteractionAt = now;
+            } else if (type === 'game_end') {
+                this._gameEnd('completed');
+            } else if (type === 'game_exit') {
+                if (this.currentGame) this._gameAbandoned();
             }
         },
 
@@ -3971,7 +3911,7 @@ function showMultSummary() {
                 if (this.sessionEnded) return;
                 this.sessionEnded = true;
                 if (this.currentGame) this._gameAbandoned();
-                this._log('session_end', { durationMs: Date.now() - (this.lastInteractionAt || Date.now()) });
+                this._log('session_end', { durationMs: Date.now() - (this.sessionStartedAt || Date.now()) });
             };
             window.addEventListener('pagehide', onLeave);
             window.addEventListener('beforeunload', onLeave);
@@ -3981,13 +3921,13 @@ function showMultSummary() {
             if (this.currentGame) this._gameAbandoned();
             this.currentGame = {
                 subject: subject,
-                level: level,
+                level: String(level),
                 startTime: Date.now(),
                 answers: [],
                 correct: 0
             };
             this.lastInteractionAt = Date.now();
-            this._log('game_start', { subject: subject, level: level });
+            this._log('game_start', { subject: subject, level: String(level) });
         },
 
         _gameEnd(reason) {
@@ -4016,7 +3956,7 @@ function showMultSummary() {
         }
     };
 
-    // Init after window load so all module scripts are registered
+    // Init after window load (Firebase is initialised on DOMContentLoaded)
     function bootAnalytics() {
         try { A.init(); } catch (e) { console.warn('[analytics] init error', e); }
     }
