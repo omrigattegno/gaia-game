@@ -687,14 +687,14 @@
         .googy-topic-btn .gt-en { font-size: 0.8rem; color: var(--ink-soft); font-family: 'Fredoka', sans-serif; direction: ltr; }
 
         #googy-screen .game-container { min-height: 520px; justify-content: flex-start; border-color: oklch(0.66 0.12 180); }
-        #googy-head {
+        #googy-head, .googy-head {
             display: flex; align-items: center; gap: 10px; padding: 4px 4px 8px;
             border-bottom: 2px solid oklch(0.88 0.06 180); direction: rtl;
         }
-        #googy-head .gh-text { flex: 1; text-align: right; }
-        #googy-head .gh-name { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 1.3rem; color: oklch(0.45 0.10 185); }
-        #googy-head .gh-topic { font-size: 0.95rem; color: var(--ink-soft); }
-        #googy-progress { font-weight: 700; color: oklch(0.55 0.15 255); font-size: 1.05rem; white-space: nowrap; }
+        #googy-head .gh-text, .googy-head .gh-text { flex: 1; text-align: right; }
+        #googy-head .gh-name, .googy-head .gh-name { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 1.3rem; color: oklch(0.45 0.10 185); }
+        #googy-head .gh-topic, .googy-head .gh-topic { font-size: 0.95rem; color: var(--ink-soft); }
+        #googy-progress, #repeat-count { font-weight: 700; color: oklch(0.55 0.15 255); font-size: 1.05rem; white-space: nowrap; }
         #googy-log {
             direction: ltr; text-align: left; overflow-y: auto; flex: 1;
             max-height: 46vh; min-height: 200px; padding: 10px 4px; scroll-behavior: smooth;
@@ -745,7 +745,52 @@
         #googy-end { display: none; text-align: center; padding: 10px 6px 56px; direction: rtl; }
         #googy-end.show { display: block; }
         /* Gaia would cover the topic buttons and the chat's input bar */
-        body:has(#googy-screen.active) #gaia-char, body:has(#googy-topics.active) #gaia-char { display: none; }
+        body:has(#googy-screen.active) #gaia-char, body:has(#googy-topics.active) #gaia-char,
+        body:has(#repeat-screen.active) #gaia-char { display: none; }
+
+        /* --- repeat after Googy --- */
+        #repeat-screen .game-container { min-height: 520px; justify-content: flex-start; border-color: oklch(0.66 0.12 180); }
+        #repeat-card {
+            background: oklch(0.97 0.03 180); border: 2px solid oklch(0.80 0.08 180);
+            border-radius: 22px; padding: 16px 12px 12px; margin: 14px 4px 10px;
+        }
+        #repeat-progress { direction: ltr; text-align: center; line-height: 1.25; }
+        #repeat-points { font-weight: 700; font-size: 0.95rem; color: oklch(0.60 0.15 70); white-space: nowrap; }
+        #repeat-sentence { font-family: 'Fredoka', sans-serif; font-size: 1.9rem; font-weight: 600; line-height: 1.4; color: var(--ink); }
+        #repeat-sentence .rw { display: inline-block; padding: 0 3px; border-radius: 8px; cursor: pointer; transition: background var(--t-ui), color var(--t-ui); }
+        #repeat-sentence .rw.ok { color: oklch(0.42 0.14 150); background: oklch(0.92 0.07 145); }
+        #repeat-sentence .rw.miss { color: oklch(0.55 0.20 25); text-decoration: underline wavy oklch(0.62 0.20 25); text-underline-offset: 7px; }
+        #repeat-hebrew { direction: rtl; font-size: 1.05rem; color: var(--ink-soft); margin-top: 8px; }
+        .repeat-listen { display: flex; gap: 8px; justify-content: center; margin-top: 12px; }
+        .repeat-listen button {
+            border: none; border-radius: 14px; padding: 8px 16px; font-size: 1.05rem; cursor: pointer;
+            background: oklch(0.90 0.05 180); color: oklch(0.35 0.08 185); font-family: 'Varela Round', sans-serif;
+        }
+        #repeat-mic {
+            display: block; margin: 6px auto; width: 230px; max-width: 90%; min-height: 64px; border: none;
+            border-radius: 999px; font-size: 1.4rem; font-weight: 700; color: white; cursor: pointer;
+            background: oklch(0.66 0.12 180); box-shadow: 0 5px 0 oklch(0.50 0.11 185); font-family: 'Varela Round', sans-serif;
+        }
+        #repeat-mic.listening { background: oklch(0.62 0.20 25); box-shadow: 0 5px 0 oklch(0.45 0.18 25); animation: pulse 1s infinite; }
+        #repeat-screen button:disabled { opacity: 0.5; cursor: default; }
+        #repeat-live { min-height: 1.4em; color: var(--ink-soft); font-family: 'Fredoka', sans-serif; font-size: 1.05rem; }
+        #repeat-result { direction: rtl; }
+        #repeat-result .rr-heard { font-size: 1rem; color: var(--ink-soft); }
+        #repeat-result .rr-heard bdi { font-family: 'Fredoka', sans-serif; color: var(--ink); }
+        #repeat-result .rr-msg { font-size: 1.3rem; font-weight: 700; }
+        #repeat-result .stars-earned { font-size: 1.9rem; margin: 2px 0; }
+        #repeat-actions { display: flex; gap: 10px; justify-content: center; margin: 6px 4px; }
+        #repeat-actions button { flex: 1; max-width: 180px; margin: 0; padding: 10px; font-size: 1.2rem; min-height: 52px; }
+        #repeat-hint { direction: rtl; font-size: 0.95rem; color: var(--ink-soft); min-height: 1.2em; margin-top: 4px; }
+        #repeat-play { padding-bottom: 58px; }   /* room for the 🏠 button */
+        #repeat-skip {
+            display: block; margin: 4px auto 0; border: none; background: none; cursor: pointer;
+            color: var(--ink-soft); text-decoration: underline; font-size: 0.95rem; font-family: 'Varela Round', sans-serif;
+        }
+        #repeat-end { display: none; text-align: center; padding: 10px 6px 56px; direction: rtl; }
+        #repeat-end.show { display: block; }
+        #repeat-end .repeat-end-line { font-size: 1.2rem; color: var(--ink-soft); }
+        #repeat-end .repeat-end-points { font-size: 1.3rem; font-weight: 700; color: oklch(0.60 0.15 70); margin-bottom: 8px; }
 
         /* --- reduced motion: collapse map/parallax/character motion to instant --- */
         @media (prefers-reduced-motion: reduce) {
@@ -755,7 +800,7 @@
             .big-btn, .answer-btn, .mult-opt-btn, .reading-opt-btn,
             #land-panel, #land-scrim, .land-icon-circle,
             .btn-squash { transition: none !important; animation: none !important; }
-            .googy-avatar .g-mouth, .gchat-typing span, #googy-mic { animation: none !important; }
+            .googy-avatar .g-mouth, .gchat-typing span, #googy-mic, #repeat-mic { animation: none !important; }
         }
     </style>
 </head>
@@ -1019,8 +1064,8 @@
     <div id="googy-topics" class="screen">
         <div class="menu-box" style="border-color: oklch(0.66 0.12 180);">
             <button class="home-btn" onclick="goHome()" style="position:relative; top:0; left:0; width:60px; margin-bottom:10px;">🔙</button>
-            <div class="googy-hello"><span class="googy-avatar-slot" data-size="72"></span><h2 style="color:oklch(0.45 0.10 185);">עַל מָה נְדַבֵּר הַיּוֹם? 💬</h2></div>
-            <p style="color:var(--ink-soft); margin:0 0 4px;">Googy מְדַבֶּרֶת רַק אַנְגְּלִית. אֶפְשָׁר לְדַבֵּר, לְהַקְלִיד אוֹ לִבְחֹר תְּשׁוּבָה.</p>
+            <div class="googy-hello"><span class="googy-avatar-slot" data-size="72"></span><h2 id="googy-topics-title" style="color:oklch(0.45 0.10 185);"></h2></div>
+            <p id="googy-topics-hint" style="color:var(--ink-soft); margin:0 0 4px;"></p>
             <div class="googy-topic-grid" id="googy-topic-grid"></div>
         </div>
     </div>
@@ -1041,6 +1086,38 @@
                 <button id="googy-send" aria-label="לִשְׁלֹחַ">➤</button>
             </div>
             <div id="googy-end"></div>
+            <button class="home-btn" onclick="goHome()">🏠</button>
+        </div>
+    </div>
+
+    <!-- ===== REPEAT AFTER GOOGY ===== -->
+    <div id="repeat-screen" class="screen">
+        <div class="game-container">
+            <div id="repeat-head" class="googy-head">
+                <span class="googy-avatar-slot" id="repeat-head-avatar" data-size="64"></span>
+                <div class="gh-text"><div class="gh-name">Googy</div><div class="gh-topic" id="repeat-topic-label"></div></div>
+                <div id="repeat-progress"><div id="repeat-count"></div><div id="repeat-points"></div></div>
+            </div>
+            <div id="repeat-play">
+                <div id="repeat-card">
+                    <div id="repeat-sentence" dir="ltr"></div>
+                    <div id="repeat-hebrew"></div>
+                    <div class="repeat-listen">
+                        <button id="repeat-listen">🔊 שִׁמְעִי שׁוּב</button>
+                        <button id="repeat-slow">🐢 לְאַט</button>
+                    </div>
+                </div>
+                <button id="repeat-mic"></button>
+                <div id="repeat-live" dir="ltr"></div>
+                <div id="repeat-result"></div>
+                <div id="repeat-actions">
+                    <button id="repeat-again" class="big-btn btn-level-2">נַסִּי שׁוּב 🔄</button>
+                    <button id="repeat-next" class="big-btn btn-googy"></button>
+                </div>
+                <div id="repeat-hint"></div>
+                <button id="repeat-skip">דַּלְּגִי עַל הַמִּשְׁפָּט</button>
+            </div>
+            <div id="repeat-end"></div>
             <button class="home-btn" onclick="goHome()">🏠</button>
         </div>
     </div>
@@ -3627,20 +3704,29 @@ function googyScrollDown() {
 function setGoogyHint(text) { document.getElementById('googy-hint').textContent = text; }
 
 // --- screens ---
-function goToGoogy(level) {
-    googyStop();
-    stopAllGames();
-    Googy.level = level === 'medium' ? 'medium' : 'easy';
+// The topic picker is shared by the chat and by "repeat after Googy".
+function showGoogyTopics(title, hint, topics, onPick) {
+    document.getElementById('googy-topics-title').textContent = title;
+    document.getElementById('googy-topics-hint').textContent = hint;
     const grid = document.getElementById('googy-topic-grid');
     grid.textContent = '';
-    GOOGY_TOPICS.forEach(topic => {
+    topics.forEach(topic => {
         const btn = googyEl('button', 'googy-topic-btn');
         btn.append(googyEl('span', 'gt-emoji', topic.emoji), googyEl('span', 'gt-he', topic.he), googyEl('span', 'gt-en', topic.en));
-        btn.onclick = () => startGoogyChat(topic.id);
+        btn.onclick = () => onPick(topic.id);
         grid.appendChild(btn);
     });
     fillGoogyAvatars();
     showScreen('googy-topics');
+}
+
+function goToGoogy(level) {
+    googyStop();
+    stopAllGames();
+    Googy.level = level === 'medium' ? 'medium' : 'easy';
+    showGoogyTopics('עַל מָה נְדַבֵּר הַיּוֹם? 💬',
+        'Googy מְדַבֶּרֶת רַק אַנְגְּלִית. אֶפְשָׁר לְדַבֵּר, לְהַקְלִיד אוֹ לִבְחֹר תְּשׁוּבָה.',
+        GOOGY_TOPICS, startGoogyChat);
 }
 
 function startGoogyChat(topicId) {
@@ -3858,16 +3944,17 @@ function pickGoogyVoice() {
         || english[0] || null;
 }
 
-function googySpeak(text) {
+// Googy says the text; `face` is the avatar whose mouth moves (the chat's by default).
+function googySpeak(text, { rate, face = '#googy-head-avatar' } = {}) {
     if (!window.speechSynthesis || !text) return;
     speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'en-US';
-    utterance.rate = Googy.level === 'easy' ? 0.85 : 0.95;
+    utterance.rate = rate || (Googy.level === 'easy' ? 0.85 : 0.95);
     utterance.pitch = 1.3;
     const voice = pickGoogyVoice();
     if (voice) utterance.voice = voice;
-    const face = document.querySelector('#googy-head-avatar .googy-avatar');
+    face = document.querySelector(face + ' .googy-avatar');
     utterance.onstart = () => face && face.classList.add('talking');
     utterance.onend = utterance.onerror = () => face && face.classList.remove('talking');
     speechSynthesis.speak(utterance);
@@ -3938,6 +4025,633 @@ document.getElementById('googy-text').addEventListener('keydown', event => {
 fillGoogyAvatars();
 </script>
 <script>
+// ===== REPEAT AFTER GOOGY MODULE =====
+// Googy says a short English sentence and the child says it back. The browser's speech
+// recognition writes down what it heard, and every word of the sentence that was heard
+// turns green. No AI and no server: the sentences are right here.
+
+const REPEAT_ROUND = 8;                  // sentences in a round
+const REPEAT_TRIES = 3;                  // tries per sentence
+const REPEAT_POINTS = [0, 4, 7, 10];     // a sentence's points, by the stars of its best try
+
+// [English, Hebrew]. Everyday words and no names, so the recognizer can write every word.
+const REPEAT_TOPICS = [
+    { id: 'greetings', emoji: '👋', he: 'שָׁלוֹם וּבְרָכוֹת', en: 'Hello!',
+      easy: [
+        ['Hello, my friend!', 'שלום, חברה שלי!'],
+        ['Good morning!', 'בוקר טוב!'],
+        ['How are you?', 'מה שלומך?'],
+        ['I am fine, thank you.', 'אני בסדר, תודה.'],
+        ['Nice to meet you.', 'נעים להכיר.'],
+        ['Good night!', 'לילה טוב!'],
+        ['See you tomorrow!', 'נתראה מחר!'],
+        ['Thank you very much!', 'תודה רבה!']
+      ],
+      medium: [
+        ['Hello! It is so nice to meet you.', 'שלום! כל כך נעים להכיר אותך.'],
+        ['Good morning! Did you sleep well?', 'בוקר טוב! ישנת טוב?'],
+        ['I am eight years old.', 'אני בת שמונה.'],
+        ['Can you help me, please?', 'את יכולה לעזור לי, בבקשה?'],
+        ['Thank you for your help.', 'תודה על העזרה שלך.'],
+        ['Have a nice day!', 'שיהיה לך יום נעים!'],
+        ["Let's play together after school.", 'בואי נשחק ביחד אחרי בית הספר.'],
+        ['Goodbye! See you next week.', 'להתראות! נתראה בשבוע הבא.']
+      ] },
+    { id: 'animals', emoji: '🐶', he: 'חַיּוֹת', en: 'Animals',
+      easy: [
+        ['I like dogs.', 'אני אוהבת כלבים.'],
+        ['The cat is small.', 'החתול קטן.'],
+        ['A fish can swim.', 'דג יודע לשחות.'],
+        ['The bird can fly.', 'הציפור יודעת לעוף.'],
+        ['I see a big lion.', 'אני רואה אריה גדול.'],
+        ['The rabbit is white.', 'הארנב לבן.'],
+        ['I have a pet.', 'יש לי חיית מחמד.'],
+        ['The frog is green.', 'הצפרדע ירוקה.']
+      ],
+      medium: [
+        ['My dog likes to run in the park.', 'הכלב שלי אוהב לרוץ בפארק.'],
+        ['The elephant has big ears.', 'לפיל יש אוזניים גדולות.'],
+        ['A monkey can climb a tree.', 'קוף יודע לטפס על עץ.'],
+        ['The horse is eating green grass.', 'הסוס אוכל דשא ירוק.'],
+        ['I would like to have a puppy.', 'הייתי רוצה שיהיה לי גור כלבים.'],
+        ['The turtle walks very slowly.', 'הצב הולך לאט מאוד.'],
+        ['My favorite animal is the giraffe.', "החיה האהובה עליי היא הג'ירפה."],
+        ['The little kitten is sleeping.', 'החתלתול הקטן ישן.']
+      ] },
+    { id: 'food', emoji: '🍕', he: 'אֹכֶל', en: 'Food',
+      easy: [
+        ['I like pizza.', 'אני אוהבת פיצה.'],
+        ['The apple is red.', 'התפוח אדום.'],
+        ['I am hungry.', 'אני רעבה.'],
+        ['I want some water.', 'אני רוצה קצת מים.'],
+        ['Ice cream is yummy!', 'גלידה זה טעים!'],
+        ['I love chocolate.', 'אני אוהבת שוקולד.'],
+        ['Can I have some bread?', 'אפשר לקבל קצת לחם?'],
+        ['Bananas are yellow.', 'בננות הן צהובות.']
+      ],
+      medium: [
+        ['I would like a cheese sandwich, please.', 'אני רוצה כריך גבינה, בבקשה.'],
+        ['My favorite fruit is watermelon.', 'הפרי האהוב עליי הוא אבטיח.'],
+        ['We eat breakfast in the morning.', 'אנחנו אוכלים ארוחת בוקר בבוקר.'],
+        ['Can I have a glass of milk?', 'אפשר לקבל כוס חלב?'],
+        ['Tonight we are eating pasta for dinner.', 'הערב אנחנו אוכלים פסטה לארוחת ערב.'],
+        ['I do not like carrots very much.', 'אני לא כל כך אוהבת גזר.'],
+        ['The soup is too hot.', 'המרק חם מדי.'],
+        ["Let's bake a chocolate cake together.", 'בואי נאפה ביחד עוגת שוקולד.']
+      ] },
+    { id: 'family', emoji: '👨‍👩‍👧', he: 'מִשְׁפָּחָה', en: 'Family',
+      easy: [
+        ['This is my mom.', 'זאת אמא שלי.'],
+        ['I love my dad.', 'אני אוהבת את אבא שלי.'],
+        ['I have a brother.', 'יש לי אח.'],
+        ['My sister is funny.', 'אחותי מצחיקה.'],
+        ['My grandma is nice.', 'סבתא שלי נחמדה.'],
+        ['My grandpa is tall.', 'סבא שלי גבוה.'],
+        ['We are a big family.', 'אנחנו משפחה גדולה.'],
+        ['I love my family.', 'אני אוהבת את המשפחה שלי.']
+      ],
+      medium: [
+        ['My mom makes the best cake.', 'אמא שלי מכינה את העוגה הכי טובה.'],
+        ['I play games with my brother.', 'אני משחקת במשחקים עם אחי.'],
+        ['My sister and I share a room.', 'אני ואחותי חולקות חדר.'],
+        ['On Friday we visit my grandma.', 'ביום שישי אנחנו מבקרים את סבתא.'],
+        ['My dad reads me a story at night.', 'אבא שלי מקריא לי סיפור בלילה.'],
+        ['We have dinner together every evening.', 'אנחנו אוכלים ארוחת ערב ביחד כל ערב.'],
+        ['My family likes to go to the beach.', 'המשפחה שלי אוהבת ללכת לים.'],
+        ['My little brother is two years old.', 'אחי הקטן בן שנתיים.']
+      ] },
+    { id: 'colors', emoji: '🎨', he: 'צְבָעִים', en: 'Colors',
+      easy: [
+        ['The sky is blue.', 'השמיים כחולים.'],
+        ['The sun is yellow.', 'השמש צהובה.'],
+        ['I like pink.', 'אני אוהבת ורוד.'],
+        ['The grass is green.', 'הדשא ירוק.'],
+        ['My bag is red.', 'התיק שלי אדום.'],
+        ['I have a purple pen.', 'יש לי עט סגול.'],
+        ['The snow is white.', 'השלג לבן.'],
+        ['I can draw a rainbow.', 'אני יודעת לצייר קשת בענן.']
+      ],
+      medium: [
+        ['My favorite color is orange.', 'הצבע האהוב עליי הוא כתום.'],
+        ['I am drawing a big red flower.', 'אני מציירת פרח אדום גדול.'],
+        ['A rainbow has many colors.', 'לקשת בענן יש הרבה צבעים.'],
+        ['Blue and yellow make green.', 'כחול וצהוב יוצרים ירוק.'],
+        ['Can I use your crayons, please?', 'אפשר להשתמש בצבעים שלך, בבקשה?'],
+        ['At night the sky is dark blue.', 'בלילה השמיים כחולים כהים.'],
+        ['I painted my room light green.', 'צבעתי את החדר שלי בירוק בהיר.'],
+        ['Her dress is pink and purple.', 'השמלה שלה ורודה וסגולה.']
+      ] },
+    { id: 'school', emoji: '🏫', he: 'בֵּית סֵפֶר', en: 'School',
+      easy: [
+        ['I go to school.', 'אני הולכת לבית הספר.'],
+        ['This is my book.', 'זה הספר שלי.'],
+        ['I have a pencil.', 'יש לי עיפרון.'],
+        ['My teacher is nice.', 'המורה שלי נחמדה.'],
+        ['I can read.', 'אני יודעת לקרוא.'],
+        ["Let's play outside!", 'בואי נשחק בחוץ!'],
+        ['I like to draw.', 'אני אוהבת לצייר.'],
+        ['Where is my bag?', 'איפה התיק שלי?']
+      ],
+      medium: [
+        ['I know how to count to twenty.', 'אני יודעת לספור עד עשרים.'],
+        ['My best friend sits next to me.', 'החברה הכי טובה שלי יושבת לידי.'],
+        ['We have English on Monday.', 'יש לנו אנגלית ביום שני.'],
+        ['Can I borrow your eraser, please?', 'אפשר לשאול את המחק שלך, בבקשה?'],
+        ['I put my books in my bag.', 'אני שמה את הספרים שלי בתיק.'],
+        ['At recess we play in the yard.', 'בהפסקה אנחנו משחקים בחצר.'],
+        ['The teacher reads us a story.', 'המורה מקריאה לנו סיפור.'],
+        ['I like math and art.', 'אני אוהבת חשבון ואומנות.']
+      ] },
+    { id: 'weather', emoji: '🌦️', he: 'מֶזֶג אֲוִיר', en: 'Weather',
+      easy: [
+        ['It is sunny today.', 'היום יש שמש.'],
+        ['It is raining.', 'יורד גשם.'],
+        ['I am cold.', 'קר לי.'],
+        ['It is very hot.', 'חם מאוד.'],
+        ['I see a cloud.', 'אני רואה ענן.'],
+        ['The wind is strong.', 'הרוח חזקה.'],
+        ['I like the snow.', 'אני אוהבת את השלג.'],
+        ['Take your umbrella!', 'קחי את המטרייה שלך!']
+      ],
+      medium: [
+        ['It is cold, so I wear a coat.', 'קר, אז אני לובשת מעיל.'],
+        ['In the summer we go to the beach.', 'בקיץ אנחנו הולכים לים.'],
+        ['Look at the rainbow in the sky!', 'תראי את הקשת בענן בשמיים!'],
+        ['I like to jump in the puddles.', 'אני אוהבת לקפוץ בשלוליות.'],
+        ['The sun is shining today.', 'השמש זורחת היום.'],
+        ['It is windy, so hold your hat.', 'יש רוח, אז תחזיקי את הכובע.'],
+        ['In the winter it rains a lot.', 'בחורף יורד הרבה גשם.'],
+        ['What is the weather like today?', 'איך מזג האוויר היום?']
+      ] },
+    { id: 'feelings', emoji: '😊', he: 'רְגָשׁוֹת', en: 'Feelings',
+      easy: [
+        ['I am happy.', 'אני שמחה.'],
+        ['I am sad.', 'אני עצובה.'],
+        ['I am tired.', 'אני עייפה.'],
+        ['I feel great!', 'אני מרגישה מצוין!'],
+        ['I am a little scared.', 'אני קצת מפחדת.'],
+        ['I am so excited!', 'אני כל כך מתרגשת!'],
+        ['I am angry.', 'אני כועסת.'],
+        ['I love you!', 'אני אוהבת אותך!']
+      ],
+      medium: [
+        ['I feel happy when I play with friends.', 'אני מרגישה שמחה כשאני משחקת עם חברים.'],
+        ['I am tired, so I want to sleep.', 'אני עייפה, אז אני רוצה לישון.'],
+        ['Are you okay? You look sad.', 'את בסדר? את נראית עצובה.'],
+        ['I was scared of the big dog.', 'פחדתי מהכלב הגדול.'],
+        ['Thank you, that makes me smile.', 'תודה, זה גורם לי לחייך.'],
+        ['I am proud of my drawing.', 'אני גאה בציור שלי.'],
+        ['When I am angry, I take a deep breath.', 'כשאני כועסת, אני נושמת עמוק.'],
+        ['A big hug makes me feel better.', 'חיבוק גדול עושה לי טוב.']
+      ] },
+    { id: 'play', emoji: '⚽', he: 'מִשְׂחָקִים וּסְפּוֹרְט', en: 'Play & sports',
+      easy: [
+        ["Let's play ball!", 'בואי נשחק בכדור!'],
+        ['I can run fast.', 'אני יכולה לרוץ מהר.'],
+        ['I like to swim.', 'אני אוהבת לשחות.'],
+        ['Catch the ball!', 'תתפסי את הכדור!'],
+        ['My team won!', 'הקבוצה שלי ניצחה!'],
+        ['I can jump high.', 'אני יכולה לקפוץ גבוה.'],
+        ['It is my turn.', 'עכשיו תורי.'],
+        ['I love to dance.', 'אני אוהבת לרקוד.']
+      ],
+      medium: [
+        ['Do you want to play hide and seek?', 'את רוצה לשחק מחבואים?'],
+        ['I ride my bike in the park.', 'אני רוכבת על האופניים שלי בפארק.'],
+        ['My favorite sport is soccer.', 'הספורט האהוב עליי הוא כדורגל.'],
+        ['We play basketball after school.', 'אנחנו משחקים כדורסל אחרי בית הספר.'],
+        ['Can I play with you, please?', 'אפשר לשחק איתך, בבקשה?'],
+        ['I learned to swim this summer.', 'למדתי לשחות בקיץ הזה.'],
+        ['Kick the ball to me!', 'תבעטי אליי את הכדור!'],
+        ["Let's build a big tower with blocks.", 'בואי נבנה מגדל גדול מקוביות.']
+      ] },
+    { id: 'myday', emoji: '☀️', he: 'הַיּוֹם שֶׁלִּי', en: 'My day',
+      easy: [
+        ['I wake up.', 'אני מתעוררת.'],
+        ['I brush my teeth.', 'אני מצחצחת שיניים.'],
+        ['I eat breakfast.', 'אני אוכלת ארוחת בוקר.'],
+        ['I wash my hands.', 'אני שוטפת ידיים.'],
+        ['I get dressed.', 'אני מתלבשת.'],
+        ['I go to bed.', 'אני הולכת לישון.'],
+        ['I take a bath.', 'אני מתרחצת באמבטיה.'],
+        ['I read a book.', 'אני קוראת ספר.']
+      ],
+      medium: [
+        ['Every morning I wake up at seven.', 'כל בוקר אני מתעוררת בשבע.'],
+        ['I brush my teeth before I go to bed.', 'אני מצחצחת שיניים לפני שאני הולכת לישון.'],
+        ['After school I do my homework.', 'אחרי בית הספר אני מכינה שיעורי בית.'],
+        ['I put on my shoes and my coat.', 'אני נועלת נעליים ולובשת מעיל.'],
+        ['In the afternoon I play with my friends.', 'אחר הצהריים אני משחקת עם החברים שלי.'],
+        ['In the evening I take a warm bath.', 'בערב אני מתרחצת באמבטיה חמה.'],
+        ['I help my mom set the table.', 'אני עוזרת לאמא לערוך את השולחן.'],
+        ['At night I read a book in bed.', 'בלילה אני קוראת ספר במיטה.']
+      ] }
+];
+
+// --- checking what the child said ---
+// Both the sentence and what the recognizer wrote are brought to the same simple form,
+// so "I'm", "I am" and "i am" are the same, and so are "7" and "seven".
+const REPEAT_CONTRACTIONS = new Map(Object.entries({
+    "i'm": 'i am', im: 'i am', "you're": 'you are', youre: 'you are', "we're": 'we are',
+    "they're": 'they are', theyre: 'they are', "it's": 'it is', its: 'it is', "that's": 'that is', thats: 'that is',
+    "what's": 'what is', whats: 'what is', "where's": 'where is', wheres: 'where is', "who's": 'who is',
+    "how's": 'how is', "there's": 'there is', "here's": 'here is', "he's": 'he is', "she's": 'she is',
+    "let's": 'let us', lets: 'let us', "don't": 'do not', dont: 'do not', "doesn't": 'does not', doesnt: 'does not',
+    "didn't": 'did not', didnt: 'did not', "isn't": 'is not', isnt: 'is not', "aren't": 'are not', arent: 'are not',
+    "can't": 'can not', cant: 'can not', cannot: 'can not', "won't": 'will not', "i'll": 'i will',
+    "you'll": 'you will', "we'll": 'we will', "i've": 'i have', ive: 'i have', "i'd": 'i would',
+    wanna: 'want to', gonna: 'going to', goodbye: 'good bye'
+}));
+const REPEAT_NUMBERS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten',
+    'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty'];
+// Words that sound the same (the recognizer may write either one), and spelling variants.
+const REPEAT_SAME_SOUND = new Map(Object.entries({
+    two: 'to', too: 'to', four: 'for', eight: 'ate', won: 'one', sea: 'see', son: 'sun', high: 'hi',
+    know: 'no', knew: 'new', dear: 'deer', bare: 'bear', blew: 'blue', write: 'right', meat: 'meet',
+    hour: 'our', their: 'there', flour: 'flower', by: 'bye', buy: 'bye', ok: 'okay',
+    mommy: 'mom', mum: 'mom', mummy: 'mom', daddy: 'dad', grey: 'gray', pyjamas: 'pajamas',
+    favourite: 'favorite', colour: 'color', colours: 'colors'
+}));
+
+// "Let's meet at 7:00!" → ['let', 'us', 'meet', 'at', 'seven']
+function repeatWords(text) {
+    return String(text || '').toLowerCase()
+        .replace(/[’‘ʼ`]/g, "'")
+        .replace(/(\d)[:.]00\b/g, '$1')
+        .replace(/[^a-z0-9'\s]+/g, ' ')
+        .split(/\s+/)
+        .flatMap(word => (REPEAT_CONTRACTIONS.get(word) || REPEAT_CONTRACTIONS.get(word.replace(/'/g, '')) || word.replace(/'/g, '')).split(' '))
+        .filter(Boolean)
+        .map(word => (/^\d+$/.test(word) && REPEAT_NUMBERS[Number(word)]) || word)
+        .map(word => REPEAT_SAME_SOUND.get(word) || word);
+}
+
+// The same word, forgiving a missing plural "s", and one wrong letter in a longer word.
+function repeatSameWord(a, b) {
+    if (a === b) return true;
+    const [short, long] = a.length <= b.length ? [a, b] : [b, a];
+    if (short.length >= 3 && long === short + 's') return true;
+    if (short.length < 5 || long.length - short.length > 1) return false;
+    let i = 0, j = 0, edits = 0;
+    while (i < short.length && j < long.length) {
+        if (short[i] === long[j]) { i++; j++; continue; }
+        if (++edits > 1) return false;
+        if (short.length === long.length) i++;
+        j++;
+    }
+    return edits + (long.length - j) <= 1;
+}
+
+// Which words of the sentence were heard, in the sentence's order (longest common
+// subsequence), and the share of them.
+function repeatScore(sentence, heard) {
+    const words = sentence.split(' ');
+    const target = [];                                   // [token, index of its word]
+    words.forEach((word, w) => repeatWords(word).forEach(token => target.push([token, w])));
+    const said = repeatWords(heard);
+    const n = target.length, m = said.length;
+    const same = (i, j) => repeatSameWord(target[i][0], said[j]);
+    const lcs = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
+    for (let i = n - 1; i >= 0; i--) {
+        for (let j = m - 1; j >= 0; j--) {
+            lcs[i][j] = same(i, j) ? lcs[i + 1][j + 1] + 1 : Math.max(lcs[i + 1][j], lcs[i][j + 1]);
+        }
+    }
+    const heardToken = new Array(n).fill(false);
+    for (let i = 0, j = 0; i < n && j < m;) {
+        if (same(i, j) && lcs[i][j] === lcs[i + 1][j + 1] + 1) { heardToken[i] = true; i++; j++; }
+        else if (lcs[i + 1][j] >= lcs[i][j + 1]) i++;
+        else j++;
+    }
+    const wordOk = words.map((_, w) => target.every(([, owner], k) => owner !== w || heardToken[k]));
+    const ok = wordOk.filter(Boolean).length;
+    return { wordOk, ok, stars: GaiaProgress.starsFor(ok, words.length) };
+}
+
+// --- game state ---
+const Repeat = {
+    level: 'easy', topic: null, items: [], idx: 0,
+    attempts: 0, best: 0, lastStars: 0,  // this sentence: tries, points of the best try, stars of the last
+    total: 0, said: 0,                   // this round: points, sentences the child said
+    phase: 'ready',                      // ready | listening | judged | done
+    active: false, recognizer: null, shownAt: 0
+};
+
+const REPEAT_HINTS = {
+    start: 'הַקְשִׁיבִי לְ-Googy, וְאָז לְחַצִי עַל 🎤 וְחִזְרִי אַחֲרֶיהָ',
+    listening: 'אִמְרִי אֶת הַמִּשְׁפָּט בְּקוֹל 🗣️',
+    tapWord: 'אֶפְשָׁר לִלְחֹץ עַל מִלָּה כְּדֵי לִשְׁמֹעַ אוֹתָהּ 👆',
+    noRecognition: 'בַּדַּפְדְּפָן הַזֶּה אֵין זִהוּי דִּבּוּר, אָז אֶפְשָׁר לְהַקְשִׁיב וְלַחֲזֹר בְּקוֹל. כְּדֵי לְקַבֵּל כּוֹכָבִים, פִּתְחִי אֶת הַמִּשְׂחָק בְּ-Chrome אוֹ בְּ-Safari.',
+    'no-speech': 'לֹא שָׁמַעְתִּי כְּלוּם — לְחַצִי עַל 🎤 וְדַבְּרִי בְּקוֹל 🙂',
+    'not-allowed': 'צָרִיךְ לְאַשֵּׁר לַדַּפְדְּפָן גִּישָׁה לַמִּיקְרוֹפוֹן 🎤',
+    'service-not-allowed': 'צָרִיךְ לְאַשֵּׁר לַדַּפְדְּפָן גִּישָׁה לַמִּיקְרוֹפוֹן 🎤',
+    'audio-capture': 'לֹא מָצָאתִי מִיקְרוֹפוֹן 🎤',
+    network: 'זִהוּי הַדִּבּוּר צָרִיךְ חִבּוּר לָאִינְטֶרְנֶט 📶',
+    micFailed: 'הַמִּיקְרוֹפוֹן לֹא עָבַד — נַסִּי שׁוּב 🎤'
+};
+
+// What Googy says after a try: by stars, and for a low score whether another try is left.
+const REPEAT_PRAISE = {
+    3: ['Perfect!', 'Amazing!', 'Wonderful!'],
+    2: ['Very good!', 'Great job!', 'Well done!'],
+    1: ['Almost! Try again.'],
+    0: ["Let's try again!"],
+    last: ['Good try!', 'Nice try!']
+};
+
+function setRepeatHint(text) { document.getElementById('repeat-hint').textContent = text || ''; }
+
+function repeatCanRetry() { return Repeat.lastStars < 3 && Repeat.attempts < REPEAT_TRIES; }
+
+// --- screens ---
+function goToRepeat(level) {
+    repeatStop();
+    stopAllGames();
+    Repeat.level = level === 'medium' ? 'medium' : 'easy';
+    showGoogyTopics('מָה נְתַרְגֵּל הַיּוֹם? 🦜',
+        'Googy אוֹמֶרֶת מִשְׁפָּט בְּאַנְגְּלִית, וְאַתְּ חוֹזֶרֶת אַחֲרֶיהָ 🎤',
+        REPEAT_TOPICS, startRepeat);
+}
+
+function startRepeat(topicId) {
+    const topic = REPEAT_TOPICS.find(t => t.id === topicId);
+    if (!topic) return;
+    stopAllGames();
+    repeatStop();
+    googyUnlockSpeech();
+    Object.assign(Repeat, {
+        topic, items: shuffle(topic[Repeat.level]).slice(0, REPEAT_ROUND),
+        idx: 0, total: 0, said: 0, active: true
+    });
+    GaiaHooks.emit('game_start', { subject: 'repeat', level: topic.id + '_' + Repeat.level });
+    document.getElementById('repeat-topic-label').textContent = topic.emoji + ' ' + topic.he;
+    document.getElementById('repeat-points').style.display = GoogySpeechRecognition ? '' : 'none';
+    const end = document.getElementById('repeat-end');
+    end.textContent = '';
+    end.classList.remove('show');
+    fillGoogyAvatars();
+    showScreen('repeat-screen');
+    showRepeatSentence();
+    setRepeatHint(GoogySpeechRecognition ? REPEAT_HINTS.start : REPEAT_HINTS.noRecognition);
+}
+
+function showRepeatSentence() {
+    const [english, hebrew] = Repeat.items[Repeat.idx];
+    Object.assign(Repeat, { attempts: 0, best: 0, lastStars: 0, phase: 'ready', shownAt: Date.now() });
+    const box = document.getElementById('repeat-sentence');
+    box.textContent = '';
+    english.split(' ').forEach((word, i) => {
+        if (i) box.append(' ');
+        const span = googyEl('span', 'rw', word);
+        span.onclick = () => repeatSayWord(word);
+        box.appendChild(span);
+    });
+    document.getElementById('repeat-hebrew').textContent = hebrew;
+    document.getElementById('repeat-live').textContent = '';
+    document.getElementById('repeat-result').textContent = '';
+    if (GoogySpeechRecognition) setRepeatHint('');
+    updateRepeatProgress();
+    updateRepeatControls();
+    later(() => repeatSay(false), 350);
+}
+
+function updateRepeatProgress() {
+    const count = Repeat.items.length;
+    document.getElementById('repeat-count').textContent = Math.min(Repeat.idx + 1, count) + '/' + count;
+    document.getElementById('repeat-points').textContent = '⭐ ' + (Repeat.total + Repeat.best);
+}
+
+function updateRepeatControls() {
+    const { phase, attempts } = Repeat;
+    const canHear = !!GoogySpeechRecognition;
+    const listening = phase === 'listening';
+    const show = (id, visible) => { document.getElementById(id).style.display = visible ? '' : 'none'; };
+    show('repeat-play', phase !== 'done');
+    show('repeat-mic', canHear && (phase === 'ready' || listening));
+    show('repeat-again', canHear && phase === 'judged' && repeatCanRetry());
+    show('repeat-next', !canHear || (attempts > 0 && !listening));
+    show('repeat-skip', canHear && attempts === 0);
+    const mic = document.getElementById('repeat-mic');
+    mic.classList.toggle('listening', listening);
+    mic.textContent = listening ? '👂 אֲנִי מַקְשִׁיבָה...' : '🎤 עַכְשָׁו אַתְּ!';
+    document.getElementById('repeat-listen').disabled = listening;
+    document.getElementById('repeat-slow').disabled = listening;
+    document.getElementById('repeat-next').textContent =
+        Repeat.idx >= Repeat.items.length - 1 ? 'סִיּוּם 🏁' : 'הַבָּא ➜';
+}
+
+// Leaving the game (🏠 or any other screen) stops the mic and the voice.
+function repeatStop() {
+    Repeat.active = false;
+    repeatStopListening();
+    if (window.speechSynthesis) speechSynthesis.cancel();
+}
+GaiaHooks.on((type, data) => {
+    if (type === 'nav' && data.screen !== 'repeat-screen' && Repeat.active) repeatStop();
+});
+
+// --- Googy's voice ---
+function repeatSay(slow) {
+    if (!Repeat.active || Repeat.phase === 'listening' || Repeat.phase === 'done') return;
+    googySpeak(Repeat.items[Repeat.idx][0], {
+        rate: slow ? 0.6 : (Repeat.level === 'easy' ? 0.8 : 0.9),
+        face: '#repeat-head-avatar'
+    });
+}
+
+function repeatSayWord(word) {
+    if (!Repeat.active || Repeat.phase === 'listening' || Repeat.phase === 'done') return;
+    googySpeak(word.replace(/[^A-Za-z']/g, ''), { rate: 0.7, face: '#repeat-head-avatar' });
+}
+
+// --- the child's voice ---
+function repeatStopListening() {
+    const rec = Repeat.recognizer;
+    Repeat.recognizer = null;
+    if (rec) { try { rec.abort(); } catch (e) { /* already stopped */ } }
+    if (Repeat.phase === 'listening') {
+        Repeat.phase = 'ready';
+        updateRepeatControls();
+    }
+}
+
+function repeatListen() {
+    if (!GoogySpeechRecognition || !Repeat.active || Repeat.recognizer) return;
+    if (Repeat.phase === 'done' || (Repeat.phase === 'judged' && !repeatCanRetry())) return;
+    if (window.speechSynthesis) speechSynthesis.cancel();
+    const rec = new GoogySpeechRecognition();
+    rec.lang = 'en-US';
+    rec.interimResults = true;
+    rec.continuous = false;
+    rec.maxAlternatives = 5;
+    const finals = [];          // for every final piece of speech, its alternatives
+    let interim = '', error = '';
+    const live = document.getElementById('repeat-live');
+    rec.onresult = event => {
+        if (Repeat.recognizer !== rec) return;
+        interim = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const result = event.results[i];
+            if (result.isFinal) finals[i] = Array.from(result, alt => alt.transcript);
+            else interim += result[0].transcript;
+        }
+        live.textContent = finals.filter(Boolean).map(alts => alts[0]).concat(interim).join(' ').trim();
+    };
+    rec.onerror = event => { error = event.error; };
+    rec.onend = () => {
+        if (Repeat.recognizer !== rec) return;   // stopped on purpose
+        Repeat.recognizer = null;
+        live.textContent = '';
+        const candidates = repeatCandidates(finals.filter(Boolean), interim);
+        if (candidates.length) {
+            repeatJudge(candidates);
+        } else {
+            Repeat.phase = 'ready';
+            updateRepeatControls();
+            setRepeatHint(REPEAT_HINTS[error || 'no-speech'] || REPEAT_HINTS.micFailed);
+        }
+    };
+    Repeat.recognizer = rec;
+    Repeat.phase = 'listening';
+    live.textContent = '';
+    document.getElementById('repeat-result').textContent = '';
+    updateRepeatControls();
+    setRepeatHint(REPEAT_HINTS.listening);
+    try {
+        rec.start();
+    } catch (e) {
+        repeatStopListening();
+        setRepeatHint(REPEAT_HINTS.micFailed);
+        return;
+    }
+    // some browsers keep listening after the child stops talking
+    later(() => { if (Repeat.recognizer === rec) rec.stop(); }, 12000);
+}
+
+// Every way the recognizer wrote the whole sentence (its first choice first).
+function repeatCandidates(finals, interim) {
+    if (!finals.length) return interim.trim() ? [interim.trim()] : [];
+    const most = Math.max(...finals.map(alts => alts.length));
+    const list = [];
+    for (let k = 0; k < most; k++) {
+        const text = finals.map(alts => alts[k] || alts[0]).join(' ').trim();
+        if (text && !list.includes(text)) list.push(text);
+    }
+    return list;
+}
+
+function repeatJudge(candidates) {
+    const sentence = Repeat.items[Repeat.idx][0];
+    let best = null, heard = '';
+    candidates.forEach(text => {
+        const score = repeatScore(sentence, text);
+        if (!best || score.ok > best.ok) { best = score; heard = text; }
+    });
+    const stars = best.stars;
+    Repeat.attempts++;
+    Repeat.lastStars = stars;
+    Repeat.best = Math.max(Repeat.best, REPEAT_POINTS[stars]);
+    Repeat.phase = 'judged';
+    GaiaHooks.emit('answer', { correct: stars >= 2 });
+
+    document.querySelectorAll('#repeat-sentence .rw').forEach((el, i) => {
+        el.classList.toggle('ok', best.wordOk[i]);
+        el.classList.toggle('miss', !best.wordOk[i]);
+    });
+    const canRetry = repeatCanRetry();
+    const box = document.getElementById('repeat-result');
+    box.textContent = '';
+    const line = googyEl('div', 'rr-heard', 'שָׁמַעְתִּי: ');
+    const said = googyEl('bdi', '', heard);
+    said.dir = 'ltr';
+    line.appendChild(said);
+    const starsEl = googyEl('div', 'stars-earned');
+    renderStarsEarned(starsEl, stars);
+    box.append(line, starsEl, googyEl('div', 'rr-msg', repeatMessage(stars, canRetry)));
+    setRepeatHint(stars < 3 ? REPEAT_HINTS.tapWord : '');
+    updateRepeatProgress();
+    updateRepeatControls();
+
+    const praise = stars >= 2 || canRetry ? REPEAT_PRAISE[stars] : REPEAT_PRAISE.last;
+    googySpeak(praise[Math.floor(Math.random() * praise.length)], { rate: 0.95, face: '#repeat-head-avatar' });
+    if (stars === 3) {
+        const rect = starsEl.getBoundingClientRect();
+        spawnStars({ clientX: rect.left + rect.width / 2, clientY: rect.top + rect.height / 2 });
+    }
+}
+
+function repeatMessage(stars, canRetry) {
+    if (stars === 3) return 'מֻשְׁלָם! 🌟';
+    if (stars === 2) return 'יָפֶה מְאֹד! 👏';
+    if (stars === 1) return canRetry ? 'כִּמְעַט! נַסִּי שׁוּב 💪' : 'כִּמְעַט! 💪';
+    return canRetry ? 'בּוֹאִי נְנַסֶּה שׁוּב 💪' : 'לֹא נוֹרָא, מַמְשִׁיכִים! 💪';
+}
+
+// "Next", or skipping a sentence that wasn't tried (it gets no points).
+function repeatNext() {
+    if (!Repeat.active || Repeat.phase === 'done') return;
+    if (Date.now() - Repeat.shownAt < 400) return;   // a double tap skips only one sentence
+    repeatStopListening();
+    if (window.speechSynthesis) speechSynthesis.cancel();
+    Repeat.total += Repeat.best;
+    if (Repeat.attempts) Repeat.said++;
+    Repeat.idx++;
+    if (Repeat.idx < Repeat.items.length) showRepeatSentence();
+    else finishRepeat();
+}
+
+function finishRepeat() {
+    Repeat.phase = 'done';
+    Repeat.best = 0;
+    updateRepeatProgress();
+    updateRepeatControls();
+    setRepeatHint('');
+    const scored = !!GoogySpeechRecognition;
+    const max = Repeat.items.length * REPEAT_POINTS[3];
+    const stars = Repeat.total > 0 ? Math.max(1, GaiaProgress.starsFor(Repeat.total, max)) : 0;
+    GaiaHooks.emit('game_end');
+    if (scored) {
+        try { GaiaProgress.recordGame('english', 'repeat_' + Repeat.level, stars); }
+        catch (e) { console.warn('[progress] repeat hook', e); }
+    }
+    const end = document.getElementById('repeat-end');
+    end.textContent = '';
+    end.appendChild(googyEl('div', 'reading-title', scored && !stars ? 'בַּפַּעַם הַבָּאָה נַצְלִיחַ! 💪' : 'כָּל הַכָּבוֹד! 🎉'));
+    if (scored) {
+        end.appendChild(googyEl('div', 'repeat-end-line',
+            'אָמַרְתְּ ' + Repeat.said + ' מִתּוֹךְ ' + Repeat.items.length + ' מִשְׁפָּטִים'));
+        const starsEl = googyEl('div', 'stars-earned');
+        renderStarsEarned(starsEl, stars);
+        end.append(starsEl, googyEl('div', 'repeat-end-points', '⭐ ' + Repeat.total + ' / ' + max + ' נְקֻדּוֹת'));
+    } else {
+        end.appendChild(googyEl('div', 'repeat-end-line', 'הִקְשַׁבְתְּ לְכָל הַמִּשְׁפָּטִים 👂'));
+    }
+    const again = googyEl('button', 'big-btn btn-googy', 'סִיבּוּב נוֹסָף 🔁');
+    again.onclick = () => startRepeat(Repeat.topic.id);
+    const other = googyEl('button', 'big-btn btn-english', 'נוֹשֵׂא אַחֵר 🦜');
+    other.onclick = () => goToRepeat(Repeat.level);
+    const home = googyEl('button', 'big-btn btn-home', 'חֲזָרָה לַמַּפָּה 🏠');
+    home.onclick = () => goHome();
+    end.append(again, other, home);
+    end.classList.add('show');
+    googySpeak(stars >= 2 ? 'You did it! Great job!' : 'Good job! See you next time!', { rate: 0.95, face: '#repeat-head-avatar' });
+    later(() => {
+        playSound('victory');
+        if (stars >= 2) spawnStars();
+    }, 500);
+}
+
+document.getElementById('repeat-mic').addEventListener('click', () => {
+    if (Repeat.phase === 'listening') { if (Repeat.recognizer) Repeat.recognizer.stop(); }
+    else repeatListen();
+});
+document.getElementById('repeat-again').addEventListener('click', repeatListen);
+document.getElementById('repeat-next').addEventListener('click', repeatNext);
+document.getElementById('repeat-skip').addEventListener('click', repeatNext);
+document.getElementById('repeat-listen').addEventListener('click', () => repeatSay(false));
+document.getElementById('repeat-slow').addEventListener('click', () => repeatSay(true));
+</script>
+<script>
 // ===== ADVENTURE MAP MODULE =====
 // Builds a tall scrolling SVG "kingdom" scene, places themed lands along a
 // winding RTL path, renders star badges from GaiaProgress, animates Gaia's
@@ -3998,6 +4712,8 @@ fillGoogyAvatars();
                 { cls: 'btn-level-2', label: 'אוֹת רִאשׁוֹנָה',           fn: () => startEnglishGame(1), levelKey: '1' },
                 { cls: 'btn-level-3', label: 'אוֹת אַחֲרוֹנָה',           fn: () => startEnglishGame(2), levelKey: '2' },
                 { cls: 'btn-english', label: 'אוֹת חֲסֵרָה (קָשֶׁה)',      fn: () => startEnglishGame(3), levelKey: '3' },
+                { cls: 'btn-googy', label: 'חִזְרִי אַחֲרֵי Googy 🦜 (קַל)', fn: () => goToRepeat('easy'), levelKey: 'repeat_easy' },
+                { cls: 'btn-googy', label: 'חִזְרִי אַחֲרֵי Googy 🦜 (קְצָת יוֹתֵר)', fn: () => goToRepeat('medium'), levelKey: 'repeat_medium' },
                 { cls: 'btn-googy', label: 'שִׂיחָה עִם Googy 💬 (קַל)', fn: () => goToGoogy('easy'), levelKey: 'googy_easy', when: googyAvailable },
                 { cls: 'btn-googy', label: 'שִׂיחָה עִם Googy 💬 (קְצָת יוֹתֵר)', fn: () => goToGoogy('medium'), levelKey: 'googy_medium', when: googyAvailable }
             ]
