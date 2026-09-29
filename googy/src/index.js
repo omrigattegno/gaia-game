@@ -1,4 +1,4 @@
-// Googy — the English-conversation friend in Gaia Game.
+// Googy — the English-conversation friend in Yoovy & Googy.
 // This Cloudflare Worker sits between the game and the Claude API: the API key stays
 // here, only signed-in players of the game can talk, and every request is size- and
 // rate-limited. Nothing the child writes is stored or logged.
