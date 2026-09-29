@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Gaia Game - לומדים בכיף</title>
+    <title>Yoovy &amp; Googy - לומדים בכיף</title>
 
     <!-- Firebase (deferred: never blocks the first paint; initialised on DOMContentLoaded) -->
     <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -96,16 +96,30 @@
         }
         .screen { position: relative; z-index: 1; }
 
-        /* === GAIA CHARACTER === */
+        /* === YOOVY & GOOGY IN THE CORNER === */
         #gaia-char {
-            position: fixed; right: 8px; bottom: 0; z-index: 100;
-            width: 110px; pointer-events: none;
-            transform-origin: bottom center;
+            position: fixed; right: 2px; bottom: 0; z-index: 100;
+            display: flex; align-items: flex-end; pointer-events: none;
         }
-        #gaia-char.gaia-idle { animation: gaia-breathe 2.5s ease-in-out infinite; }
-        #gaia-char.gaia-happy { animation: gaia-jump 0.6s var(--ease-out-quart) forwards; }
-        #gaia-char.gaia-sad { animation: gaia-shake 0.5s ease-in-out; }
-        #gaia-char.gaia-dance { animation: gaia-dance 0.4s ease-in-out infinite alternate; }
+        #gaia-char .girl { display: block; transform-origin: bottom center; }
+        #gaia-char .girl-googy { margin-right: -28px; }   /* the two stand close together */
+        #gaia-char.gaia-idle .girl { animation: gaia-breathe 2.5s ease-in-out infinite; }
+        #gaia-char.gaia-idle .girl-googy { animation-delay: -1.1s; }
+        #gaia-char.gaia-happy .girl { animation: gaia-jump 0.6s var(--ease-out-quart) forwards; }
+        #gaia-char.gaia-happy .girl-googy { animation-delay: 0.1s; }
+        #gaia-char.gaia-sad .girl { animation: gaia-shake 0.5s ease-in-out; }
+        #gaia-char.gaia-dance .girl { animation: gaia-dance 0.4s ease-in-out infinite alternate; }
+        #gaia-char.gaia-dance .girl-googy { animation-direction: alternate-reverse; }
+        /* faces: a smile, or a small frown and worried brows when an answer was wrong */
+        .girl .g-mouth-sad, .girl .g-brows-sad,
+        #gaia-char.gaia-sad .g-mouth-happy, #gaia-char.gaia-sad .g-brows-happy { display: none; }
+        #gaia-char.gaia-sad .g-mouth-sad, #gaia-char.gaia-sad .g-brows-sad { display: inline; }
+        /* the welcome screen and the map show the girls themselves */
+        body:has(#welcome-screen.active) #gaia-char, body:has(#main-menu.active) #gaia-char { display: none; }
+        @media (max-height: 700px) {   /* short phones: smaller, so they cover less of the game */
+            #gaia-char .girl { height: 118px; width: auto; }
+            #gaia-char .girl-googy { margin-right: -22px; }
+        }
         @keyframes gaia-breathe {
             0%,100% { transform: scaleY(1); }
             50% { transform: scaleY(1.03) translateY(-3px); }
@@ -182,21 +196,27 @@
             border: 3px solid var(--gold);
         }
 
-        .logo-container { margin-bottom: 30px; animation: popIn 0.8s var(--ease-out-quart); }
-        .logo-wrapper { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: nowrap; }
-        .cartoon-girl { font-size: 5rem; animation: subtle-bounce 3s infinite ease-in-out; }
+        .logo-container { margin-bottom: 22px; animation: popIn 0.8s var(--ease-out-quart); }
+        .welcome-girls { display: flex; justify-content: center; align-items: flex-end; direction: rtl; margin-bottom: 4px; }
+        .welcome-girls .girl { animation: subtle-bounce 3s infinite ease-in-out; }
+        .welcome-girls .girl-googy { margin-right: -34px; animation-delay: -1.5s; }
+        .welcome-story { font-size: 1.15rem; line-height: 1.6; color: var(--ink-soft); margin: 8px 0 0; }
 
         /* Solid chunky logo — no gradient text / background-clip */
         .gaia-logo {
             /* Latin per-letter spans inside an RTL document reverse visually without this */
             direction: ltr; unicode-bidi: isolate;
             font-family: 'Fredoka', 'Comic Sans MS', sans-serif;
-            font-size: 4rem; font-weight: 700;
+            font-size: clamp(2.3rem, 11vw, 3.6rem); font-weight: 700;
             color: var(--brand);
             letter-spacing: -1px; line-height: 1.1;
             text-shadow: 0 3px 0 var(--brand-deep), 0 6px 12px oklch(0.4 0.1 300 / 0.25);
         }
         .gaia-logo .gl { display: inline-block; animation: logo-pop 0.5s var(--ease-out-quart) backwards; }
+        .gaia-logo .gl-space { width: 0.28em; }
+        .gaia-logo .yg-y { color: oklch(0.55 0.19 290); }       /* Yoovy's purple */
+        .gaia-logo .yg-g { color: oklch(0.66 0.20 355); text-shadow: 0 3px 0 oklch(0.48 0.18 355), 0 6px 12px oklch(0.4 0.1 300 / 0.25); }   /* Googy's pink */
+        .gaia-logo .yg-amp { color: var(--gold); text-shadow: 0 3px 0 oklch(0.62 0.14 75); font-size: 0.8em; }
         @keyframes logo-pop {
             0%   { opacity: 0; transform: translateY(14px) scale(0.7); }
             100% { opacity: 1; transform: translateY(0) scale(1); }
@@ -351,6 +371,71 @@
             width: 70%; text-align: center; margin-bottom: 10px;
             font-family: 'Varela Round', sans-serif;
         }
+
+        /* --- leaderboards and the player picker --- */
+        .gg-modal {
+            position: fixed; inset: 0; z-index: 300; display: flex; align-items: center; justify-content: center;
+            background: oklch(0.3 0.05 300 / 0.45); padding: 12px; box-sizing: border-box;
+        }
+        .gg-modal[hidden] { display: none; }
+        .gg-modal-box {
+            position: relative; width: 100%; max-width: 460px; max-height: 92vh; max-height: 92dvh; overflow-y: auto;
+            background: var(--surface); border-radius: 26px; border: 3px solid var(--gold);
+            box-shadow: 0 20px 40px oklch(0.3 0.1 300 / 0.3); padding: 18px 16px 14px; box-sizing: border-box;
+            text-align: center; direction: rtl; animation: popIn 0.35s var(--ease-out-quart);
+        }
+        .gg-modal-box h2 { margin: 4px 0 2px; color: var(--brand-deep); }
+        .gg-modal-close {
+            position: absolute; top: 10px; left: 10px; width: 40px; height: 40px; border-radius: 50%;
+            border: none; background: var(--surface-2); color: var(--ink); font-size: 1.2rem; cursor: pointer;
+        }
+        #board-land { font-size: 1.15rem; font-weight: 700; color: var(--ink-soft); margin-bottom: 8px; }
+        .board-chips {
+            display: flex; gap: 6px; overflow-x: auto; padding: 2px 2px 8px; margin: 0 -4px;
+            -webkit-overflow-scrolling: touch; scrollbar-width: thin;
+        }
+        .board-chips button {
+            flex-shrink: 0; border: 2px solid oklch(0.85 0.08 90); background: oklch(0.98 0.03 95); color: var(--ink);
+            border-radius: 999px; padding: 6px 12px; font-size: 0.95rem; cursor: pointer; white-space: nowrap;
+            font-family: 'Varela Round', 'Fredoka', sans-serif;
+        }
+        .board-chips button.active { background: var(--gold); border-color: oklch(0.72 0.15 80); font-weight: 700; }
+        .board-table { margin-top: 4px; }
+        .board-table td.bt-time, .board-table td.bt-grade { direction: ltr; font-family: 'Fredoka', sans-serif; }
+        .board-table tr.me td { outline: 2px solid oklch(0.66 0.20 355); outline-offset: -2px; font-weight: 700; }
+        .board-table td.bt-empty { color: var(--ink-soft); font-size: 1rem; padding: 14px 6px; }
+        #board-note { font-size: 0.9rem; color: var(--ink-soft); min-height: 1.2em; margin: 8px 0 0; }
+        .board-rule { font-size: 0.85rem; color: var(--ink-soft); margin: 4px 0 6px; }
+        .board-player-btn {
+            border: none; background: none; color: var(--brand); text-decoration: underline; cursor: pointer;
+            font-size: 0.95rem; font-family: 'Varela Round', sans-serif; padding: 6px;
+        }
+        .player-girls { display: flex; justify-content: center; direction: rtl; }
+        .player-girls .girl-googy { margin-right: -6px; }
+        #player-list { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 10px 0 4px; }
+        #player-list button {
+            border: none; border-radius: 16px; padding: 10px 18px; font-size: 1.25rem; cursor: pointer; color: white;
+            background: linear-gradient(135deg, oklch(0.68 0.20 320), oklch(0.60 0.22 315));
+            box-shadow: 0 4px 0 oklch(0.48 0.20 315); font-family: 'Varela Round', sans-serif;
+        }
+        #player-list button.current { outline: 3px solid var(--gold); }
+        #player-new-label { margin: 10px 0 4px; color: var(--ink-soft); }
+        .player-form { display: flex; gap: 8px; align-items: center; justify-content: center; }
+        .player-form .name-input { width: auto; flex: 1; min-width: 0; margin: 0; }
+        .player-form .big-btn { width: auto; margin: 0; padding: 10px 14px; font-size: 1.1rem; }
+
+        /* the result box at the end of every game */
+        .board-card {
+            background: oklch(0.98 0.04 95); border: 2px solid oklch(0.85 0.12 90); border-radius: 18px;
+            padding: 10px 12px; margin: 12px auto 6px; max-width: 360px; direction: rtl; text-align: center;
+        }
+        .board-card .bc-title { font-weight: 700; color: oklch(0.55 0.14 70); font-size: 1.05rem; }
+        .board-card .bc-stats { display: flex; justify-content: center; gap: 18px; margin: 4px 0; font-size: 1.25rem; font-weight: 700; color: var(--ink); }
+        .board-card .bc-stats bdi { font-family: 'Fredoka', sans-serif; }
+        .board-card .bc-status { font-size: 1.05rem; min-height: 1.4em; color: var(--ink); }
+        .board-card .player-form { margin: 6px 0; }
+        .board-card .bc-open { margin-top: 6px; }
+        .btn-board { background: linear-gradient(135deg, oklch(0.80 0.15 85), oklch(0.70 0.16 70)); color: oklch(0.30 0.06 60); }
 
         /* --- אנימציות --- */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -587,6 +672,12 @@
             color: white; text-shadow: 0 2px 0 var(--brand-deep), 0 3px 6px oklch(0.3 0.05 300 / 0.4);
             pointer-events: none;
         }
+        #player-chip {
+            pointer-events: auto; border: 2px solid var(--gold); background: var(--surface); color: var(--ink);
+            border-radius: 999px; padding: 7px 12px; font-size: 1rem; font-weight: 700; cursor: pointer;
+            box-shadow: 0 4px 10px oklch(0.3 0.05 300 / 0.2); font-family: 'Varela Round', sans-serif;
+            max-width: 42vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
         #map-stars-badge {
             background: var(--surface); border-radius: 999px; padding: 8px 14px;
             font-weight: 700; color: var(--ink); box-shadow: 0 4px 10px oklch(0.3 0.05 300 / 0.2);
@@ -601,6 +692,17 @@
         .land-plaque-fo, .land-plaque-wrap { pointer-events: auto; }
         /* the avatar rides on top of land circles — it must never swallow their taps */
         #gaia-map-avatar { pointer-events: none; }
+        .land-guide { display: flex; align-items: center; gap: 8px; direction: rtl; margin: 0 0 10px; }
+        .land-guide .girl { flex-shrink: 0; }
+        .land-guide-bubble {
+            position: relative; flex: 1; text-align: right; font-size: 1.02rem; line-height: 1.5;
+            background: oklch(0.97 0.02 300); border: 2px solid oklch(0.88 0.05 300);
+            border-radius: 16px; padding: 8px 12px; color: var(--ink);
+        }
+        .land-guide-bubble::before {   /* the bubble's tail points at the girl */
+            content: ''; position: absolute; right: -9px; top: 50%; margin-top: -7px;
+            border: 7px solid transparent; border-left-color: oklch(0.88 0.05 300); border-right: 0;
+        }
         .land-plaque {
             display: inline-flex; align-items: center; gap: 6px;
             background: var(--surface); border: 2px solid var(--gold);
@@ -794,7 +896,7 @@
 
         /* --- reduced motion: collapse map/parallax/character motion to instant --- */
         @media (prefers-reduced-motion: reduce) {
-            #gaia-char, .kg-cloud, .kg-sparkle, .kg-star, .map-cloud { animation: none !important; }
+            #gaia-char .girl, .kg-cloud, .kg-sparkle, .kg-star, .map-cloud { animation: none !important; }
             .map-cloud { transform: none !important; }
             #gaia-map-avatar { transition: none !important; }
             .big-btn, .answer-btn, .mult-opt-btn, .reading-opt-btn,
@@ -835,57 +937,16 @@
     </svg>
 </div>
 
-<svg id="gaia-char" class="gaia-idle" viewBox="0 0 110 190" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="55" cy="185" rx="30" ry="5" fill="rgba(0,0,0,0.1)"/>
-    <path d="M30 110 Q20 160 15 185 L95 185 Q90 160 80 110 Z" fill="#FF69B4"/>
-    <path d="M30 110 Q20 150 22 185 L45 185 L50 130 Z" fill="#F06292"/>
-    <text x="48" y="160" font-size="14" fill="#FFD700">⭐</text>
-    <ellipse cx="55" cy="105" rx="25" ry="30" fill="#FFCCBC"/>
-    <path d="M30 108 Q10 115 8 130" stroke="#FFCCBC" stroke-width="12" stroke-linecap="round" fill="none"/>
-    <path d="M80 108 Q100 115 102 130" stroke="#FFCCBC" stroke-width="12" stroke-linecap="round" fill="none"/>
-    <circle cx="8" cy="132" r="7" fill="#FFCCBC"/>
-    <circle cx="102" cy="132" r="7" fill="#FFCCBC"/>
-    <rect x="48" y="78" width="14" height="12" rx="4" fill="#FFCCBC"/>
-    <ellipse cx="55" cy="65" rx="28" ry="30" fill="#FFCCBC"/>
-    <ellipse cx="32" cy="72" rx="8" ry="5" fill="#FFB3BA" opacity="0.7"/>
-    <ellipse cx="78" cy="72" rx="8" ry="5" fill="#FFB3BA" opacity="0.7"/>
-    <g id="gaia-eyes-happy">
-        <ellipse cx="44" cy="62" rx="7" ry="8" fill="#1565C0"/>
-        <ellipse cx="66" cy="62" rx="7" ry="8" fill="#1565C0"/>
-        <ellipse cx="44" cy="62" rx="3" ry="4" fill="#0D47A1"/>
-        <ellipse cx="66" cy="62" rx="3" ry="4" fill="#0D47A1"/>
-        <circle cx="47" cy="59" r="2" fill="white"/>
-        <circle cx="69" cy="59" r="2" fill="white"/>
-    </g>
-    <g id="gaia-eyes-sad" display="none">
-        <ellipse cx="44" cy="63" rx="7" ry="6" fill="#1565C0"/>
-        <ellipse cx="66" cy="63" rx="7" ry="6" fill="#1565C0"/>
-        <path d="M37 57 Q44 62 51 57" stroke="#FFB3BA" stroke-width="2" fill="none"/>
-        <path d="M59 57 Q66 62 73 57" stroke="#FFB3BA" stroke-width="2" fill="none"/>
-    </g>
-    <path id="gaia-mouth-happy" d="M43 78 Q55 88 67 78" stroke="#E91E63" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-    <path id="gaia-mouth-sad" d="M43 84 Q55 76 67 84" stroke="#E91E63" stroke-width="2.5" fill="none" stroke-linecap="round" display="none"/>
-    <ellipse cx="55" cy="40" rx="30" ry="20" fill="#FFD700"/>
-    <circle cx="28" cy="52" r="16" fill="#FFD700"/>
-    <circle cx="82" cy="52" r="16" fill="#FFD700"/>
-    <circle cx="20" cy="65" r="12" fill="#FFC107"/>
-    <circle cx="90" cy="65" r="12" fill="#FFC107"/>
-    <circle cx="35" cy="32" r="14" fill="#FFD700"/>
-    <circle cx="55" cy="28" r="12" fill="#FFC107"/>
-    <circle cx="72" cy="33" r="13" fill="#FFD700"/>
-    <circle cx="40" cy="36" r="5" fill="#FFF9C4" opacity="0.6"/>
-    <path d="M28 50 Q55 42 82 50" stroke="#FF69B4" stroke-width="3" fill="none"/>
-</svg>
+<div id="gaia-char" class="gaia-idle" aria-hidden="true"></div>
 
     <div id="welcome-screen" class="screen active">
         <div class="logo-container">
-            <div class="logo-wrapper">
-                <span class="cartoon-girl">👧🏼</span>
-                <div class="gaia-logo" aria-label="Gaia Game"><span class="gl" style="animation-delay:0s">G</span><span class="gl" style="animation-delay:.05s">a</span><span class="gl" style="animation-delay:.1s">i</span><span class="gl" style="animation-delay:.15s">a</span><span class="gl" style="animation-delay:.25s">&nbsp;</span><span class="gl" style="animation-delay:.3s">G</span><span class="gl" style="animation-delay:.35s">a</span><span class="gl" style="animation-delay:.4s">m</span><span class="gl" style="animation-delay:.45s">e</span></div>
-            </div>
+            <div class="welcome-girls" aria-hidden="true"></div>
+            <div class="gaia-logo" aria-label="Yoovy &amp; Googy"><span class="gl yg-y" style="animation-delay:0.00s">Y</span><span class="gl yg-y" style="animation-delay:0.05s">o</span><span class="gl yg-y" style="animation-delay:0.10s">o</span><span class="gl yg-y" style="animation-delay:0.15s">v</span><span class="gl yg-y" style="animation-delay:0.20s">y</span><span class="gl gl-space"> </span><span class="gl yg-amp" style="animation-delay:0.25s">&amp;</span><span class="gl gl-space"> </span><span class="gl yg-g" style="animation-delay:0.30s">G</span><span class="gl yg-g" style="animation-delay:0.35s">o</span><span class="gl yg-g" style="animation-delay:0.40s">o</span><span class="gl yg-g" style="animation-delay:0.45s">g</span><span class="gl yg-g" style="animation-delay:0.50s">y</span></div>
             <p class="welcome-text" id="welcome-text">בְּרוּכִים הַבָּאִים!</p>
+            <p class="welcome-story">יוּבִי וְגוּגִי יוֹצְאוֹת לְמַסָּע בְּמַמְלֶכֶת הַיֶּדַע.<br>בְּכָל אֶרֶץ מְחַכֶּה אֶתְגָּר — בּוֹאִי לְהִצְטָרֵף! 🗺️</p>
         </div>
-        <button class="big-btn start-btn" onclick="startGameApp()">הַתְחִילִי מִשְׂחָק ▶️</button>
+        <button class="big-btn start-btn" onclick="startGameApp()">יוֹצְאוֹת לַדֶּרֶךְ ▶️</button>
     </div>
 
     <!-- ===== ADVENTURE MAP (replaces the old flat main menu) ===== -->
@@ -900,6 +961,7 @@
         <div id="map-viewport">
             <div id="map-topbar">
                 <div id="map-title">מַפַּת הַהַרְפַּתְקָה 🗺️</div>
+                <button id="player-chip" onclick="GaiaBoards.openPlayers()"></button>
                 <div id="map-stars-badge"><span id="map-total-medal"></span>⭐ <span id="map-total-stars">0</span></div>
             </div>
             <!-- The tall SVG scene is generated by the map module into #map-scene-holder -->
@@ -988,30 +1050,9 @@
             <p style="font-size: 1.5rem; margin: 10px 0 0;">צָבַרְתְּ: <strong id="final-score-display" style="color:#ff8f00; font-size: 2rem;">0</strong> נְקֻדּוֹת!</p>
             <div id="final-stars" class="stars-earned" aria-label="כּוֹכָבִים שֶׁהִרְוַחְתְּ בַּמַּפָּה"></div>
 
-            <div id="save-score-area">
-                <p>כִּתְבִי אֶת הַשֵּׁם שֶׁלָּךְ:</p>
-                <input type="text" id="player-name" class="name-input" placeholder="שֵׁם..." maxlength="20">
-                <br>
-                <button class="big-btn btn-save" id="save-btn" onclick="saveScore()">שְׁמוֹר בַּטַּבְלָה 💾</button>
-            </div>
-            <!-- outside #save-score-area so it stays visible after the area is hidden -->
-            <p id="save-status" style="margin:8px 0; font-size:0.95rem;"></p>
+            <div id="end-board"></div>
 
-            <div id="leaderboard-area" style="display:none; margin-top:20px;">
-                <h2>👑 טַבְלַת הָאֲלוּפִים 👑</h2>
-                <table class="highscore-table">
-                    <thead>
-                        <tr>
-                            <th>מָקוֹם</th>
-                            <th>שֵׁם</th>
-                            <th>נְקֻדּוֹת</th>
-                        </tr>
-                    </thead>
-                    <tbody id="highscore-body"></tbody>
-                </table>
-            </div>
-
-            <button class="big-btn btn-home" onclick="goHome()">חֲזָרָה לַתַּפְרִיט 🏠</button>
+            <button class="big-btn btn-home" onclick="goHome()">חֲזָרָה לַמַּפָּה 🏠</button>
         </div>
     </div>
 
@@ -1119,6 +1160,37 @@
             </div>
             <div id="repeat-end"></div>
             <button class="home-btn" onclick="goHome()">🏠</button>
+        </div>
+    </div>
+    <!-- ===== LEADERBOARD & PLAYER DIALOGS ===== -->
+    <div id="board-modal" class="gg-modal" role="dialog" aria-modal="true" aria-labelledby="board-title" hidden>
+        <div class="gg-modal-box">
+            <button class="gg-modal-close" aria-label="סְגִירָה">✕</button>
+            <h2 id="board-title">🏆 לוּחַ הַתּוֹצָאוֹת</h2>
+            <div id="board-land"></div>
+            <div id="board-games" class="board-chips"></div>
+            <table class="highscore-table board-table">
+                <thead><tr><th>מָקוֹם</th><th>שֵׁם</th><th>צִיּוּן</th><th>⏱️ זְמַן</th></tr></thead>
+                <tbody id="board-rows"></tbody>
+            </table>
+            <p id="board-note"></p>
+            <p class="board-rule">מִי שֶׁקִּבְּלָה צִיּוּן גָּבוֹהַּ יוֹתֵר — לְמַעְלָה. בְּצִיּוּן שָׁוֶה — הַכִּי מְהִירָה.</p>
+            <button id="board-player" class="board-player-btn"></button>
+        </div>
+    </div>
+
+    <div id="player-modal" class="gg-modal" role="dialog" aria-modal="true" aria-labelledby="player-title" hidden>
+        <div class="gg-modal-box">
+            <button class="gg-modal-close" aria-label="סְגִירָה">✕</button>
+            <div class="player-girls" aria-hidden="true"></div>
+            <h2 id="player-title">מִי מְשַׂחֶקֶת עַכְשָׁו? 👋</h2>
+            <div id="player-list"></div>
+            <p id="player-new-label">שַׂחְקָנִית חֲדָשָׁה? כִּתְבִי אֶת הַשֵּׁם שֶׁלָּךְ:</p>
+            <form id="player-form" class="player-form">
+                <input type="text" id="player-name-input" class="name-input" maxlength="20" placeholder="הַשֵּׁם שֶׁלָּךְ..." autocomplete="off">
+                <button type="submit" class="big-btn btn-save">זוֹ אֲנִי! ✨</button>
+            </form>
+            <button id="player-skip" class="board-player-btn">אַחַר כָּךְ</button>
         </div>
     </div>
 <script>
@@ -1253,6 +1325,173 @@
 
     load();
     window.GaiaProgress = GaiaProgress;
+})();
+</script>
+<script>
+// ===== YOOVY & GOOGY: THE CHARACTERS =====
+// Googy (Gaia, 6.5): golden curls down past her shoulders, blue eyes, pink dress.
+// Yoovy (Yuval, 9): taller, long straight brown hair, purple shirt.
+// Both stand on the same ground line (y≈224), so side by side Yoovy is taller.
+// mode 'head' crops the same drawing to the face (the avatars in chats and on the map).
+const GIRL_LOOKS = {
+    googy: { hair: '#F2B53A', hairDark: '#D9952B', hairLight: '#FFD877', eyes: '#3F80D8', pupil: '#1C3C78',
+             brows: '#C98A32', dress: '#FF7EB3', dressLight: '#FFA6CB', dressDark: '#E85C98', shoes: '#E0407F' },
+    yoovy: { hair: '#7B4A2A', hairDark: '#5C361D', hairLight: '#A0683C', eyes: '#7A5230', pupil: '#2B1A0D',
+             brows: '#5C361D', shirt: '#8E6CEF', shirtDark: '#7353D6', skirt: '#4A7BD0', skirtDark: '#3A64B0', shoes: '#8E6CEF' }
+};
+const GIRL_SKIN = '#FFDBC4', GIRL_SKIN_SHADE = '#F4C3A6', GIRL_CHEEK = '#FF98B3';
+
+function girlFace(cx, cy, look, big, mode) {
+    // eyes: big and round for Googy, a little smaller for Yoovy
+    const ex = big ? 13 : 12, ey = cy + 4, rx = big ? 6.2 : 5.4, ry = big ? 7.2 : 6.4;
+    const eye = x =>
+        `<ellipse cx="${x}" cy="${ey}" rx="${rx}" ry="${ry}" fill="${look.eyes}"/>` +
+        `<ellipse cx="${x}" cy="${ey + 0.6}" rx="${rx * 0.55}" ry="${ry * 0.55}" fill="${look.pupil}"/>` +
+        `<circle cx="${x + rx * 0.35}" cy="${ey - ry * 0.4}" r="${big ? 2.2 : 1.9}" fill="#fff"/>` +
+        `<circle cx="${x - rx * 0.35}" cy="${ey + ry * 0.45}" r="0.9" fill="#fff" opacity="0.8"/>`;
+    const lashes =
+        `<path d="M${cx - ex - rx + 0.5} ${ey - ry * 0.55} l-3.2 -2.2 M${cx + ex + rx - 0.5} ${ey - ry * 0.55} l3.2 -2.2" stroke="${look.pupil}" stroke-width="1.4" stroke-linecap="round"/>`;
+    const browsHappy =
+        `<path class="g-brows-happy" d="M${cx - ex - 5} ${ey - ry - 3.5} Q${cx - ex} ${ey - ry - 6.5} ${cx - ex + 5} ${ey - ry - 4} M${cx + ex - 5} ${ey - ry - 4} Q${cx + ex} ${ey - ry - 6.5} ${cx + ex + 5} ${ey - ry - 3.5}" stroke="${look.brows}" stroke-width="1.7" fill="none" stroke-linecap="round"/>`;
+    const browsSad =
+        `<path class="g-brows-sad" d="M${cx - ex - 5} ${ey - ry - 3} L${cx - ex + 5} ${ey - ry - 6.5} M${cx + ex - 5} ${ey - ry - 6.5} L${cx + ex + 5} ${ey - ry - 3}" stroke="${look.brows}" stroke-width="1.7" fill="none" stroke-linecap="round"/>`;
+    const cheeks =
+        `<ellipse cx="${cx - ex - 3}" cy="${ey + 10}" rx="5.5" ry="3.4" fill="${GIRL_CHEEK}" opacity="0.55"/>` +
+        `<ellipse cx="${cx + ex + 3}" cy="${ey + 10}" rx="5.5" ry="3.4" fill="${GIRL_CHEEK}" opacity="0.55"/>`;
+    const nose = `<path d="M${cx - 1.8} ${ey + 7.5} Q${cx} ${ey + 9} ${cx + 1.8} ${ey + 7.5}" stroke="#E3A184" stroke-width="1.3" fill="none" stroke-linecap="round"/>`;
+    const my = ey + 14;
+    const mouth = mode === 'head'
+        // the avatars talk: this mouth opens and closes (see .googy-avatar.talking)
+        ? `<path class="g-mouth" d="M${cx - 6} ${my - 1} Q${cx} ${my + 6} ${cx + 6} ${my - 1} Q${cx} ${my + 1.5} ${cx - 6} ${my - 1} Z" fill="#D2456E"/>`
+        : `<path class="g-mouth-happy" d="M${cx - 7} ${my - 1.5} Q${cx} ${my + 7} ${cx + 7} ${my - 1.5} Q${cx} ${my + 1.5} ${cx - 7} ${my - 1.5} Z" fill="#D2456E"/>` +
+          `<path class="g-mouth-sad" d="M${cx - 5.5} ${my + 3} Q${cx} ${my - 2} ${cx + 5.5} ${my + 3}" stroke="#D2456E" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
+    return eye(cx - ex) + eye(cx + ex) + lashes + browsHappy + browsSad + cheeks + nose + mouth;
+}
+
+function drawGoogy(mode) {
+    const L = GIRL_LOOKS.googy, cx = 60, cy = 98;
+    const curls = (list, fill, stroke) => list.map(([x, y, r]) =>
+        `<circle cx="${x}" cy="${cy + y}" r="${r}" fill="${fill}"${stroke ? ` stroke="${stroke}" stroke-width="1"` : ''}/>`).join('');
+    // long curls behind her, down past the shoulders
+    const back = curls([[0, -6, 35], [-32, 4, 11.5], [-35, 17, 11.5], [-33, 30, 10.5], [-29, 42, 9], [-22, 49, 6.5],
+                        [32, 4, 11.5], [35, 17, 11.5], [33, 30, 10.5], [29, 42, 9], [22, 49, 6.5]].map(([x, y, r]) => [cx + x, y, r]), L.hairDark) +
+        curls([[-32, 9, 6.5], [-34, 23, 6.5], [-30, 36, 5.5], [32, 9, 6.5], [34, 23, 6.5], [30, 36, 5.5]].map(([x, y, r]) => [cx + x, y, r]), L.hair);
+    const body =
+        `<path d="M52 186 L52 212 M68 186 L68 212" stroke="${GIRL_SKIN}" stroke-width="8.5" stroke-linecap="round"/>` +
+        `<path d="M47.5 211 h9 M63.5 211 h9" stroke="#fff" stroke-width="5" stroke-linecap="round"/>` +
+        `<ellipse cx="50" cy="218" rx="8.5" ry="5.2" fill="${L.shoes}"/><ellipse cx="70" cy="218" rx="8.5" ry="5.2" fill="${L.shoes}"/>` +
+        `<path class="g-arm-l" d="M44 138 Q36 152 33 164" stroke="${GIRL_SKIN}" stroke-width="8" fill="none" stroke-linecap="round"/>` +
+        `<path class="g-arm-r" d="M76 138 Q84 152 87 164" stroke="${GIRL_SKIN}" stroke-width="8" fill="none" stroke-linecap="round"/>` +
+        `<circle cx="33" cy="166" r="5.2" fill="${GIRL_SKIN}"/><circle cx="87" cy="166" r="5.2" fill="${GIRL_SKIN}"/>` +
+        `<path d="M46 128 Q60 123 74 128 L86 184 Q60 192 34 184 Z" fill="${L.dress}"/>` +
+        `<path d="M34 184 Q60 192 86 184 L85 179.5 Q60 187.5 35 179.5 Z" fill="${L.dressDark}"/>` +
+        `<circle cx="44" cy="135" r="7.8" fill="${L.dressLight}"/><circle cx="76" cy="135" r="7.8" fill="${L.dressLight}"/>` +
+        `<path d="M53 127 Q56.5 133.5 60 128 Q63.5 133.5 67 127" fill="#fff" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>` +
+        `<path d="M60 149 l2.3 4.8 5.2 .6 -3.8 3.6 1 5.2 -4.7 -2.6 -4.7 2.6 1 -5.2 -3.8 -3.6 5.2 -.6 z" fill="#FFD54F"/>` +
+        `<rect x="55" y="119" width="10" height="10" rx="3" fill="${GIRL_SKIN_SHADE}"/>`;
+    const top = [[-27, -14, 11.5], [-17, -26, 12.5], [-2, -31, 13.5], [14, -28, 12.5], [25, -17, 11.5], [30, -4, 7.5], [-30, -4, 7.5]];
+    const fringe = [[-18, -18, 7.5], [-7, -23, 8], [6, -23, 8], [17, -18, 7.5]];
+    const shine = [[-20, -31, 3], [-4, -38, 3.2], [12, -34, 3], [-11, -27, 2.4], [9, -27, 2.4], [-29, -20, 2.6], [27, -22, 2.6]];
+    const head =
+        `<ellipse cx="${cx}" cy="${cy}" rx="28.5" ry="29" fill="${GIRL_SKIN}"/>` +
+        girlFace(cx, cy, L, true, mode) +
+        curls(top.map(([x, y, r]) => [cx + x, y, r]), L.hair, L.hairDark) +
+        curls(fringe.map(([x, y, r]) => [cx + x, y, r]), L.hair, L.hairDark) +
+        curls(shine.map(([x, y, r]) => [cx + x, y, r]), L.hairLight) +
+        // a pink flower in her curls
+        `<g transform="translate(${cx + 27} ${cy - 31})"><circle cx="0" cy="-4" r="3.4" fill="#FF6FA5"/><circle cx="3.8" cy="-1.2" r="3.4" fill="#FF6FA5"/>` +
+        `<circle cx="2.4" cy="3.2" r="3.4" fill="#FF6FA5"/><circle cx="-2.4" cy="3.2" r="3.4" fill="#FF6FA5"/><circle cx="-3.8" cy="-1.2" r="3.4" fill="#FF6FA5"/>` +
+        `<circle cx="0" cy="0" r="2.3" fill="#FFD54F"/></g>`;
+    return back + body + head;
+}
+
+function drawYoovy(mode) {
+    const L = GIRL_LOOKS.yoovy, cx = 60, cy = 70;
+    // long straight hair behind her, down to the middle of her back
+    const back =
+        `<path d="M29 66 Q29 30 60 30 Q91 30 91 66 L96 146 Q88 152 78 148 L60 151 L42 148 Q32 152 24 146 Z" fill="${L.hairDark}"/>`;
+    const body =
+        `<path d="M52 182 L52 214 M68 182 L68 214" stroke="${GIRL_SKIN}" stroke-width="8.5" stroke-linecap="round"/>` +
+        `<ellipse cx="50" cy="219" rx="9.5" ry="5.5" fill="#fff" stroke="${L.shoes}" stroke-width="2"/>` +
+        `<ellipse cx="70" cy="219" rx="9.5" ry="5.5" fill="#fff" stroke="${L.shoes}" stroke-width="2"/>` +
+        `<path class="g-arm-l" d="M41 112 Q32 132 30 154" stroke="${GIRL_SKIN}" stroke-width="8" fill="none" stroke-linecap="round"/>` +
+        `<path class="g-arm-r" d="M79 112 Q88 132 90 154" stroke="${GIRL_SKIN}" stroke-width="8" fill="none" stroke-linecap="round"/>` +
+        `<circle cx="30" cy="156" r="5.2" fill="${GIRL_SKIN}"/><circle cx="90" cy="156" r="5.2" fill="${GIRL_SKIN}"/>` +
+        // skirt, then the shirt with short sleeves
+        `<path d="M42 150 L78 150 L88 184 Q60 190 32 184 Z" fill="${L.skirt}"/>` +
+        `<path d="M32 184 Q60 190 88 184 L87 180 Q60 186 33 180 Z" fill="${L.skirtDark}"/>` +
+        `<path d="M43 104 Q60 99 77 104 L80 154 Q60 158 40 154 Z" fill="${L.shirt}"/>` +
+        `<path d="M43 104 Q34 108 33 122 L42 124 Z M77 104 Q86 108 87 122 L78 124 Z" fill="${L.shirtDark}"/>` +
+        `<path d="M60 136 C55 130 49 134 53 139 L60 145 L67 139 C71 134 65 130 60 136 Z" fill="#FFD54F"/>` +
+        `<rect x="55" y="94" width="10" height="11" rx="3" fill="${GIRL_SKIN_SHADE}"/>`;
+    const head =
+        `<ellipse cx="${cx}" cy="${cy}" rx="27.5" ry="30.5" fill="${GIRL_SKIN}"/>` +
+        girlFace(cx, cy, L, false, mode) +
+        // straight fringe swept to one side, the parting on her right
+        `<path d="M31 72 C29 44 42 31 62 31 C81 31 92 44 90 72 C87 60 83 54 78 50 C74 57 64 58 50 55 C44 56 36 62 31 72 Z" fill="${L.hair}"/>` +
+        `<path d="M50 34 C60 33 70 38 76 46" stroke="${L.hairLight}" stroke-width="2.4" fill="none" stroke-linecap="round" opacity="0.8"/>` +
+        // long locks in front of her shoulders
+        `<path d="M31 66 C30 90 31 112 33 128 L40 126 C38 108 37 88 36 70 Z" fill="${L.hair}"/>` +
+        `<path d="M89 66 C90 90 89 112 87 128 L80 126 C82 108 83 88 84 70 Z" fill="${L.hair}"/>` +
+        // headband
+        `<path d="M33 52 Q60 25 87 52" stroke="#FF6FA5" stroke-width="4.5" fill="none" stroke-linecap="round"/>`;
+    return back + body + head;
+}
+
+const GIRL_VIEW = { full: { googy: '0 12 120 222', yoovy: '0 12 120 222' }, head: { googy: '13 51 94 94', yoovy: '17 25 86 86' } };
+
+// who: 'googy' | 'yoovy'; mode: 'full' | 'head'; size: height in px
+function girlSVG(who, { mode = 'full', size = 60, className = '' } = {}) {
+    const drawing = who === 'yoovy' ? drawYoovy(mode) : drawGoogy(mode);
+    const view = GIRL_VIEW[mode][who === 'yoovy' ? 'yoovy' : 'googy'];
+    const [, , w, h] = view.split(' ').map(Number);
+    const width = Math.round(size * w / h);   // size is the height
+    return `<svg class="girl girl-${who} ${className}" viewBox="${view}" width="${width}" height="${size}" aria-hidden="true">${drawing}</svg>`;
+}
+
+// Yoovy and Googy keep the child company in the corner of every game (see setGaiaState).
+document.getElementById('gaia-char').innerHTML = girlSVG('yoovy', { size: 150 }) + girlSVG('googy', { size: 150 });
+document.querySelector('.welcome-girls').innerHTML = girlSVG('yoovy', { size: 190 }) + girlSVG('googy', { size: 190 });
+
+// ===== PLAYERS =====
+// The names on this device (for the leaderboards). Each player has a random id, so two
+// sisters on one tablet get their own rows, and a new name never takes over an old row.
+const GaiaPlayer = (function () {
+    const KEY = 'gaiaPlayers';
+    let state = { current: null, list: [] };   // list: [{ pid, name }]
+    try {
+        const saved = JSON.parse(localStorage.getItem(KEY));
+        if (saved && Array.isArray(saved.list)) state = saved;
+    } catch (e) { /* no saved players */ }
+    const save = () => {
+        try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { console.warn('[players] save failed', e); }
+    };
+    return {
+        cleanName(name) {
+            return String(name || '').replace(/[\u0000-\u001f<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, 20).trim();
+        },
+        current() { return state.list.find(p => p.pid === state.current) || null; },
+        list() { return state.list.slice(); },
+        choose(pid) {
+            if (!state.list.some(p => p.pid === pid)) return null;
+            state.current = pid;
+            save();
+            return this.current();
+        },
+        // Picks the player with this name, or adds one.
+        add(name) {
+            name = this.cleanName(name);
+            if (!name) return null;
+            let player = state.list.find(p => p.name === name);
+            if (!player) {
+                player = { pid: Math.random().toString(36).slice(2, 10).padEnd(8, '0'), name };
+                state.list.push(player);
+            }
+            state.current = player.pid;
+            save();
+            return player;
+        }
+    };
 })();
 </script>
     <script>
@@ -1657,23 +1896,27 @@
         let audioCtx = null;
 
         // --- הודעת פתיחה לפי שעה (בשישי ובשבת — הודעת היום, חוץ מבלילה המאוחר) ---
-        (function setWelcomeMessage() {
+        // The greeting uses the name of whoever played last on this device.
+        function setWelcomeMessage() {
             const hour = new Date().getHours();
             const day  = new Date().getDay(); // 0=ראשון, 6=שבת
+            const player = GaiaPlayer.current();
+            const name = player ? ' ' + player.name : '';
             let message;
 
             if (hour >= 22 || hour < 6)  message = "מְאֻחָר מְאוֹד! 😴 שֵׁינָה טוֹבָה אַחֲרֵי מִשְׂחָק אֶחָד!";
-            else if (day === 6)          message = "שַׁבָּת שָׁלוֹם! ✡️ שַׁבָּת שֶׁל לִמּוּד";
+            else if (day === 6)          message = "שַׁבָּת שָׁלוֹם" + name + "! ✡️ שַׁבָּת שֶׁל לִמּוּד";
             else if (day === 5)          message = "יוֹם שִׁישִּׁי! 🎉 נִגְמָר שָׁבוּעַ, בּוֹאִי נִשְׁחַק!";
-            else if (hour < 10)          message = "בֹּקֶר טוֹב גַּאְיָה! ☀️ מוּכָנָה לִלְמוֹד?";
-            else if (hour < 13)          message = "בֹּקֶר נֶהְדָּר! 🌟 בּוֹאִי נִשְׁחַק!";
-            else if (hour < 16)          message = "צָהֳרַיִם טוֹבִים! 🌞 זְמַן מִשְׂחָק!";
-            else if (hour < 19)          message = "אַחַר הַצָּהֳרַיִם טוֹבִים! 🎮";
-            else                         message = "עֶרֶב טוֹב גַּאְיָה! 🌙 עוֹד מְעַט שֵׁינָה...";
+            else if (hour < 10)          message = "בֹּקֶר טוֹב" + name + "! ☀️ מוּכָנָה לִלְמוֹד?";
+            else if (hour < 13)          message = "בֹּקֶר נֶהְדָּר" + name + "! 🌟 בּוֹאִי נִשְׁחַק!";
+            else if (hour < 16)          message = "צָהֳרַיִם טוֹבִים" + name + "! 🌞 זְמַן מִשְׂחָק!";
+            else if (hour < 19)          message = "אַחַר הַצָּהֳרַיִם טוֹבִים" + name + "! 🎮";
+            else                         message = "עֶרֶב טוֹב" + name + "! 🌙 עוֹד מְעַט שֵׁינָה...";
 
             const el = document.getElementById('welcome-text');
-            if (el) el.innerText = message;
-        })();
+            if (el) el.textContent = message;
+        }
+        setWelcomeMessage();
 
         // --- טיימרים של מהלך המשחק ---
         // Every delayed game step goes through later(), so leaving a game
@@ -1716,6 +1959,8 @@
             initAudio();
             showScreen('main-menu');
             if (window.initAdventureMap) initAdventureMap();
+            GaiaBoards.refreshPlayerChip();
+            GaiaBoards.openPlayers();
         }
 
         function goHome() {
@@ -2126,21 +2371,14 @@
             } catch(e) {}
         }
 
-        // Gaia's mood: 'idle' | 'happy' | 'sad' | 'dance'. happy/sad fall back to idle.
+        // Yoovy & Googy's mood: 'idle' | 'happy' | 'sad' | 'dance' (their faces follow via CSS).
+        // happy/sad fall back to idle.
         let gaiaResetTimer = null;
         function setGaiaState(state) {
             const el = document.getElementById('gaia-char');
             if (!el) return;
             clearTimeout(gaiaResetTimer);
-            const showFace = sad => {
-                document.getElementById('gaia-eyes-happy').setAttribute('display', sad ? 'none' : 'inline');
-                document.getElementById('gaia-eyes-sad').setAttribute('display', sad ? 'inline' : 'none');
-                document.getElementById('gaia-mouth-happy').setAttribute('display', sad ? 'none' : 'inline');
-                document.getElementById('gaia-mouth-sad').setAttribute('display', sad ? 'inline' : 'none');
-            };
-            // <svg>.className is read-only (SVGAnimatedString) — assigning it is silently ignored
-            el.setAttribute('class', 'gaia-' + state);
-            showFace(state === 'sad');
+            el.className = 'gaia-' + state;
             if (state === 'happy') {
                 const rect = el.getBoundingClientRect();
                 const cx = rect.left + rect.width / 2;
@@ -2156,10 +2394,7 @@
                 });
             }
             if (state === 'happy' || state === 'sad') {
-                gaiaResetTimer = setTimeout(() => {
-                    el.setAttribute('class', 'gaia-idle');
-                    showFace(false);
-                }, state === 'happy' ? 1200 : 900);
+                gaiaResetTimer = setTimeout(() => { el.className = 'gaia-idle'; }, state === 'happy' ? 1200 : 900);
             }
         }
 
@@ -2791,18 +3026,11 @@
             showScreen('end-screen');
             document.getElementById('final-score-display').innerText = score;
             renderStarsEarned(document.getElementById('final-stars'), stars);
-            document.getElementById('save-score-area').style.display = 'block';
-            document.getElementById('save-btn').disabled = false;
-            document.getElementById('save-status').innerText = '';
-            document.getElementById('leaderboard-area').style.display = 'block';
-            document.getElementById('player-name').value = "";
-            // טען טבלה קיימת
-            if (db) {
-                loadFirebaseLeaderboard();
-            } else {
-                const hs = readLocalScores();
-                if (hs.length) showLeaderboard(hs);
-            }
+            // the land's leaderboard: grade, time and place
+            const boardBox = document.getElementById('end-board');
+            boardBox.textContent = '';
+            const result = GaiaBoards.finish(currentGameType, String(currentLevel), GaiaBoards.grade(score, scoreMax));
+            if (result) boardBox.appendChild(GaiaBoards.resultCard(result));
         }
 
         // ⭐⭐☆ — the stars a finished game added to the map
@@ -2813,124 +3041,6 @@
                 star.textContent = '⭐';
                 if (i >= stars) star.className = 'star-off';
                 el.appendChild(star);
-            }
-        }
-
-        // --- טבלת שיאים ---
-        function saveScore() {
-            const name = document.getElementById('player-name').value.trim().slice(0, 20);
-            if (!name) {
-                alert("בְּבַקָּשָׁה כִּתְבִי אֶת הַשֵּׁם שֶׁלָּךְ");
-                return;
-            }
-            const btn = document.getElementById('save-btn');
-            if (btn.disabled) return;   // a double tap must not save twice
-            btn.disabled = true;
-            const entry = { name: name, score: score };
-
-            if (db) {
-                // שמירה ב-Firebase (משותפת לכל המשתמשים)
-                const statusEl = document.getElementById('save-status');
-                statusEl.innerText = 'שומר...'; statusEl.style.color = '#888';
-                pushScore(entry)
-                    .then(() => {
-                        statusEl.innerText = '';
-                        document.getElementById('save-score-area').style.display = 'none';
-                        loadFirebaseLeaderboard();
-                    })
-                    .catch(e => {
-                        console.error('Firebase save error:', e);
-                        saveToLocalStorage(entry);
-                        statusEl.innerText = '⚠️ לא נשמר בטבלה המשותפת (' + (e.code || e.message) + ') — נשמר רק במכשיר הזה';
-                        statusEl.style.color = 'red';
-                    });
-            } else {
-                // שמירה מקומית בדפדפן
-                saveToLocalStorage(entry);
-            }
-        }
-
-        // Shared leaderboard write. firebase-rules.json accepts a score only together with a
-        // per-user rate-limit stamp (scoreRate/<uid>), written by the anonymous user in one
-        // atomic update. If that is refused (e.g. the console still has the older rules),
-        // fall back to the plain push those rules expect.
-        function pushScore(entry) {
-            return withTimeout(authReady, 5000).then(user => {
-                if (!user) return db.ref('scores').push(entry);
-                const key = db.ref('scores').push().key;
-                return db.ref().update({
-                    ['scores/' + key]: entry,
-                    ['scoreRate/' + user.uid]: firebase.database.ServerValue.TIMESTAMP
-                }).catch(e => {
-                    if (!/permission/i.test(String(e.code || e.message))) throw e;
-                    return db.ref('scores').push(entry);
-                });
-            });
-        }
-
-        function readLocalScores() {
-            try {
-                const list = JSON.parse(localStorage.getItem('gaiaHighScores'));
-                return Array.isArray(list) ? list : [];
-            } catch (e) { return []; }
-        }
-
-        function saveToLocalStorage(entry) {
-            let highscores = readLocalScores();
-            highscores.push(entry);
-            highscores.sort((a, b) => b.score - a.score);
-            highscores = highscores.slice(0, 10);
-            try { localStorage.setItem('gaiaHighScores', JSON.stringify(highscores)); }
-            catch (e) { console.warn('[scores] local save failed', e); }
-            document.getElementById('save-score-area').style.display = 'none';
-            showLeaderboard(highscores);
-        }
-
-        // Every saved result is its own row (not collapsed by player name).
-        function loadFirebaseLeaderboard() {
-            db.ref('scores').orderByChild('score').limitToLast(50).once('value', snapshot => {
-                const scores = [];
-                snapshot.forEach(child => {
-                    const entry = child.val();
-                    if (!entry || typeof entry.name !== 'string' || typeof entry.score !== 'number') return;
-                    scores.push(entry);
-                });
-                scores.sort((a, b) => b.score - a.score);
-                scores.splice(10);
-                showLeaderboard(scores);
-            }, err => {
-                console.warn('Leaderboard load failed:', err);
-                showLeaderboard(readLocalScores());
-            });
-        }
-
-        function showLeaderboard(scores) {
-            document.getElementById('leaderboard-area').style.display = 'block';
-
-            const tbody = document.getElementById('highscore-body');
-            tbody.innerHTML = "";
-
-            const medals = ["🥇","🥈","🥉","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣","🔟"];
-            for (let index = 0; index < 10; index++) {
-                const entry = scores[index];
-                const tr = document.createElement('tr');
-                // XSS-safe: build cells with textContent, never innerHTML with entry.name
-                const tdMedal = document.createElement('td');
-                tdMedal.textContent = medals[index];
-                const tdName = document.createElement('td');
-                const tdScore = document.createElement('td');
-                if (entry && typeof entry.name === 'string' && typeof entry.score === 'number') {
-                    tdName.textContent = entry.name;
-                    tdScore.textContent = entry.score;
-                    if (index === 0) tr.classList.add('gold-row');
-                } else {
-                    tdName.textContent = '—';  tdName.style.color = '#ccc';
-                    tdScore.textContent = '—'; tdScore.style.color = '#ccc';
-                }
-                tr.appendChild(tdMedal);
-                tr.appendChild(tdName);
-                tr.appendChild(tdScore);
-                tbody.appendChild(tr);
             }
         }
     </script>
@@ -3327,6 +3437,7 @@ function renderStorySelection() {
 
 function startReadingStory(storyIdx) {
     currentReadingStoryIdx = storyIdx;
+    GaiaBoards.startClock();   // the board times each story: reading it and its 3 questions
     renderReadingStory();
 }
 
@@ -3417,9 +3528,29 @@ function answerReading(chosen) {
             try {
                 GaiaProgress.recordReadingStory(readingProgress, currentReadingCategoryIdx, readingScore);
             } catch (e) { console.warn('[progress] reading hook', e); }
-            renderStorySelection();
+            renderStoryDone();
         }
     }, 1200);
+}
+
+// A story is done: its stars, and its place on the reading land's board.
+function renderStoryDone() {
+    const story = readingData[currentReadingCategoryIdx].stories[currentReadingStoryIdx];
+    document.getElementById('reading-q-progress').textContent = '';
+    const content = document.getElementById('reading-content');
+    content.innerHTML = `
+        <div style="text-align:center; padding:10px 6px;">
+            <div class="reading-title">סִיַּמְתְּ אֶת הַסִּיפּוּר! 🎉</div>
+            <div style="font-size:1.2rem; color:#555; direction:rtl;">${story.title}</div>
+            <div class="stars-earned" id="reading-story-stars"></div>
+            <div id="reading-board"></div>
+            <button class="big-btn btn-reading" onclick="renderStorySelection()" style="margin-top:8px;font-size:1.2rem;padding:12px;">חֲזָרָה לַסִּיפּוּרִים 📚</button>
+        </div>
+    `;
+    renderStarsEarned(document.getElementById('reading-story-stars'), readingScore);
+    const result = GaiaBoards.finish('reading', 'cat_' + currentReadingCategoryIdx, GaiaBoards.grade(readingScore, 3));
+    if (result) document.getElementById('reading-board').appendChild(GaiaBoards.resultCard(result));
+    setGaiaState(readingScore === 3 ? 'dance' : 'idle');
 }
 
 function showReadingCategoryComplete() {
@@ -3603,11 +3734,14 @@ function showMultSummary() {
             <div style="font-size:1.1rem; color:#777; direction:rtl; margin-bottom:12px;">
                 ${subtitle}
             </div>
+            <div id="mult-board"></div>
             <button class="big-btn btn-math" onclick="startMultGame(${replayArg})" style="margin-top:6px;font-size:1.3rem;">סִיבּוּב נוֹסָף 🔁</button>
             <button class="big-btn" style="background:#7986cb;margin-top:8px;font-size:1.2rem;" onclick="goToMultMenu()">לוּחַ אַחֵר ✖️</button>
         </div>
     `;
     renderStarsEarned(document.getElementById('mult-stars'), stars);
+    const result = GaiaBoards.finish('math', 'mult_' + multCurrentTable, GaiaBoards.grade(multScore, MULT_QUESTIONS_PER_ROUND));
+    if (result) document.getElementById('mult-board').appendChild(GaiaBoards.resultCard(result));
     setGaiaState(multScore >= 8 ? 'dance' : 'idle');
     if (multScore >= 8) {
         for (let i = 0; i < 5; i++) {
@@ -3668,19 +3802,7 @@ const GoogySpeechRecognition = window.SpeechRecognition || window.webkitSpeechRe
 function googyAvailable() { return !!GOOGY_API_URL; }
 
 function googyAvatarSVG(size) {
-    return '<svg class="googy-avatar" viewBox="0 0 100 100" width="' + size + '" height="' + size + '" aria-hidden="true">' +
-        '<ellipse cx="50" cy="50" rx="33" ry="35" fill="#6D4C2F"/>' +
-        '<ellipse cx="15" cy="66" rx="9" ry="17" fill="#6D4C2F"/><ellipse cx="85" cy="66" rx="9" ry="17" fill="#6D4C2F"/>' +
-        '<circle cx="19" cy="49" r="4.5" fill="#FF6FA5"/><circle cx="81" cy="49" r="4.5" fill="#FF6FA5"/>' +
-        '<path d="M28 90 Q50 102 72 90 L76 100 L24 100 Z" fill="#26A69A"/>' +
-        '<circle cx="50" cy="55" r="27" fill="#F3C9A6"/>' +
-        '<path d="M23 50 Q27 25 50 25 Q73 25 77 50 Q70 37 58 36 Q54 42 44 40 Q34 38 23 50 Z" fill="#6D4C2F"/>' +
-        '<path d="M60 20 L70 14 L70 26 Z M60 20 L50 14 L50 26 Z" fill="#FF6FA5"/><circle cx="60" cy="20" r="3" fill="#E91E63"/>' +
-        '<circle cx="40" cy="56" r="4.6" fill="#3E2723"/><circle cx="60" cy="56" r="4.6" fill="#3E2723"/>' +
-        '<circle cx="41.6" cy="54.4" r="1.6" fill="#fff"/><circle cx="61.6" cy="54.4" r="1.6" fill="#fff"/>' +
-        '<ellipse cx="32" cy="65" rx="5" ry="3" fill="#F48FB1" opacity="0.7"/><ellipse cx="68" cy="65" rx="5" ry="3" fill="#F48FB1" opacity="0.7"/>' +
-        '<ellipse class="g-mouth" cx="50" cy="70" rx="6.5" ry="3" fill="#C2185B"/>' +
-        '</svg>';
+    return girlSVG('googy', { mode: 'head', size, className: 'googy-avatar' });
 }
 
 function fillGoogyAvatars() {
@@ -4623,6 +4745,8 @@ function finishRepeat() {
         const starsEl = googyEl('div', 'stars-earned');
         renderStarsEarned(starsEl, stars);
         end.append(starsEl, googyEl('div', 'repeat-end-points', '⭐ ' + Repeat.total + ' / ' + max + ' נְקֻדּוֹת'));
+        const result = GaiaBoards.finish('english', 'repeat_' + Repeat.level, GaiaBoards.grade(Repeat.total, max));
+        if (result) end.appendChild(GaiaBoards.resultCard(result));
     } else {
         end.appendChild(googyEl('div', 'repeat-end-line', 'הִקְשַׁבְתְּ לְכָל הַמִּשְׁפָּטִים 👂'));
     }
@@ -4652,6 +4776,356 @@ document.getElementById('repeat-listen').addEventListener('click', () => repeatS
 document.getElementById('repeat-slow').addEventListener('click', () => repeatSay(true));
 </script>
 <script>
+// ===== LEADERBOARDS MODULE =====
+// Every land has a board for each of its games: the highest grade (0-100) first, and
+// between equal grades the fastest time. One row per player, and only a better result
+// replaces it. Results are kept on this device, and when Firebase allows it also in the
+// shared board every player sees: boards/<land>/<game>/<uid>_<player id>.
+
+const BOARD_TOP = 10;
+const BOARD_MAX_MS = 99999999;   // the sort key k = grade * 10^8 + (BOARD_MAX_MS - ms)
+
+// The games of every land, in the order of the land's buttons: [game key, chip label].
+const BOARD_GAMES = {
+    math: [['10', '➕ עַד 10'], ['20', '➕ עַד 20'], ['mult_all', '✖️ כָּל הַלּוּחוֹת']]
+        .concat([2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => ['mult_' + n, '✖️ ' + n])),
+    hebrew: [['1', 'אוֹת רִאשׁוֹנָה'], ['2', 'אוֹת אַחֲרוֹנָה'], ['3', 'אוֹת חֲסֵרָה']],
+    reading: readingData.map((cat, i) => ['cat_' + i, cat.label]),
+    english: [['4', 'אַלְפָּבֵית'], ['0', 'כְּתִיב מִילָה'], ['1', 'אוֹת רִאשׁוֹנָה'], ['2', 'אוֹת אַחֲרוֹנָה'],
+              ['3', 'אוֹת חֲסֵרָה'], ['repeat_easy', '🦜 חִזְרִי – קַל'], ['repeat_medium', '🦜 חִזְרִי – קְצָת יוֹתֵר']],
+    geography: [['1', 'מְדִינוֹת מֻכָּרוֹת'], ['2', 'כָּל הַמְּדִינוֹת']],
+    biology: [['1', 'אֵיבָרִים עִיקָרִיִּים'], ['2', 'כָּל הָאֵיבָרִים']],
+    memory: [['words_easy', 'מִילִים – קַל'], ['words_hard', 'מִילִים – קָשֶׁה'], ['flags_easy', 'דְּגָלִים – קַל'], ['flags_hard', 'דְּגָלִים – קָשֶׁה']],
+    puzzle: [['2x2', '2×2'], ['3x3', '3×3'], ['3x4', '3×4']]
+};
+
+const GaiaBoards = (function () {
+    const LOCAL_KEY = 'gaiaBoards';   // { '<land>/<game>': [{ pid, name, grade, ms, k }] }
+    let startedAt = 0;
+    GaiaHooks.on(type => { if (type === 'game_start') startedAt = Date.now(); });
+
+    const node = (tag, className, text) => {
+        const n = document.createElement(tag);
+        if (className) n.className = className;
+        if (text !== undefined) n.textContent = text;
+        return n;
+    };
+
+    function grade(score, max) {
+        return max > 0 ? Math.max(0, Math.min(100, Math.round(100 * score / max))) : 0;
+    }
+    function time(ms) {
+        const s = Math.round(ms / 1000);
+        return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+    }
+    const sortKey = (g, ms) => g * 1e8 + (BOARD_MAX_MS - ms);
+    const validRow = r => r && typeof r.name === 'string' && r.name && Number.isInteger(r.grade) &&
+        r.grade >= 0 && r.grade <= 100 && Number.isFinite(r.ms) && r.ms > 0 && r.ms <= BOARD_MAX_MS;
+
+    // --- this device ---
+    function readLocal() {
+        try {
+            const all = JSON.parse(localStorage.getItem(LOCAL_KEY));
+            return all && typeof all === 'object' ? all : {};
+        } catch (e) { return {}; }
+    }
+    function localRows(land, game) {
+        const rows = readLocal()[land + '/' + game];
+        return Array.isArray(rows) ? rows.filter(validRow) : [];
+    }
+    function saveLocal(land, game, row) {
+        const all = readLocal();
+        const rows = localRows(land, game).filter(r => r.pid !== row.pid);
+        rows.push(row);
+        rows.sort((a, b) => b.k - a.k);
+        all[land + '/' + game] = rows.slice(0, 30);
+        try { localStorage.setItem(LOCAL_KEY, JSON.stringify(all)); }
+        catch (e) { console.warn('[boards] local save failed', e); }
+    }
+
+    // --- the shared board (see firebase-rules.json: only a better row is accepted) ---
+    function sendOnline(land, game, row) {
+        if (!db) return Promise.resolve(false);
+        return withTimeout(authReady, 5000).then(user => {
+            if (!user) return false;
+            const stamp = firebase.database.ServerValue.TIMESTAMP;
+            return db.ref().update({
+                ['boards/' + land + '/' + game + '/' + user.uid + '_' + row.pid]:
+                    { name: row.name, grade: row.grade, ms: row.ms, k: row.k, at: stamp },
+                ['scoreRate/' + user.uid]: stamp
+            }).then(() => true);
+        }).catch(e => {
+            console.warn('[boards] not saved online:', e && (e.code || e.message));
+            return false;
+        });
+    }
+
+    function merge(lists) {
+        const best = new Map();
+        lists.forEach(list => list.forEach(r => {
+            const old = best.get(r.pid);
+            if (!old || r.k > old.k) best.set(r.pid, r);
+        }));
+        return Array.from(best.values()).sort((a, b) => b.k - a.k);
+    }
+
+    // Calls back with this device's rows right away, then again with the shared board.
+    function load(land, game, onRows) {
+        const local = localRows(land, game);
+        onRows(merge([local]), 'local');
+        if (!db) { onRows(merge([local]), 'offline'); return; }
+        const read = db.ref('boards/' + land + '/' + game).orderByChild('k').limitToLast(BOARD_TOP * 3).once('value', snap => {
+            const online = [];
+            snap.forEach(child => {
+                const v = child.val();
+                if (!validRow(v) || v.k !== sortKey(v.grade, v.ms)) return;
+                online.push({ pid: child.key.slice(child.key.lastIndexOf('_') + 1), name: v.name, grade: v.grade, ms: v.ms, k: v.k });
+            });
+            onRows(merge([online, local]), 'online');
+        }, err => {
+            console.warn('[boards] shared board not loaded:', err && (err.code || err.message));
+            onRows(merge([local]), 'offline');
+        });
+        if (read && read.catch) read.catch(() => {});   // handled by the callback above
+    }
+
+    // --- results ---
+    let lastResult = null;
+
+    // A game ended: its grade and time (ms: from the game_start event unless given).
+    function finish(land, game, g, ms) {
+        if (ms === undefined) ms = startedAt ? Date.now() - startedAt : 0;
+        startedAt = 0;
+        if (!BOARD_GAMES[land] || !(ms > 0)) return null;
+        ms = Math.min(Math.max(Math.round(ms), 1000), BOARD_MAX_MS);
+        const result = { land, game: String(game), grade: g, ms, k: sortKey(g, ms), player: null, sent: Promise.resolve(false) };
+        lastResult = result;
+        const player = GaiaPlayer.current();
+        if (player) record(result, player);
+        return result;
+    }
+
+    function record(result, player) {
+        const prev = localRows(result.land, result.game).find(r => r.pid === player.pid);
+        result.player = player;
+        result.improved = !prev || result.k > prev.k;
+        result.best = result.improved ? result : prev;
+        if (result.improved) {
+            const row = { pid: player.pid, name: player.name, grade: result.grade, ms: result.ms, k: result.k };
+            saveLocal(result.land, result.game, row);
+            result.sent = sendOnline(result.land, result.game, row);
+        }
+    }
+
+    // The player's place once the board is loaded (the shared one when it answers in time).
+    function placeOf(result, done) {
+        let answered = false;
+        const timer = setTimeout(() => finishWith(merge([localRows(result.land, result.game)])), 4000);
+        function finishWith(rows) {
+            if (answered) return;
+            answered = true;
+            clearTimeout(timer);
+            const i = rows.findIndex(r => r.pid === result.player.pid);
+            done(i >= 0 ? i + 1 : 0, rows.length);
+        }
+        result.sent.then(() => load(result.land, result.game, (rows, source) => {
+            if (source !== 'local') finishWith(rows);
+        }));
+    }
+
+    function nameForm(onName) {
+        const form = node('form', 'player-form');
+        const input = node('input', 'name-input');
+        input.type = 'text';
+        input.maxLength = 20;
+        input.placeholder = 'הַשֵּׁם שֶׁלָּךְ...';
+        input.autocomplete = 'off';
+        const save = node('button', 'big-btn btn-save', 'שִׁמְרִי 💾');
+        save.type = 'submit';
+        form.append(input, save);
+        form.onsubmit = event => {
+            event.preventDefault();
+            const name = GaiaPlayer.cleanName(input.value);
+            if (!name) { input.focus(); return; }
+            onName(name);
+        };
+        return form;
+    }
+
+    // The box at the end of every game: grade, time and the player's place on the board.
+    function resultCard(result) {
+        const card = node('div', 'board-card');
+        card.appendChild(node('div', 'bc-title', '🏆 לוּחַ הַתּוֹצָאוֹת'));
+        const stats = node('div', 'bc-stats');
+        const stat = (label, value) => {
+            const span = node('span', '', label + ' ');
+            span.appendChild(node('bdi', '', value));
+            return span;
+        };
+        stats.append(stat('צִיּוּן', String(result.grade)), stat('⏱️', time(result.ms)));
+        card.appendChild(stats);
+        const status = node('div', 'bc-status');
+        card.appendChild(status);
+        const open = node('button', 'big-btn btn-board bc-open', 'לְלוּחַ הַתּוֹצָאוֹת 🏆');
+        open.onclick = () => openBoard(result.land, result.game);
+
+        const showPlace = () => {
+            status.textContent = 'שׁוֹמֶרֶת... ⏳';
+            placeOf(result, (place, count) => {
+                if (!card.isConnected) return;
+                const best = result.best;
+                let text;
+                if (result.improved) {
+                    text = place === 1 ? '🥇 אַתְּ בְּרֹאשׁ הַלּוּחַ!' : place ? '🎉 שִׂיא חָדָשׁ! מָקוֹם ' + place + ' בַּלּוּחַ' : '🎉 שִׂיא חָדָשׁ!';
+                } else {
+                    text = 'הַשִּׂיא שֶׁלָּךְ: צִיּוּן ' + best.grade + ', ' + time(best.ms) + (place ? ' (מָקוֹם ' + place + ')' : '');
+                }
+                status.textContent = text;
+            });
+        };
+        if (result.player) {
+            showPlace();
+        } else {
+            status.textContent = 'כִּתְבִי אֶת הַשֵּׁם שֶׁלָּךְ כְּדֵי לְהִכָּנֵס לַלּוּחַ:';
+            const form = nameForm(name => {
+                const player = GaiaPlayer.add(name);
+                if (!player) return;
+                record(result, player);
+                form.remove();
+                refreshPlayerChip();
+                showPlace();
+            });
+            card.appendChild(form);
+        }
+        card.appendChild(open);
+        return card;
+    }
+
+    // --- the board dialog ---
+    let boardLand = null, boardGame = null;
+    const boardModal = document.getElementById('board-modal');
+
+    function openBoard(land, game) {
+        const games = BOARD_GAMES[land];
+        if (!games) return;
+        boardLand = land;
+        boardGame = games.some(([key]) => key === String(game)) ? String(game) : games[0][0];
+        document.getElementById('board-land').textContent = window.landTitle ? window.landTitle(land) : '';
+        const chips = document.getElementById('board-games');
+        chips.textContent = '';
+        games.forEach(([key, label]) => {
+            const chip = node('button', key === boardGame ? 'active' : '', label);
+            chip.onclick = () => {
+                boardGame = key;
+                chips.querySelectorAll('button').forEach(b => b.classList.toggle('active', b === chip));
+                showBoard();
+            };
+            chips.appendChild(chip);
+        });
+        updateBoardPlayer();
+        boardModal.hidden = false;
+        showBoard();
+        const active = chips.querySelector('.active');
+        if (active && active.scrollIntoView) active.scrollIntoView({ block: 'nearest', inline: 'center' });
+    }
+
+    function showBoard() {
+        const land = boardLand, game = boardGame;
+        const note = document.getElementById('board-note');
+        note.textContent = db ? 'טוֹעֶנֶת אֶת הַלּוּחַ הַמְּשֻׁתָּף... ⏳' : '';
+        load(land, game, (rows, source) => {
+            if (land !== boardLand || game !== boardGame) return;   // another tab was picked
+            renderRows(rows);
+            if (source === 'online') note.textContent = '';
+            else if (source === 'offline') note.textContent = 'מוּצָגוֹת רַק תּוֹצָאוֹת מֵהַמַּכְשִׁיר הַזֶּה.';
+        });
+    }
+
+    function renderRows(rows) {
+        const body = document.getElementById('board-rows');
+        body.textContent = '';
+        const me = GaiaPlayer.current();
+        const medals = ['🥇', '🥈', '🥉'];
+        rows.slice(0, BOARD_TOP).forEach((r, i) => {
+            const tr = node('tr', i === 0 ? 'gold-row' : '');
+            if (me && r.pid === me.pid) tr.classList.add('me');
+            tr.append(node('td', '', medals[i] || String(i + 1)), node('td', '', r.name),
+                node('td', 'bt-grade', String(r.grade)), node('td', 'bt-time', time(r.ms)));
+            body.appendChild(tr);
+        });
+        if (!rows.length) {
+            const tr = node('tr');
+            const td = node('td', 'bt-empty', 'עוֹד אֵין תּוֹצָאוֹת כָּאן. אַתְּ יְכוֹלָה לִהְיוֹת הָרִאשׁוֹנָה! 🏁');
+            td.colSpan = 4;
+            tr.appendChild(td);
+            body.appendChild(tr);
+        }
+    }
+
+    function updateBoardPlayer() {
+        const me = GaiaPlayer.current();
+        document.getElementById('board-player').textContent = me
+            ? '👤 מְשַׂחֶקֶת עַכְשָׁו: ' + me.name + ' (לְהַחְלִיף?)'
+            : '👤 מִי מְשַׂחֶקֶת?';
+    }
+
+    // --- who's playing ---
+    const playerModal = document.getElementById('player-modal');
+
+    function openPlayers() {
+        const list = document.getElementById('player-list');
+        list.textContent = '';
+        const me = GaiaPlayer.current();
+        GaiaPlayer.list().forEach(p => {
+            const btn = node('button', me && me.pid === p.pid ? 'current' : '', p.name);
+            btn.onclick = () => { GaiaPlayer.choose(p.pid); closePlayers(); };
+            list.appendChild(btn);
+        });
+        document.getElementById('player-new-label').textContent = GaiaPlayer.list().length
+            ? 'שַׂחְקָנִית חֲדָשָׁה? כִּתְבִי אֶת הַשֵּׁם שֶׁלָּךְ:'
+            : 'כִּתְבִי אֶת הַשֵּׁם שֶׁלָּךְ, כְּדֵי שֶׁהַתּוֹצָאוֹת יִכָּנְסוּ לַלּוּחַ:';
+        document.getElementById('player-name-input').value = '';
+        playerModal.hidden = false;
+    }
+    function closePlayers() {
+        playerModal.hidden = true;
+        refreshPlayerChip();
+        updateBoardPlayer();
+        if (!boardModal.hidden) showBoard();
+    }
+    function refreshPlayerChip() {
+        const chip = document.getElementById('player-chip');
+        const me = GaiaPlayer.current();
+        if (chip) chip.textContent = me ? '👤 ' + me.name : '👤 מִי אֲנִי?';
+    }
+
+    document.getElementById('player-form').addEventListener('submit', event => {
+        event.preventDefault();
+        if (GaiaPlayer.add(document.getElementById('player-name-input').value)) closePlayers();
+        else document.getElementById('player-name-input').focus();
+    });
+    document.getElementById('player-skip').addEventListener('click', closePlayers);
+    document.getElementById('board-player').addEventListener('click', openPlayers);
+    document.querySelector('.player-girls').innerHTML = girlSVG('yoovy', { mode: 'head', size: 70 }) + girlSVG('googy', { mode: 'head', size: 70 });
+    [boardModal, playerModal].forEach(modal => {
+        const close = () => (modal === playerModal ? closePlayers() : (modal.hidden = true));
+        modal.querySelector('.gg-modal-close').addEventListener('click', close);
+        modal.addEventListener('click', event => { if (event.target === modal) close(); });
+    });
+    document.addEventListener('keydown', event => {
+        if (event.key !== 'Escape') return;
+        if (!playerModal.hidden) closePlayers();
+        else if (!boardModal.hidden) boardModal.hidden = true;
+    });
+
+    return {
+        grade, time, finish, resultCard, openBoard, openPlayers, refreshPlayerChip,
+        startClock() { startedAt = Date.now(); },
+        get lastResult() { return lastResult; }
+    };
+})();
+</script>
+<script>
 // ===== ADVENTURE MAP MODULE =====
 // Builds a tall scrolling SVG "kingdom" scene, places themed lands along a
 // winding RTL path, renders star badges from GaiaProgress, animates Gaia's
@@ -4665,7 +5139,7 @@ document.getElementById('repeat-slow').addEventListener('click', () => repeatSay
 
     // Land definitions (top -> bottom). x,y are on the winding path (RTL feel).
     const LANDS = [
-        { key: 'castle',    name: 'טִירַת גַּאְיָה',    emoji: '🏰', hueVar: '--gold',           x: 400, y: 120,  anchor: true },
+        { key: 'castle',    name: 'טִירַת יוּבִי וְגוּגִי', emoji: '🏰', hueVar: '--gold',           x: 400, y: 120,  anchor: true },
         { key: 'math',      name: 'הַר הַחֶשְׁבּוֹן',   emoji: '🏔️', hueVar: '--land-math',      x: 600, y: 285 },
         { key: 'hebrew',    name: 'יַעַר הַמִּלִּים',   emoji: '🌳', hueVar: '--land-hebrew',    x: 230, y: 430 },
         { key: 'reading',   name: 'עֵמֶק הַסִּפּוּרִים', emoji: '📖', hueVar: '--land-reading',   x: 570, y: 575 },
@@ -4750,6 +5224,18 @@ document.getElementById('repeat-slow').addEventListener('click', () => repeatSay
                 { cls: 'btn-level-3', label: 'פַּאזֶל תְּמוּנָה 🖼️', fn: () => goToPuzzleMenu('image') }
             ]
         }
+    };
+
+    // In every land one of the sisters tells the child what waits there.
+    const LAND_GUIDES = {
+        math:      ['yoovy', 'בּוֹאִי נְטַפֵּס עַל הַר הַחֶשְׁבּוֹן! כָּל תַּרְגִּיל הוּא עוֹד צַעַד לַפִּסְגָּה ⛰️'],
+        hebrew:    ['googy', 'בַּיַּעַר הַזֶּה הִתְחַבְּאוּ אוֹתִיּוֹת. עִזְרִי לִי לִמְצֹא אוֹתָן! 🔍'],
+        reading:   ['yoovy', 'אֲנִי הֲכִי אוֹהֶבֶת סִפּוּרִים! בּוֹאִי נִקְרָא יַחַד 📖'],
+        english:   ['googy', 'הֵלוֹ! בַּמִּפְרָץ הַזֶּה מְדַבְּרִים אַנְגְּלִית 🌊'],
+        geography: ['yoovy', 'כָּל דֶּגֶל שַׁיָּךְ לִמְדִינָה אַחֶרֶת. כַּמָּה אַתְּ מַכִּירָה? 🌍'],
+        biology:   ['googy', 'מָה יֵשׁ לָנוּ בְּתוֹךְ הַגּוּף? בּוֹאִי נְגַלֶּה! 🫀'],
+        memory:    ['yoovy', 'בּוֹאִי נִרְאֶה מִי זוֹכֶרֶת יוֹתֵר טוֹב! 🃏'],
+        puzzle:    ['googy', 'עַל הַגֶּשֶׁר הַזֶּה הַחֲתִיכוֹת הִתְבַּלְבְּלוּ. נְסַדֵּר אוֹתָן? 🧩']
     };
 
     // castle land key maps to nothing playable
@@ -4850,11 +5336,12 @@ document.getElementById('repeat-slow').addEventListener('click', () => repeatSay
             }
         });
 
-        // Gaia avatar marker on the map
+        // Yoovy and Googy walk together on the map, standing on top of the last land played
         const av = el('g', { id: 'gaia-map-avatar' }, svg);
-        el('circle', { cx: 0, cy: 0, r: 26, fill: 'white', stroke: cssVar('--brand') || '#9C27B0', 'stroke-width': 4 }, av);
-        const avT = el('text', { x: 0, y: 1, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': 30 }, av);
-        avT.textContent = '👧🏼';
+        el('ellipse', { cx: 1, cy: 17, rx: 40, ry: 7, fill: 'oklch(0.3 0.05 300 / 0.22)' }, av);
+        [[-46, drawGoogy('full')], [-8, drawYoovy('full')]].forEach(function (pair) {
+            el('svg', { x: pair[0], y: -85, width: 57, height: 105, viewBox: '0 12 120 222', class: 'girl' }, av).innerHTML = pair[1];
+        });
         avatarEl = av;
 
         built = true;
@@ -4955,6 +5442,17 @@ document.getElementById('repeat-slow').addEventListener('click', () => repeatSay
         starsEl.textContent = '⭐ סַךְ הַכֹּל בָּאֶרֶץ הַזֹּאת: ' + total + (GaiaProgress.medalFor(total) ? '  ' + GaiaProgress.medalFor(total) : '');
 
         bodyEl.innerHTML = '';
+        const guide = LAND_GUIDES[landKey];
+        if (guide) {
+            const row = document.createElement('div');
+            row.className = 'land-guide';
+            row.innerHTML = girlSVG(guide[0], { mode: 'head', size: 58 });
+            const bubble = document.createElement('div');
+            bubble.className = 'land-guide-bubble';
+            bubble.textContent = guide[1];
+            row.appendChild(bubble);
+            bodyEl.appendChild(row);
+        }
         if (conf.note) {
             const note = document.createElement('p');
             note.style.cssText = 'color:var(--ink-soft);font-size:1rem;margin:2px 0 10px;direction:rtl;';
@@ -4980,6 +5478,13 @@ document.getElementById('repeat-slow').addEventListener('click', () => repeatSay
             });
             bodyEl.appendChild(btn);
         });
+        if (BOARD_GAMES[landKey]) {
+            const boardBtn = document.createElement('button');
+            boardBtn.className = 'big-btn btn-board';
+            boardBtn.textContent = '🏆 לוּחַ הַתּוֹצָאוֹת';
+            boardBtn.addEventListener('click', function () { GaiaBoards.openBoard(landKey); });
+            bodyEl.appendChild(boardBtn);
+        }
 
         panel.classList.add('open');
         panel.setAttribute('aria-hidden', 'false');
@@ -5001,6 +5506,7 @@ document.getElementById('repeat-slow').addEventListener('click', () => repeatSay
     }
 
     // Public API used by the engine / modules
+    window.landTitle = function (key) { return LAND_PANELS[key] ? LAND_PANELS[key].title : ''; };
     window.initAdventureMap = initAdventureMap;
     window.openLandPanel = openLandPanel;
     window.closeLandPanel = closeLandPanel;
