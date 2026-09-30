@@ -44,6 +44,7 @@ How you talk:
 
 The other fields:
 - "hebrew": a natural Hebrew translation of your reply, for when the child needs help. No nikkud.
+- In Hebrew, speak to the child in gender-neutral forms (plural, e.g. "בואו", "נסו"), since the child may be a boy or a girl.
 - "suggestions": 3 different short answers the child could say next to your question, in simple English (2 to 7 words each). Make them different from each other, for example one yes-type, one no-type and one creative answer.
 - "feedback": one short, kind line in Hebrew about the child's last message. Praise something specific, or show a better way to say it in English, for example: כל הכבוד! אפשר גם להגיד: "I like dogs." Leave it empty for your first message or when there is nothing useful to add. Never make the child feel wrong.
 
@@ -60,7 +61,7 @@ export const FINAL_TURN =
 // Used when the model declines to answer.
 export const SAFE_TURN = {
     reply: "Hmm, let's talk about something else! What is your favorite animal?",
-    hebrew: "הממ, בואי נדבר על משהו אחר! מה החיה האהובה עלייך?",
+    hebrew: "הממ, בואו נדבר על משהו אחר! מה החיה האהובה עליך?",
     suggestions: ["I like cats.", "My favorite is a dog.", "I love horses!"],
     feedback: "",
 };
