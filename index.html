@@ -944,9 +944,9 @@
             <div class="welcome-girls" aria-hidden="true"></div>
             <div class="gaia-logo" aria-label="Yoovy &amp; Googy"><span class="gl yg-y" style="animation-delay:0.00s">Y</span><span class="gl yg-y" style="animation-delay:0.05s">o</span><span class="gl yg-y" style="animation-delay:0.10s">o</span><span class="gl yg-y" style="animation-delay:0.15s">v</span><span class="gl yg-y" style="animation-delay:0.20s">y</span><span class="gl gl-space"> </span><span class="gl yg-amp" style="animation-delay:0.25s">&amp;</span><span class="gl gl-space"> </span><span class="gl yg-g" style="animation-delay:0.30s">G</span><span class="gl yg-g" style="animation-delay:0.35s">o</span><span class="gl yg-g" style="animation-delay:0.40s">o</span><span class="gl yg-g" style="animation-delay:0.45s">g</span><span class="gl yg-g" style="animation-delay:0.50s">y</span></div>
             <p class="welcome-text" id="welcome-text">בְּרוּכִים הַבָּאִים!</p>
-            <p class="welcome-story">יוּבִי וְגוּגִי יוֹצְאוֹת לְמַסָּע בְּמַמְלֶכֶת הַיֶּדַע.<br>בְּכָל אֶרֶץ מְחַכֶּה אֶתְגָּר — בּוֹאִי לְהִצְטָרֵף! 🗺️</p>
+            <p class="welcome-story">יוּבִי וְגוּגִי יוֹצְאוֹת לְמַסָּע בְּמַמְלֶכֶת הַיֶּדַע.<br>בְּכָל אֶרֶץ מְחַכֶּה אֶתְגָּר — בּוֹאוּ לְהִצְטָרֵף! 🗺️</p>
         </div>
-        <button class="big-btn start-btn" onclick="startGameApp()">יוֹצְאוֹת לַדֶּרֶךְ ▶️</button>
+        <button class="big-btn start-btn" onclick="startGameApp()">יוֹצְאִים לַדֶּרֶךְ ▶️</button>
     </div>
 
     <!-- ===== ADVENTURE MAP (replaces the old flat main menu) ===== -->
@@ -993,19 +993,19 @@
     <div id="puzzle-menu" class="screen">
         <div class="menu-box" style="border-color: #ff8f00;">
             <button class="home-btn" onclick="goHome()" style="position:relative; top:0; left:0; width:60px; margin-bottom:10px;">🔙</button>
-            <h2 style="color:#e65100;" id="puzzle-menu-title">פַּאזֶל 🔢</h2>
+            <h2 style="color:#e65100;" id="puzzle-menu-title">פָּאזֶל 🔢</h2>
 
             <div style="display:flex; gap:8px; margin-bottom:14px;">
-                <button class="puzzle-mode-btn active" id="btn-mode-numbers" onclick="setPuzzleMode('numbers')">🔢 מספרים</button>
-                <button class="puzzle-mode-btn" id="btn-mode-image" onclick="setPuzzleMode('image')">🖼️ תמונה</button>
+                <button class="puzzle-mode-btn active" id="btn-mode-numbers" onclick="setPuzzleMode('numbers')">🔢 מִסְפָּרִים</button>
+                <button class="puzzle-mode-btn" id="btn-mode-image" onclick="setPuzzleMode('image')">🖼️ תְּמוּנָה</button>
             </div>
 
             <div id="puzzle-image-picker" style="display:none; margin-bottom:12px;">
-                <p style="color:#777; font-size:0.9rem; margin:0 0 8px;">בחרי תמונה:</p>
+                <p style="color:#777; font-size:0.9rem; margin:0 0 8px;">בַּחֲרוּ תְּמוּנָה:</p>
                 <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap;" id="puzzle-img-list"></div>
             </div>
 
-            <p style="color:#777; font-size:1rem; margin:0 0 10px;">בחרי רמת קושי:</p>
+            <p style="color:#777; font-size:1rem; margin:0 0 10px;">בַּחֲרוּ רָמַת קֹשִׁי:</p>
             <button class="big-btn btn-level-1" onclick="startPuzzle(2,2)">קַל — 2×2 (3 חֲתִיכוֹת)</button>
             <button class="big-btn btn-level-2" onclick="startPuzzle(3,3)">בֵּינוֹנִי — 3×3 (8 חֲתִיכוֹת)</button>
             <button class="big-btn btn-level-3" onclick="startPuzzle(3,4)">קָשֶׁה — 3×4 (11 חֲתִיכוֹת)</button>
@@ -1015,14 +1015,14 @@
     <div id="puzzle-screen" class="screen">
         <div class="game-container" style="border-color:#ff8f00; min-height:480px;">
             <div class="hud-container" style="border-bottom-color:#ff8f00; background:#fff3e0;">
-                <div style="color:#e65100; font-weight:bold;">מְהַלְכִים: <span id="puzzle-moves">0</span></div>
-                <div style="color:#e65100; font-weight:bold;" id="puzzle-status">🔢 סַדְּרִי!</div>
+                <div style="color:#e65100; font-weight:bold;">מַהֲלָכִים: <span id="puzzle-moves">0</span></div>
+                <div style="color:#e65100; font-weight:bold;" id="puzzle-status">🔢 סַדְּרוּ!</div>
                 <div style="color:#e65100; font-weight:bold;">⏱️ <span id="puzzle-timer">0</span>שׁ׳</div>
             </div>
             <div style="margin-top:60px; display:flex; flex-direction:column; align-items:center; padding:10px;">
                 <div id="puzzle-grid" class="puzzle-grid"></div>
             </div>
-            <button class="big-btn btn-puzzle" style="margin:10px 20px 50px; font-size:1.1rem; padding:10px;" onclick="reshufflePuzzle()">עָרְבֵּב מֵחָדָשׁ 🔀</button>
+            <button class="big-btn btn-puzzle" style="margin:10px 20px 50px; font-size:1.1rem; padding:10px;" onclick="reshufflePuzzle()">לְעַרְבֵּב מֵחָדָשׁ 🔀</button>
             <button class="home-btn" onclick="goHome()">🏠</button>
         </div>
     </div>
@@ -1046,9 +1046,9 @@
     <div id="end-screen" class="screen">
         <div class="menu-box" style="border-color: #ffd700; background: #fffde7;">
             <div style="font-size: 4rem;">🏆</div>
-            <h1>סִיַּמְתְּ אֶת הַמִּשְׂחָק!</h1>
-            <p style="font-size: 1.5rem; margin: 10px 0 0;">צָבַרְתְּ: <strong id="final-score-display" style="color:#ff8f00; font-size: 2rem;">0</strong> נְקֻדּוֹת!</p>
-            <div id="final-stars" class="stars-earned" aria-label="כּוֹכָבִים שֶׁהִרְוַחְתְּ בַּמַּפָּה"></div>
+            <h1>הַמִּשְׂחָק הִסְתַּיֵּם!</h1>
+            <p style="font-size: 1.5rem; margin: 10px 0 0;">נִצְבְּרוּ <strong id="final-score-display" style="color:#ff8f00; font-size: 2rem;">0</strong> נְקֻדּוֹת!</p>
+            <div id="final-stars" class="stars-earned" aria-label="כּוֹכָבִים לַמַּפָּה"></div>
 
             <div id="end-board"></div>
 
@@ -1072,8 +1072,8 @@
     <div id="mult-menu" class="screen">
         <div class="menu-box" style="border-color: #ef5350;">
             <button class="home-btn" onclick="goHome()" style="position:relative; top:0; left:0; width:60px; margin-bottom:10px;">🔙</button>
-            <h2 style="color:#c62828;">בַּחֲרִי לוּחַ ✖️</h2>
-            <p style="color:#777; font-size:1rem; margin:0 0 10px;">תַּרְגּוּל לוּחַ הַכֶּפֶל</p>
+            <h2 style="color:#c62828;">בַּחֲרוּ לוּחַ ✖️</h2>
+            <p style="color:#777; font-size:1rem; margin:0 0 10px;">תִּרְגּוּל לוּחַ הַכֶּפֶל</p>
             <div class="mult-table-grid">
                 <button class="mult-table-btn" onclick="startMultGame(2)">2</button>
                 <button class="mult-table-btn" onclick="startMultGame(3)">3</button>
@@ -1144,7 +1144,7 @@
                     <div id="repeat-sentence" dir="ltr"></div>
                     <div id="repeat-hebrew"></div>
                     <div class="repeat-listen">
-                        <button id="repeat-listen">🔊 שִׁמְעִי שׁוּב</button>
+                        <button id="repeat-listen">🔊 לִשְׁמֹעַ שׁוּב</button>
                         <button id="repeat-slow">🐢 לְאַט</button>
                     </div>
                 </div>
@@ -1152,11 +1152,11 @@
                 <div id="repeat-live" dir="ltr"></div>
                 <div id="repeat-result"></div>
                 <div id="repeat-actions">
-                    <button id="repeat-again" class="big-btn btn-level-2">נַסִּי שׁוּב 🔄</button>
+                    <button id="repeat-again" class="big-btn btn-level-2">עוֹד נִסָּיוֹן 🔄</button>
                     <button id="repeat-next" class="big-btn btn-googy"></button>
                 </div>
                 <div id="repeat-hint"></div>
-                <button id="repeat-skip">דַּלְּגִי עַל הַמִּשְׁפָּט</button>
+                <button id="repeat-skip">דִּלּוּג עַל הַמִּשְׁפָּט</button>
             </div>
             <div id="repeat-end"></div>
             <button class="home-btn" onclick="goHome()">🏠</button>
@@ -1174,7 +1174,7 @@
                 <tbody id="board-rows"></tbody>
             </table>
             <p id="board-note"></p>
-            <p class="board-rule">מִי שֶׁקִּבְּלָה צִיּוּן גָּבוֹהַּ יוֹתֵר — לְמַעְלָה. בְּצִיּוּן שָׁוֶה — הַכִּי מְהִירָה.</p>
+            <p class="board-rule">צִיּוּן גָּבוֹהַּ יוֹתֵר — לְמַעְלָה. בְּצִיּוּן שָׁוֶה — הַזְּמַן הַקָּצָר יוֹתֵר קוֹדֵם.</p>
             <button id="board-player" class="board-player-btn"></button>
         </div>
     </div>
@@ -1183,12 +1183,12 @@
         <div class="gg-modal-box">
             <button class="gg-modal-close" aria-label="סְגִירָה">✕</button>
             <div class="player-girls" aria-hidden="true"></div>
-            <h2 id="player-title">מִי מְשַׂחֶקֶת עַכְשָׁו? 👋</h2>
+            <h2 id="player-title">מִי בַּמִּשְׂחָק עַכְשָׁו? 👋</h2>
             <div id="player-list"></div>
-            <p id="player-new-label">שַׂחְקָנִית חֲדָשָׁה? כִּתְבִי אֶת הַשֵּׁם שֶׁלָּךְ:</p>
+            <p id="player-new-label">שֵׁם חָדָשׁ? כּוֹתְבִים אוֹתוֹ כָּאן:</p>
             <form id="player-form" class="player-form">
-                <input type="text" id="player-name-input" class="name-input" maxlength="20" placeholder="הַשֵּׁם שֶׁלָּךְ..." autocomplete="off">
-                <button type="submit" class="big-btn btn-save">זוֹ אֲנִי! ✨</button>
+                <input type="text" id="player-name-input" class="name-input" maxlength="20" placeholder="שֵׁם..." autocomplete="off">
+                <button type="submit" class="big-btn btn-save">קָדִימָה! ✨</button>
             </form>
             <button id="player-skip" class="board-player-btn">אַחַר כָּךְ</button>
         </div>
@@ -1661,12 +1661,12 @@ const GaiaPlayer = (function () {
             // רמה 1 — איברים עיקריים
             { emoji: "❤️", name: "לֵב",       func: "מַזְרִים דָּם בְּכָל הַגּוּף",          level: 1 },
             { emoji: "🧠", name: "מוֹחַ",     func: "שׁוֹלֵט עַל הַגּוּף וְהַמַּחְשָׁבוֹת",  level: 1 },
-            { emoji: "🫁", name: "רֵיאוֹת",   func: "מַכְנִיסוֹת אֲוִויר לַגּוּף",           level: 1 },
+            { emoji: "🫁", name: "רֵיאוֹת",   func: "מַכְנִיסוֹת אֲוִיר לַגּוּף",           level: 1 },
             { emoji: "🦴", name: "עֲצָמוֹת",  func: "נוֹתְנוֹת לַגּוּף אֶת הַצּוּרָה שֶׁלּוֹ", level: 1 },
             { emoji: "👁️", name: "עֵינַיִם",  func: "עוֹזְרוֹת לָנוּ לִרְאוֹת",              level: 1 },
             { emoji: "👂", name: "אוֹזְנַיִם", func: "עוֹזְרוֹת לָנוּ לִשְׁמוֹעַ",            level: 1 },
             { emoji: "👃", name: "אַף",        func: "עוֹזֵר לָנוּ לְהָרִיחַ",                level: 1 },
-            { emoji: "🦷", name: "שִׁינַּיִם", func: "עוֹזְרוֹת לָנוּ לִלְעוֹס אוֹכֶל",       level: 1 },
+            { emoji: "🦷", name: "שִׁנַּיִם", func: "עוֹזְרוֹת לָנוּ לִלְעוֹס אוֹכֶל",       level: 1 },
             // רמה 2 — כל האיברים
             { emoji: "🟤", name: "כָּבֵד",    func: "מְנַקֶּה אֶת הַדָּם מֵרַעֲלִים",         level: 2 },
             { emoji: "🟡", name: "קֵיבָה",    func: "מְפָרֶקֶת אֶת הָאוֹכֶל אַחֲרֵי הָאֲכִילָה", level: 2 },
@@ -1677,17 +1677,17 @@ const GaiaPlayer = (function () {
             { emoji: "👅", name: "לָשׁוֹן",    func: "עוֹזֶרֶת לָנוּ לִטְעוֹם אוֹכֶל",         level: 2 },
             { emoji: "🦵", name: "רַגְלַיִם",  func: "עוֹזְרוֹת לָנוּ לָלֶכֶת וְלָרוּץ",        level: 2 },
             // יד וזרוע
-            { emoji: "🤲", name: "יָדַיִם",              func: "עוֹזְרוֹת לָנוּ לְאַחֵז וְלַעֲשׂוֹת דְּבָרִים",          level: 2 },
-            { emoji: "🖐️", name: "אֶצְבָּעוֹת",          func: "מַרְגִּישׁוֹת מֶגַּע וְעוֹזְרוֹת לְאַחֵז חֲפָצִים",       level: 2 },
+            { emoji: "🤲", name: "יָדַיִם",              func: "עוֹזְרוֹת לָנוּ לֶאֱחֹז וְלַעֲשׂוֹת דְּבָרִים",          level: 2 },
+            { emoji: "🖐️", name: "אֶצְבָּעוֹת",          func: "מַרְגִּישׁוֹת מֶגַּע וְעוֹזְרוֹת לֶאֱחֹז חֲפָצִים",       level: 2 },
             { emoji: "🦾", name: "זְרוֹעוֹת",            func: "עוֹזְרוֹת לָנוּ לְהָרִים וְלָשֵׂאת דְּבָרִים",           level: 2 },
-            { emoji: "🔩", name: "מַרְפֵּק",              func: "מַפְרֵק שֶׁמַּכְפִּיף אֶת הַזְּרוֹעַ",                   level: 2 },
+            { emoji: "🔩", name: "מַרְפֵּק",              func: "מַפְרֵק שֶׁמְּאַפְשֵׁר לְכוֹפֵף אֶת הַזְּרוֹעַ",                   level: 2 },
             // רגל
             { emoji: "🦶", name: "כַּף רֶגֶל",           func: "עוֹזֶרֶת לָנוּ לַעֲמוֹד וְלָרוּץ",                       level: 2 },
             { emoji: "🦿", name: "קַרְסֹל",              func: "מְחַבֵּר אֶת כַּף הָרֶגֶל לָרֶגֶל",                      level: 2 },
-            { emoji: "🧎", name: "בֶּרֶךְ",              func: "מַפְרֵק שֶׁמַּכְפִּיף אֶת הָרֶגֶל",                       level: 2 },
+            { emoji: "🧎", name: "בֶּרֶךְ",              func: "מַפְרֵק שֶׁמְּאַפְשֵׁר לְכוֹפֵף אֶת הָרֶגֶל",                       level: 2 },
             // ראש וצוואר
             { emoji: "👄", name: "שְׂפָתַיִם",            func: "עוֹזְרוֹת לָנוּ לְדַבֵּר וְלֶאֱכוֹל",                    level: 2 },
-            { emoji: "🗣️", name: "גָּרוֹן",              func: "מַעֲבִיר אוֹכֶל וַאֲוִויר מֵהַפֶּה לַגּוּף",             level: 2 },
+            { emoji: "🗣️", name: "גָּרוֹן",              func: "מַעֲבִיר אוֹכֶל וַאֲוִיר מֵהַפֶּה לַגּוּף",             level: 2 },
             { emoji: "🧣", name: "צַוָּאר",              func: "מְחַבֵּר אֶת הָרֹאשׁ לַגּוּף",                            level: 2 },
             { emoji: "💀", name: "גֻּלְגֹּלֶת",          func: "מְגִינָה עַל הַמּוֹחַ מִפְּגִיעוֹת",                      level: 2 },
             { emoji: "🤷", name: "כָּתֵף",               func: "מְחַבֶּרֶת אֶת הַזְּרוֹעַ לַגּוּף",                       level: 2 },
@@ -1697,28 +1697,28 @@ const GaiaPlayer = (function () {
             { emoji: "🤸", name: "גַּב",                  func: "תּוֹמֵךְ בַּגּוּף וּמְאַפְשֵׁר עֲמִידָה זְקוּפָה",       level: 2 },
             { emoji: "🫃", name: "בֶּטֶן",               func: "מְכִילָה אֶת אֵיבְרֵי הָעִיכּוּל",                        level: 2 },
             // מערכת עיכול
-            { emoji: "🌀", name: "מֵעִי דַּק",            func: "סוֹפֵג חֳמָרֵי תְּזוּנָה מֵהָאוֹכֶל לַגּוּף",            level: 2 },
+            { emoji: "🌀", name: "מֵעִי דַּק",            func: "סוֹפֵג חָמְרֵי תְּזוּנָה מֵהָאוֹכֶל לַגּוּף",            level: 2 },
             { emoji: "〰️", name: "מֵעִי גַּס",            func: "סוֹפֵג מַיִם וּמוֹצִיא פְּסוֹלֶת מֵהַגּוּף",              level: 2 },
-            { emoji: "💧", name: "שַׁלְפּוּחִית הַשֶּׁתֶן", func: "אוֹגֶרֶת שֶׁתֶּן עַד שֶׁיּוֹצְאִים לַשֵּׁרוּתִים",       level: 2 },
+            { emoji: "💧", name: "שַׁלְפּוּחִית הַשֶּׁתֶן", func: "אוֹגֶרֶת שֶׁתֶן עַד שֶׁיּוֹצְאִים לַשֵּׁרוּתִים",       level: 2 },
             // בלוטות ואיברים
             { emoji: "🧬", name: "לַבְלָב",              func: "מְיַצֵּר חֳמָרִים לְוִסּוּת הַסֻּכָּר בַּדָּם",           level: 2 },
             { emoji: "🟢", name: "טְחוֹל",               func: "עוֹזֵר לַגּוּף לְהִלָּחֵם בַּמַּחֲלוֹת",                  level: 2 },
             { emoji: "💨", name: "סֶרַעֶפֶת",            func: "שְׁרִיר שֶׁמְּסַיֵּעַ לָנוּ לִנְשׁוֹם פְּנִימָה",         level: 2 },
             // מערכת דם וכלי דם
             { emoji: "🔴", name: "עוֹרְקִים",            func: "מוֹבִילִים דָּם מֵהַלֵּב לְכָל הַגּוּף",                  level: 2 },
-            { emoji: "🔵", name: "וְרִידִים",            func: "מַחֲזִירִים דָּם מֵהַגּוּף חָזֳרָה אֶל הַלֵּב",           level: 2 },
+            { emoji: "🔵", name: "וְרִידִים",            func: "מַחֲזִירִים דָּם מֵהַגּוּף חֲזָרָה אֶל הַלֵּב",           level: 2 },
             { emoji: "🟠", name: "כַּדּוּרִיּוֹת דָּם אֲדֻמּוֹת", func: "נוֹשְׂאוֹת חַמְצָן לְכָל תָּאֵי הַגּוּף",   level: 2 },
             { emoji: "⚪", name: "כַּדּוּרִיּוֹת דָּם לְבָנוֹת",  func: "נִלְחָמוֹת בַּחַיְדַּקִים שֶׁנִּכְנָסִים לַגּוּף", level: 2 },
             // מערכות הגוף
             { emoji: "🛡️", name: "מַעֲרֶכֶת הַחִיסּוּן",  func: "מְגִינָה עַל הַגּוּף מִפְּנֵי מַחֲלוֹת",                 level: 2 },
             { emoji: "⚡", name: "מַעֲרֶכֶת הָעֲצָבִים",  func: "מַעֲבִירָה הוֹרָאוֹת מֵהַמּוֹחַ לְכָל הַגּוּף",          level: 2 },
-            { emoji: "🔬", name: "תָּאִים",              func: "אֶבְנֵי הַבִּנְיָן הַזְּעִירוֹת שֶׁמִּמֶּנּוּ הַגּוּף בָּנוּי", level: 2 },
+            { emoji: "🔬", name: "תָּאִים",              func: "אֶבְנֵי הַבִּנְיָן הַזְּעִירוֹת שֶׁמֵּהֶן בָּנוּי הַגּוּף", level: 2 },
             // שונות
             { emoji: "💦", name: "בְּלוּטוֹת זֵיעָה",    func: "מְקָרְרוֹת אֶת הַגּוּף כְּשֶׁחַם מִדַּי",                 level: 2 },
             { emoji: "💇", name: "שֵׂעָר",               func: "מְחַמֵּם אֶת הָרֹאשׁ וּמָגֵן עָלָיו",                     level: 2 },
             { emoji: "💅", name: "צִיפָּרְנַיִם",         func: "מְגִינוֹת עַל קְצוֹת הָאֶצְבָּעוֹת",                      level: 2 },
             { emoji: "👀", name: "אִישׁוֹן",             func: "שׁוֹלֵט בְּכַמּוּת הָאוֹר הַנִּכְנֶסֶת לָעַיִן",          level: 2 },
-            { emoji: "🎤", name: "מֵיתְרֵי הַקּוֹל",     func: "מְיַצְּרִים קוֹל כְּשֶׁאֲוִויר עוֹבֵר דַּרְכָּם",         level: 2 },
+            { emoji: "🎤", name: "מֵיתְרֵי הַקּוֹל",     func: "מְיַצְּרִים קוֹל כְּשֶׁאֲוִיר עוֹבֵר דַּרְכָּם",         level: 2 },
         ];
 
         // --- מאגר אנגלית ---
@@ -1818,11 +1818,11 @@ const GaiaPlayer = (function () {
             { code: "ar", name: "אַרְגֶנְטִינָה",       level: 2 },
             { code: "ua", name: "אוּקְרַאִינָה",        level: 2 },
             // רמה 2 — עוד מדינות
-            { code: "dk", name: "דַּנְמַרְק",           level: 2 },
+            { code: "dk", name: "דֶּנְמַרְק",           level: 2 },
             { code: "fi", name: "פִינְלַנְד",           level: 2 },
             { code: "ie", name: "אִירְלַנְד",           level: 2 },
             { code: "hu", name: "הוּנְגַרְיָה",         level: 2 },
-            { code: "ro", name: "רוּמַנְיָה",           level: 2 },
+            { code: "ro", name: "רוֹמַנְיָה",           level: 2 },
             { code: "bg", name: "בּוּלְגַרְיָה",        level: 2 },
             { code: "hr", name: "קְרוֹאַטְיָה",         level: 2 },
             { code: "rs", name: "סֶרְבְּיָה",           level: 2 },
@@ -1837,7 +1837,7 @@ const GaiaPlayer = (function () {
             { code: "jo", name: "יַרְדֵּן",              level: 2 },
             { code: "lb", name: "לְבָנוֹן",             level: 2 },
             { code: "iq", name: "עִירַאק",              level: 2 },
-            { code: "ae", name: "אִמִירֻיּוֹת",          level: 2 },
+            { code: "ae", name: "אִיחוּד הָאֲמִירוּיוֹת",          level: 2 },
             { code: "ma", name: "מָרוֹקוֹ",             level: 2 },
             { code: "tn", name: "תּוּנִיסְיָה",          level: 2 },
             { code: "ng", name: "נִיגֶרְיָה",           level: 2 },
@@ -1845,7 +1845,7 @@ const GaiaPlayer = (function () {
             { code: "id", name: "אִינְדּוֹנֵזְיָה",      level: 2 },
             { code: "my", name: "מָלֵזְיָה",            level: 2 },
             { code: "th", name: "תַּאִילַנְד",           level: 2 },
-            { code: "vn", name: "וִיאֶטְנָם",           level: 2 },
+            { code: "vn", name: "וְיֶטְנָאם",           level: 2 },
             { code: "nz", name: "נִיּוּ זִילַנְד",       level: 2 },
             { code: "sg", name: "סִינְגַפּוּר",          level: 2 },
         ];
@@ -1878,7 +1878,7 @@ const GaiaPlayer = (function () {
         }
         let timeLeft = 15;
         let timerInterval = null;
-        const positiveFeedback = ["כֹּל הַכָּבוֹד! 🎉", "אַלּוּפָה! 🏆", "מְצֻיָּן! 🌟", "גְּאוֹנָה! 💡", "מַדְהִים! 🚀"];
+        const positiveFeedback = ["כָּל הַכָּבוֹד! 🎉", "יֵשׁ! 🏆", "מְצֻיָּן! 🌟", "מַבְרִיק! 💡", "מַדְהִים! 🚀"];
 
         // תור שאלות (ללא חזרות)
         let questionQueue = [];
@@ -1901,14 +1901,14 @@ const GaiaPlayer = (function () {
             const hour = new Date().getHours();
             const day  = new Date().getDay(); // 0=ראשון, 6=שבת
             const player = GaiaPlayer.current();
-            const name = player ? ' ' + player.name : '';
+            const name = player ? ', ' + player.name : '';
             let message;
 
             if (hour >= 22 || hour < 6)  message = "מְאֻחָר מְאוֹד! 😴 שֵׁינָה טוֹבָה אַחֲרֵי מִשְׂחָק אֶחָד!";
             else if (day === 6)          message = "שַׁבָּת שָׁלוֹם" + name + "! ✡️ שַׁבָּת שֶׁל לִמּוּד";
-            else if (day === 5)          message = "יוֹם שִׁישִּׁי! 🎉 נִגְמָר שָׁבוּעַ, בּוֹאִי נִשְׁחַק!";
-            else if (hour < 10)          message = "בֹּקֶר טוֹב" + name + "! ☀️ מוּכָנָה לִלְמוֹד?";
-            else if (hour < 13)          message = "בֹּקֶר נֶהְדָּר" + name + "! 🌟 בּוֹאִי נִשְׁחַק!";
+            else if (day === 5)          message = "יוֹם שִׁשִּׁי! 🎉 הַשָּׁבוּעַ נִגְמָר — בּוֹאוּ נְשַׂחֵק!";
+            else if (hour < 10)          message = "בֹּקֶר טוֹב" + name + "! ☀️ מוּכָנִים לִלְמֹד?";
+            else if (hour < 13)          message = "בֹּקֶר נֶהְדָּר" + name + "! 🌟 בּוֹאוּ נְשַׂחֵק!";
             else if (hour < 16)          message = "צָהֳרַיִם טוֹבִים" + name + "! 🌞 זְמַן מִשְׂחָק!";
             else if (hour < 19)          message = "אַחַר הַצָּהֳרַיִם טוֹבִים" + name + "! 🎮";
             else                         message = "עֶרֶב טוֹב" + name + "! 🌙 עוֹד מְעַט שֵׁינָה...";
@@ -2173,7 +2173,7 @@ const GaiaPlayer = (function () {
             document.getElementById('btn-mode-image').classList.toggle('active', mode === 'image');
             const picker = document.getElementById('puzzle-image-picker');
             picker.style.display = mode === 'image' ? 'block' : 'none';
-            document.getElementById('puzzle-menu-title').innerText = mode === 'numbers' ? 'פַּאזֶל הַמִּסְפָּרִים 🔢' : 'פַּאזֶל הַתְּמוּנָה 🖼️';
+            document.getElementById('puzzle-menu-title').innerText = mode === 'numbers' ? 'פָּאזֶל הַמִּסְפָּרִים 🔢' : 'פָּאזֶל הַתְּמוּנָה 🖼️';
             if (mode === 'image') buildImagePicker();
         }
 
@@ -2223,7 +2223,7 @@ const GaiaPlayer = (function () {
             showScreen('puzzle-screen');
             document.getElementById('puzzle-moves').innerText = 0;
             document.getElementById('puzzle-timer').innerText = 0;
-            document.getElementById('puzzle-status').innerText = puzzleMode === 'image' ? '🖼️ סַדְּרִי!' : '🔢 סַדְּרִי!';
+            document.getElementById('puzzle-status').innerText = puzzleMode === 'image' ? '🖼️ סַדְּרוּ!' : '🔢 סַדְּרוּ!';
             document.getElementById('puzzle-grid').classList.remove('puzzle-solved');
 
             puzzleTimerInterval = setInterval(() => {
@@ -2329,7 +2329,7 @@ const GaiaPlayer = (function () {
             clearInterval(puzzleTimerInterval);
             playSound('victory'); setGaiaState('dance');
             spawnStars(null);
-            document.getElementById('puzzle-status').innerText = puzzleMode === 'image' ? '🏆 פָּתַרְתְּ אֶת הַתְּמוּנָה!' : '🏆 פָּתַרְתְּ!';
+            document.getElementById('puzzle-status').innerText = puzzleMode === 'image' ? '🏆 הַתְּמוּנָה הֻשְׁלְמָה!' : '🏆 הַפָּאזֶל נִפְתַּר!';
             document.getElementById('puzzle-grid').classList.add('puzzle-solved');
 
             later(() => {
@@ -2499,7 +2499,7 @@ const GaiaPlayer = (function () {
             questionCount++;
             updateHud();
             const feedback = document.getElementById('feedback');
-            feedback.innerText = "הזמן נגמר! ⏰";
+            feedback.innerText = "הַזְּמַן נִגְמַר! ⏰";
             feedback.style.color = "#c62828";
 
             // גלוי תשובה נכונה
@@ -2509,12 +2509,12 @@ const GaiaPlayer = (function () {
             } else if (currentGameType === 'english') {
                 const display = document.querySelector('.english-word-display');
                 if (display) display.innerText = englishWordObj.word;
-                else feedback.innerText = `הזמן נגמר! ⏰  התשובה: ${currentAnswer}`;
+                else feedback.innerText = `הַזְּמַן נִגְמַר! ⏰  הַתְּשׁוּבָה: ${currentAnswer}`;
             } else if (currentGameType === 'math') {
                 const mathDisplay = document.querySelector('.math-display');
                 if (mathDisplay) mathDisplay.innerText = mathDisplay.innerText.replace('?', currentAnswer);
             } else if (currentGameType === 'biology' || currentGameType === 'geography') {
-                feedback.innerText = `הזמן נגמר! ⏰  התשובה: ${currentAnswer}`;
+                feedback.innerText = `הַזְּמַן נִגְמַר! ⏰  הַתְּשׁוּבָה: ${currentAnswer}`;
             }
 
             shakeGameContainer();
@@ -2729,7 +2729,7 @@ const GaiaPlayer = (function () {
             if (currentLevel === 0) {
                 currentAnswer = englishWordObj.word;
                 container.innerHTML = `<div class="emoji-display" style="cursor:pointer;" onclick="speakWord('${englishWordObj.word}')">${englishWordObj.emoji}</div>
-                    <div style="font-size:1.1rem; color:#555; margin-top:2px;">מָה הַמִּילָה? <span onclick="speakWord('${englishWordObj.word}')" style="cursor:pointer; font-size:1.3rem;">🔊</span></div>`;
+                    <div style="font-size:1.1rem; color:#555; margin-top:2px;">מָה הַמִּלָּה? <span onclick="speakWord('${englishWordObj.word}')" style="cursor:pointer; font-size:1.3rem;">🔊</span></div>`;
                 speakWord(englishWordObj.word);
                 const optionsEl = document.getElementById('options');
                 optionsEl.innerHTML = "";
@@ -3007,7 +3007,7 @@ const GaiaPlayer = (function () {
                 if (score < 0) score = 0;
                 updateHud();
                 playSound('wrong'); setGaiaState('sad');
-                feedback.innerText = "נְסִי שׁוּב... 🤔";
+                feedback.innerText = "נַסּוּ שׁוּב... 🤔";
                 feedback.style.color = "#c62828";
                 shakeGameContainer();
             }
@@ -3208,7 +3208,7 @@ const readingData = [
         title: "בַּכִּיתָּה ✏️",
         sentences: [
           "יוּבָל בָּא לַכִּיתָּה.",
-          "הוּא יָשַׁב לִיד חָבֵר.",
+          "הוּא יָשַׁב לְיַד חָבֵר.",
           "הַמּוֹרָה כָּתְבָה עַל הַלּוּחַ.",
           "יוּבָל כָּתַב בַּמַּחְבֶּרֶת.",
           "הוּא כָּתַב מִלִּים בְּעִבְרִית.",
@@ -3219,7 +3219,7 @@ const readingData = [
           "יוּבָל אוֹהֵב אֶת בֵּית הַסֵּפֶר."
         ],
         questions: [
-          { q: "אֵיפֹה יָשַׁב יוּבָל?", options: ["לִיד הַמּוֹרָה", "לִיד חָבֵר", "לְבַדּוֹ"], a: 1 },
+          { q: "אֵיפֹה יָשַׁב יוּבָל?", options: ["לְיַד הַמּוֹרָה", "לְיַד חָבֵר", "לְבַדּוֹ"], a: 1 },
           { q: "מָה כָּתַב יוּבָל?", options: ["מִסְפָּרִים", "מִלִּים בְּעִבְרִית", "שִׁיר"], a: 1 },
           { q: "אֵיפֹה שִׂחֲקוּ הַיְּלָדִים?", options: ["בַּכִּיתָּה", "בַּגַּן", "בַּחֲצֵר"], a: 2 }
         ]
@@ -3231,7 +3231,7 @@ const readingData = [
           "הִיא שָׁרָה שִׁיר יָפֶה.",
           "יוּבָל שָׁמַע אֶת הַשִּׁיר.",
           "הוּא חִיֵּךְ וְהִסְתַּכֵּל.",
-          "הַצִּפּוֹר הִנִּידָה אֶת כְּנָפֶיהָ.",
+          "הַצִּפּוֹר נִפְנְפָה בִּכְנָפֶיהָ.",
           "הִיא עָפָה לַשָּׁמַיִם.",
           "יוּבָל הִסְתַּכֵּל עָלֶיהָ.",
           "הוּא רָצָה לִהְיוֹת צִפּוֹר.",
@@ -3306,7 +3306,7 @@ const readingData = [
         ],
         questions: [
           { q: "מַה שְׁמוֹ שֶׁל הַיֶּלֶד?", options: ["עוֹדֵד", "אוֹר", "אֵלִי"], a: 1 },
-          { q: "מָה אוֹר אוֹהֵב לַעֲשׂוֹת?", options: ["לִשְׂחֵק", "לִקְרֹא", "לִישׁוֹן"], a: 1 },
+          { q: "מָה אוֹר אוֹהֵב לַעֲשׂוֹת?", options: ["לְשַׂחֵק", "לִקְרֹא", "לִישׁוֹן"], a: 1 },
           { q: "מָתַי קוֹרֵא אוֹר?", options: ["רַק בַּבֹּקֶר", "גַּם בַּלַּיְלָה", "רַק בְּשַׁבָּת"], a: 1 }
         ]
       }
@@ -3352,7 +3352,7 @@ const readingData = [
         ],
         questions: [
           { q: "מַה צֶּבַע הַכַּדּוּר?", options: ["אָדֹם", "כָּחֹל", "יָרֹק"], a: 1 },
-          { q: "לְאָן נָפַל הַכַּדּוּר?", options: ["בַּגַּן", "בַּמַּיִם", "בָּעֵץ"], a: 1 },
+          { q: "אֵיפֹה נָפַל הַכַּדּוּר?", options: ["בַּגַּן", "בַּמַּיִם", "בָּעֵץ"], a: 1 },
           { q: "מָה עָשָׂה יוּבָל עִם הַכַּדּוּר?", options: ["הֶחְזִיר אוֹתוֹ", "יִבֵּשׁ אוֹתוֹ", "נָתַן אוֹתוֹ"], a: 1 }
         ]
       },
@@ -3360,7 +3360,7 @@ const readingData = [
         title: "מָרָק חַם 🍲",
         sentences: [
           "בַּחוּץ קַר מְאֹד.",
-          "אִמָּא בִּישְּׁלָה מָרָק.",
+          "אִמָּא בִּשְּׁלָה מָרָק.",
           "הַמָּרָק הָיָה חַם.",
           "יוּבָל רָאָה עָשָׁן מֵהַסִּיר.",
           "הוּא הֵרִיחַ אֶת הַמָּרָק.",
@@ -3371,7 +3371,7 @@ const readingData = [
           "יוּבָל אָמַר תּוֹדָה לְאִמָּא."
         ],
         questions: [
-          { q: "מִי בִּישְּׁלָה אֶת הַמָּרָק?", options: ["אַבָּא", "יוּבָל", "אִמָּא"], a: 2 },
+          { q: "מִי בִּשְּׁלָה אֶת הַמָּרָק?", options: ["אַבָּא", "יוּבָל", "אִמָּא"], a: 2 },
           { q: "אֵיךְ שָׁתָה יוּבָל?", options: ["מַהֵר", "לְאַט לְאַט", "בְּשִׂמְחָה"], a: 1 },
           { q: "מָה הַמָּרָק עָשָׂה לַגּוּף?", options: ["קֵרֵר", "חִמֵּם", "כָּאַב"], a: 1 }
         ]
@@ -3409,13 +3409,13 @@ function renderStorySelection() {
     const doneCount = prog.filter(v => v >= 0).length;
 
     document.getElementById('reading-cat-label').textContent = cat.label;
-    document.getElementById('reading-story-progress').textContent = doneCount + '/3 הושלמו';
+    document.getElementById('reading-story-progress').textContent = doneCount + '/3 הֻשְׁלְמוּ';
     document.getElementById('reading-q-progress').textContent = '';
 
     const content = document.getElementById('reading-content');
     content.innerHTML = `
         <div style="direction:rtl; margin-bottom:10px;">
-            <div class="reading-title" style="font-size:1.6rem;">בַּחֲרִי סִיפּוּר:</div>
+            <div class="reading-title" style="font-size:1.6rem;">בַּחֲרוּ סִיפּוּר:</div>
         </div>
         ${cat.stories.map((story, i) => {
             const done = prog[i] >= 0;
@@ -3453,7 +3453,7 @@ function renderReadingStory() {
     const content = document.getElementById('reading-content');
     content.innerHTML = `
         <button onclick="renderStorySelection()" style="background:none;border:none;font-size:1.1rem;color:#7b1fa2;cursor:pointer;direction:rtl;margin-bottom:6px;font-family:'Varela Round','Fredoka',sans-serif;">
-            ← חֲזָרָה לְבַחִירַת סִיפּוּר
+            ← חֲזָרָה לִבְחִירַת סִיפּוּר
         </button>
         <div class="reading-title">${story.title}</div>
         <div class="reading-story-box">
@@ -3540,7 +3540,7 @@ function renderStoryDone() {
     const content = document.getElementById('reading-content');
     content.innerHTML = `
         <div style="text-align:center; padding:10px 6px;">
-            <div class="reading-title">סִיַּמְתְּ אֶת הַסִּיפּוּר! 🎉</div>
+            <div class="reading-title">סוֹף הַסִּיפּוּר! 🎉</div>
             <div style="font-size:1.2rem; color:#555; direction:rtl;">${story.title}</div>
             <div class="stars-earned" id="reading-story-stars"></div>
             <div id="reading-board"></div>
@@ -3560,20 +3560,20 @@ function showReadingCategoryComplete() {
     const totalScore = prog.reduce((s, v) => s + (v > 0 ? v : 0), 0);
     const content = document.getElementById('reading-content');
     document.getElementById('reading-q-progress').textContent = '';
-    document.getElementById('reading-story-progress').textContent = 'הושלם! 🎉';
+    document.getElementById('reading-story-progress').textContent = 'הֻשְׁלַם! 🎉';
 
     content.innerHTML = `
         <div style="text-align:center; padding:20px 10px;">
             <div style="font-size:4rem; animation:popIn 0.5s;">🏆</div>
             <div class="reading-title" style="color:#e040fb;">כָּל הַכָּבוֹד!</div>
             <div style="font-size:1.4rem; color:#555; direction:rtl; margin:10px 0;">
-                סִיַּמְתְּ אֶת כָּל הַסִּיפּוּרִים בְּ${cat.label}!
+                כָּל הַסִּיפּוּרִים בְּ${cat.label} נִקְרְאוּ!
             </div>
             <div style="font-size:1.6rem; color:#ff8f00; font-weight:bold; margin:8px 0;">
                 ⭐ ${totalScore} / 9 נְקֻדּוֹת
             </div>
             <button class="big-btn btn-reading" onclick="goToReadingMenu()" style="margin-top:12px; font-size:1.3rem;">
-                חֲזָרָה לְבַחִירַת נִיקּוּד 📖
+                חֲזָרָה לִבְחִירַת נִקּוּד 📖
             </button>
         </div>
     `;
@@ -3711,12 +3711,12 @@ function showMultSummary() {
     try {
         GaiaProgress.recordGame('math', 'mult_' + multCurrentTable, stars);
     } catch (e) { console.warn('[progress] mult hook', e); }
-    document.getElementById('mult-progress').textContent = 'סִיַּמְתְּ! 🎉';
+    document.getElementById('mult-progress').textContent = 'סִיּוּם! 🎉';
     let msg, color;
     if (multScore === 10)      { msg = 'מֻשְׁלָם!';        color = '#2e7d32'; }
     else if (multScore >= 8)   { msg = 'מְצֻיָּן!';        color = '#43a047'; }
     else if (multScore >= 5)   { msg = 'יָפֶה מְאֹד!';     color = '#ff8f00'; }
-    else                       { msg = 'נְסִי שׁוּב — אַתְּ יְכוֹלָה!'; color = '#c62828'; }
+    else                       { msg = 'נַסּוּ שׁוּב — אַתֶּם יְכוֹלִים!'; color = '#c62828'; }
 
     const content = document.getElementById('mult-content');
     const subtitle = multCurrentTable === 'all'
@@ -3784,11 +3784,11 @@ const GOOGY_TOPICS = [
 const GOOGY_ERRORS = {
     unauthorized: 'Googy לא מצליחה להתחבר (צריך להפעיל ב-Firebase התחברות אנונימית).',
     not_configured: 'Googy עוד לא מוכנה — צריך להשלים את ההגדרה שלה.',
-    rate_limited: 'וואו, כמה מהר! חכי רגע ונסי שוב.',
-    busy: 'Googy קצת עסוקה. נסי שוב עוד רגע.',
-    timeout: 'Googy לא ענתה בזמן. נסי שוב.',
-    network: 'אין חיבור לאינטרנט. נסי שוב.',
-    upstream: 'אופס, משהו השתבש. נסי שוב.'
+    rate_limited: 'וואו, כמה מהר! רגע אחד, ואז אפשר לנסות שוב.',
+    busy: 'Googy קצת עסוקה. אפשר לנסות שוב עוד רגע.',
+    timeout: 'Googy לא ענתה בזמן. אפשר לנסות שוב.',
+    network: 'אין חיבור לאינטרנט. אפשר לנסות שוב.',
+    upstream: 'אופס, משהו השתבש. אפשר לנסות שוב.'
 };
 
 const Googy = {
@@ -3867,8 +3867,8 @@ function startGoogyChat(topicId) {
     document.getElementById('googy-inputbar').style.display = '';
     document.getElementById('googy-mic').style.display = GoogySpeechRecognition ? '' : 'none';
     setGoogyHint(GoogySpeechRecognition
-        ? 'לְחַצִי עַל 🎤 וְדַבְּרִי בְּאַנְגְּלִית, הַקְלִידִי, אוֹ בַּחֲרִי תְּשׁוּבָה'
-        : 'הַקְלִידִי בְּאַנְגְּלִית אוֹ בַּחֲרִי תְּשׁוּבָה');
+        ? 'אֶפְשָׁר לְדַבֵּר בְּאַנְגְּלִית עִם 🎤, לְהַקְלִיד אוֹ לִבְחֹר תְּשׁוּבָה'
+        : 'אֶפְשָׁר לְהַקְלִיד בְּאַנְגְּלִית אוֹ לִבְחֹר תְּשׁוּבָה');
     updateGoogyProgress();
     fillGoogyAvatars();
     showScreen('googy-screen');
@@ -4018,7 +4018,7 @@ function showGoogyError(code) {
     setGoogyBusy(false);
     const note = googyEl('div', 'gchat-note', (GOOGY_ERRORS[code] || GOOGY_ERRORS.upstream) + ' ');
     if (code !== 'not_configured' && code !== 'unauthorized') {
-        const retry = googyEl('button', '', 'נסי שוב 🔄');
+        const retry = googyEl('button', '', 'לְנַסּוֹת שׁוּב 🔄');
         retry.onclick = () => { note.remove(); Googy.failed = false; googyAsk(); };
         note.appendChild(retry);
     }
@@ -4040,7 +4040,7 @@ function finishGoogyChat() {
     const end = document.getElementById('googy-end');
     end.textContent = '';
     end.appendChild(googyEl('div', 'reading-title', 'כָּל הַכָּבוֹד! 🎉'));
-    end.appendChild(googyEl('div', '', 'דִּבַּרְתְּ עִם Googy עַל ' + Googy.topic.he));
+    end.appendChild(googyEl('div', '', 'שִׂיחָה עִם Googy עַל ' + Googy.topic.he));
     const starsEl = googyEl('div', 'stars-earned');
     renderStarsEarned(starsEl, stars);
     end.appendChild(starsEl);
@@ -4121,7 +4121,7 @@ function googyToggleMic() {
     };
     rec.onerror = event => {
         if (event.error === 'not-allowed' || event.error === 'service-not-allowed') setGoogyHint('צריך לאשר לדפדפן גישה למיקרופון 🎤');
-        else if (event.error === 'no-speech') setGoogyHint('לֹא שָׁמַעְתִּי — נַסִּי שׁוּב 🎤');
+        else if (event.error === 'no-speech') setGoogyHint('לֹא שָׁמַעְתִּי — נַסּוּ שׁוּב 🎤');
         else if (event.error !== 'aborted') setGoogyHint('הַמִּיקְרוֹפוֹן לֹא עָבַד — אֶפְשָׁר לְהַקְלִיד');
     };
     rec.onend = () => {
@@ -4135,7 +4135,7 @@ function googyToggleMic() {
     Googy.recognizer = rec;
     Googy.listening = true;
     mic.classList.add('listening');
-    setGoogyHint('🎤 דַּבְּרִי בְּאַנְגְּלִית...');
+    setGoogyHint('🎤 מְדַבְּרִים בְּאַנְגְּלִית...');
     try { rec.start(); } catch (e) { googyStopListening(); }
 }
 
@@ -4157,10 +4157,11 @@ const REPEAT_TRIES = 3;                  // tries per sentence
 const REPEAT_POINTS = [0, 4, 7, 10];     // a sentence's points, by the stars of its best try
 
 // [English, Hebrew]. Everyday words and no names, so the recognizer can write every word.
+// The Hebrew fits boys and girls (אוהב/ת, בואו).
 const REPEAT_TOPICS = [
     { id: 'greetings', emoji: '👋', he: 'שָׁלוֹם וּבְרָכוֹת', en: 'Hello!',
       easy: [
-        ['Hello, my friend!', 'שלום, חברה שלי!'],
+        ['Hello, my friend!', 'שלום, חבר/ה שלי!'],
         ['Good morning!', 'בוקר טוב!'],
         ['How are you?', 'מה שלומך?'],
         ['I am fine, thank you.', 'אני בסדר, תודה.'],
@@ -4172,16 +4173,16 @@ const REPEAT_TOPICS = [
       medium: [
         ['Hello! It is so nice to meet you.', 'שלום! כל כך נעים להכיר אותך.'],
         ['Good morning! Did you sleep well?', 'בוקר טוב! ישנת טוב?'],
-        ['I am eight years old.', 'אני בת שמונה.'],
-        ['Can you help me, please?', 'את יכולה לעזור לי, בבקשה?'],
+        ['I am eight years old.', 'אני בן/בת שמונה.'],
+        ['Can you help me, please?', 'אפשר לעזור לי, בבקשה?'],
         ['Thank you for your help.', 'תודה על העזרה שלך.'],
         ['Have a nice day!', 'שיהיה לך יום נעים!'],
-        ["Let's play together after school.", 'בואי נשחק ביחד אחרי בית הספר.'],
+        ["Let's play together after school.", 'בואו נשחק ביחד אחרי בית הספר.'],
         ['Goodbye! See you next week.', 'להתראות! נתראה בשבוע הבא.']
       ] },
     { id: 'animals', emoji: '🐶', he: 'חַיּוֹת', en: 'Animals',
       easy: [
-        ['I like dogs.', 'אני אוהבת כלבים.'],
+        ['I like dogs.', 'אני אוהב/ת כלבים.'],
         ['The cat is small.', 'החתול קטן.'],
         ['A fish can swim.', 'דג יודע לשחות.'],
         ['The bird can fly.', 'הציפור יודעת לעוף.'],
@@ -4202,12 +4203,12 @@ const REPEAT_TOPICS = [
       ] },
     { id: 'food', emoji: '🍕', he: 'אֹכֶל', en: 'Food',
       easy: [
-        ['I like pizza.', 'אני אוהבת פיצה.'],
+        ['I like pizza.', 'אני אוהב/ת פיצה.'],
         ['The apple is red.', 'התפוח אדום.'],
-        ['I am hungry.', 'אני רעבה.'],
+        ['I am hungry.', 'אני רעב/ה.'],
         ['I want some water.', 'אני רוצה קצת מים.'],
         ['Ice cream is yummy!', 'גלידה זה טעים!'],
-        ['I love chocolate.', 'אני אוהבת שוקולד.'],
+        ['I love chocolate.', 'אני אוהב/ת שוקולד.'],
         ['Can I have some bread?', 'אפשר לקבל קצת לחם?'],
         ['Bananas are yellow.', 'בננות הן צהובות.']
       ],
@@ -4217,25 +4218,25 @@ const REPEAT_TOPICS = [
         ['We eat breakfast in the morning.', 'אנחנו אוכלים ארוחת בוקר בבוקר.'],
         ['Can I have a glass of milk?', 'אפשר לקבל כוס חלב?'],
         ['Tonight we are eating pasta for dinner.', 'הערב אנחנו אוכלים פסטה לארוחת ערב.'],
-        ['I do not like carrots very much.', 'אני לא כל כך אוהבת גזר.'],
+        ['I do not like carrots very much.', 'אני לא כל כך אוהב/ת גזר.'],
         ['The soup is too hot.', 'המרק חם מדי.'],
-        ["Let's bake a chocolate cake together.", 'בואי נאפה ביחד עוגת שוקולד.']
+        ["Let's bake a chocolate cake together.", 'בואו נאפה ביחד עוגת שוקולד.']
       ] },
     { id: 'family', emoji: '👨‍👩‍👧', he: 'מִשְׁפָּחָה', en: 'Family',
       easy: [
         ['This is my mom.', 'זאת אמא שלי.'],
-        ['I love my dad.', 'אני אוהבת את אבא שלי.'],
+        ['I love my dad.', 'אני אוהב/ת את אבא שלי.'],
         ['I have a brother.', 'יש לי אח.'],
         ['My sister is funny.', 'אחותי מצחיקה.'],
         ['My grandma is nice.', 'סבתא שלי נחמדה.'],
         ['My grandpa is tall.', 'סבא שלי גבוה.'],
         ['We are a big family.', 'אנחנו משפחה גדולה.'],
-        ['I love my family.', 'אני אוהבת את המשפחה שלי.']
+        ['I love my family.', 'אני אוהב/ת את המשפחה שלי.']
       ],
       medium: [
         ['My mom makes the best cake.', 'אמא שלי מכינה את העוגה הכי טובה.'],
-        ['I play games with my brother.', 'אני משחקת במשחקים עם אחי.'],
-        ['My sister and I share a room.', 'אני ואחותי חולקות חדר.'],
+        ['I play games with my brother.', 'אני משחק/ת במשחקים עם אחי.'],
+        ['My sister and I share a room.', 'לי ולאחותי יש חדר משותף.'],
         ['On Friday we visit my grandma.', 'ביום שישי אנחנו מבקרים את סבתא.'],
         ['My dad reads me a story at night.', 'אבא שלי מקריא לי סיפור בלילה.'],
         ['We have dinner together every evening.', 'אנחנו אוכלים ארוחת ערב ביחד כל ערב.'],
@@ -4246,16 +4247,16 @@ const REPEAT_TOPICS = [
       easy: [
         ['The sky is blue.', 'השמיים כחולים.'],
         ['The sun is yellow.', 'השמש צהובה.'],
-        ['I like pink.', 'אני אוהבת ורוד.'],
+        ['I like pink.', 'אני אוהב/ת ורוד.'],
         ['The grass is green.', 'הדשא ירוק.'],
         ['My bag is red.', 'התיק שלי אדום.'],
         ['I have a purple pen.', 'יש לי עט סגול.'],
         ['The snow is white.', 'השלג לבן.'],
-        ['I can draw a rainbow.', 'אני יודעת לצייר קשת בענן.']
+        ['I can draw a rainbow.', 'אני יודע/ת לצייר קשת בענן.']
       ],
       medium: [
         ['My favorite color is orange.', 'הצבע האהוב עליי הוא כתום.'],
-        ['I am drawing a big red flower.', 'אני מציירת פרח אדום גדול.'],
+        ['I am drawing a big red flower.', 'אני מצייר/ת פרח אדום גדול.'],
         ['A rainbow has many colors.', 'לקשת בענן יש הרבה צבעים.'],
         ['Blue and yellow make green.', 'כחול וצהוב יוצרים ירוק.'],
         ['Can I use your crayons, please?', 'אפשר להשתמש בצבעים שלך, בבקשה?'],
@@ -4265,24 +4266,24 @@ const REPEAT_TOPICS = [
       ] },
     { id: 'school', emoji: '🏫', he: 'בֵּית סֵפֶר', en: 'School',
       easy: [
-        ['I go to school.', 'אני הולכת לבית הספר.'],
+        ['I go to school.', 'אני הולך/ת לבית הספר.'],
         ['This is my book.', 'זה הספר שלי.'],
         ['I have a pencil.', 'יש לי עיפרון.'],
         ['My teacher is nice.', 'המורה שלי נחמדה.'],
-        ['I can read.', 'אני יודעת לקרוא.'],
-        ["Let's play outside!", 'בואי נשחק בחוץ!'],
-        ['I like to draw.', 'אני אוהבת לצייר.'],
+        ['I can read.', 'אני יודע/ת לקרוא.'],
+        ["Let's play outside!", 'בואו נשחק בחוץ!'],
+        ['I like to draw.', 'אני אוהב/ת לצייר.'],
         ['Where is my bag?', 'איפה התיק שלי?']
       ],
       medium: [
-        ['I know how to count to twenty.', 'אני יודעת לספור עד עשרים.'],
+        ['I know how to count to twenty.', 'אני יודע/ת לספור עד עשרים.'],
         ['My best friend sits next to me.', 'החברה הכי טובה שלי יושבת לידי.'],
         ['We have English on Monday.', 'יש לנו אנגלית ביום שני.'],
         ['Can I borrow your eraser, please?', 'אפשר לשאול את המחק שלך, בבקשה?'],
-        ['I put my books in my bag.', 'אני שמה את הספרים שלי בתיק.'],
+        ['I put my books in my bag.', 'אני שם/ה את הספרים שלי בתיק.'],
         ['At recess we play in the yard.', 'בהפסקה אנחנו משחקים בחצר.'],
         ['The teacher reads us a story.', 'המורה מקריאה לנו סיפור.'],
-        ['I like math and art.', 'אני אוהבת חשבון ואומנות.']
+        ['I like math and art.', 'אני אוהב/ת חשבון ואומנות.']
       ] },
     { id: 'weather', emoji: '🌦️', he: 'מֶזֶג אֲוִיר', en: 'Weather',
       easy: [
@@ -4292,81 +4293,81 @@ const REPEAT_TOPICS = [
         ['It is very hot.', 'חם מאוד.'],
         ['I see a cloud.', 'אני רואה ענן.'],
         ['The wind is strong.', 'הרוח חזקה.'],
-        ['I like the snow.', 'אני אוהבת את השלג.'],
-        ['Take your umbrella!', 'קחי את המטרייה שלך!']
+        ['I like the snow.', 'אני אוהב/ת את השלג.'],
+        ['Take your umbrella!', 'קחו את המטרייה!']
       ],
       medium: [
-        ['It is cold, so I wear a coat.', 'קר, אז אני לובשת מעיל.'],
+        ['It is cold, so I wear a coat.', 'קר, אז אני לובש/ת מעיל.'],
         ['In the summer we go to the beach.', 'בקיץ אנחנו הולכים לים.'],
-        ['Look at the rainbow in the sky!', 'תראי את הקשת בענן בשמיים!'],
-        ['I like to jump in the puddles.', 'אני אוהבת לקפוץ בשלוליות.'],
+        ['Look at the rainbow in the sky!', 'תראו את הקשת בענן בשמיים!'],
+        ['I like to jump in the puddles.', 'אני אוהב/ת לקפוץ בשלוליות.'],
         ['The sun is shining today.', 'השמש זורחת היום.'],
-        ['It is windy, so hold your hat.', 'יש רוח, אז תחזיקי את הכובע.'],
+        ['It is windy, so hold your hat.', 'יש רוח, אז תחזיקו את הכובע.'],
         ['In the winter it rains a lot.', 'בחורף יורד הרבה גשם.'],
         ['What is the weather like today?', 'איך מזג האוויר היום?']
       ] },
     { id: 'feelings', emoji: '😊', he: 'רְגָשׁוֹת', en: 'Feelings',
       easy: [
-        ['I am happy.', 'אני שמחה.'],
-        ['I am sad.', 'אני עצובה.'],
-        ['I am tired.', 'אני עייפה.'],
-        ['I feel great!', 'אני מרגישה מצוין!'],
-        ['I am a little scared.', 'אני קצת מפחדת.'],
-        ['I am so excited!', 'אני כל כך מתרגשת!'],
-        ['I am angry.', 'אני כועסת.'],
-        ['I love you!', 'אני אוהבת אותך!']
+        ['I am happy.', 'אני שמח/ה.'],
+        ['I am sad.', 'אני עצוב/ה.'],
+        ['I am tired.', 'אני עייף/ה.'],
+        ['I feel great!', 'אני מרגיש/ה מצוין!'],
+        ['I am a little scared.', 'אני קצת מפחד/ת.'],
+        ['I am so excited!', 'אני כל כך מתרגש/ת!'],
+        ['I am angry.', 'אני כועס/ת.'],
+        ['I love you!', 'אני אוהב/ת אותך!']
       ],
       medium: [
-        ['I feel happy when I play with friends.', 'אני מרגישה שמחה כשאני משחקת עם חברים.'],
-        ['I am tired, so I want to sleep.', 'אני עייפה, אז אני רוצה לישון.'],
-        ['Are you okay? You look sad.', 'את בסדר? את נראית עצובה.'],
+        ['I feel happy when I play with friends.', 'אני שמח/ה כשאני משחק/ת עם חברים.'],
+        ['I am tired, so I want to sleep.', 'אני עייף/ה, אז אני רוצה לישון.'],
+        ['Are you okay? You look sad.', 'הכול בסדר? נראה שעצוב לך.'],
         ['I was scared of the big dog.', 'פחדתי מהכלב הגדול.'],
         ['Thank you, that makes me smile.', 'תודה, זה גורם לי לחייך.'],
         ['I am proud of my drawing.', 'אני גאה בציור שלי.'],
-        ['When I am angry, I take a deep breath.', 'כשאני כועסת, אני נושמת עמוק.'],
+        ['When I am angry, I take a deep breath.', 'כשאני כועס/ת, אני נושם/ת עמוק.'],
         ['A big hug makes me feel better.', 'חיבוק גדול עושה לי טוב.']
       ] },
     { id: 'play', emoji: '⚽', he: 'מִשְׂחָקִים וּסְפּוֹרְט', en: 'Play & sports',
       easy: [
-        ["Let's play ball!", 'בואי נשחק בכדור!'],
-        ['I can run fast.', 'אני יכולה לרוץ מהר.'],
-        ['I like to swim.', 'אני אוהבת לשחות.'],
-        ['Catch the ball!', 'תתפסי את הכדור!'],
+        ["Let's play ball!", 'בואו נשחק בכדור!'],
+        ['I can run fast.', 'אני יכול/ה לרוץ מהר.'],
+        ['I like to swim.', 'אני אוהב/ת לשחות.'],
+        ['Catch the ball!', 'תפסו את הכדור!'],
         ['My team won!', 'הקבוצה שלי ניצחה!'],
-        ['I can jump high.', 'אני יכולה לקפוץ גבוה.'],
+        ['I can jump high.', 'אני יכול/ה לקפוץ גבוה.'],
         ['It is my turn.', 'עכשיו תורי.'],
-        ['I love to dance.', 'אני אוהבת לרקוד.']
+        ['I love to dance.', 'אני אוהב/ת לרקוד.']
       ],
       medium: [
-        ['Do you want to play hide and seek?', 'את רוצה לשחק מחבואים?'],
-        ['I ride my bike in the park.', 'אני רוכבת על האופניים שלי בפארק.'],
+        ['Do you want to play hide and seek?', 'רוצים לשחק מחבואים?'],
+        ['I ride my bike in the park.', 'אני רוכב/ת על האופניים שלי בפארק.'],
         ['My favorite sport is soccer.', 'הספורט האהוב עליי הוא כדורגל.'],
         ['We play basketball after school.', 'אנחנו משחקים כדורסל אחרי בית הספר.'],
         ['Can I play with you, please?', 'אפשר לשחק איתך, בבקשה?'],
         ['I learned to swim this summer.', 'למדתי לשחות בקיץ הזה.'],
-        ['Kick the ball to me!', 'תבעטי אליי את הכדור!'],
-        ["Let's build a big tower with blocks.", 'בואי נבנה מגדל גדול מקוביות.']
+        ['Kick the ball to me!', 'תבעטו אליי את הכדור!'],
+        ["Let's build a big tower with blocks.", 'בואו נבנה מגדל גדול מקוביות.']
       ] },
     { id: 'myday', emoji: '☀️', he: 'הַיּוֹם שֶׁלִּי', en: 'My day',
       easy: [
-        ['I wake up.', 'אני מתעוררת.'],
-        ['I brush my teeth.', 'אני מצחצחת שיניים.'],
-        ['I eat breakfast.', 'אני אוכלת ארוחת בוקר.'],
-        ['I wash my hands.', 'אני שוטפת ידיים.'],
-        ['I get dressed.', 'אני מתלבשת.'],
-        ['I go to bed.', 'אני הולכת לישון.'],
-        ['I take a bath.', 'אני מתרחצת באמבטיה.'],
-        ['I read a book.', 'אני קוראת ספר.']
+        ['I wake up.', 'אני מתעורר/ת.'],
+        ['I brush my teeth.', 'אני מצחצח/ת שיניים.'],
+        ['I eat breakfast.', 'אני אוכל/ת ארוחת בוקר.'],
+        ['I wash my hands.', 'אני שוטף/ת ידיים.'],
+        ['I get dressed.', 'אני מתלבש/ת.'],
+        ['I go to bed.', 'אני הולך/ת לישון.'],
+        ['I take a bath.', 'אני מתרחץ/ת באמבטיה.'],
+        ['I read a book.', 'אני קורא/ת ספר.']
       ],
       medium: [
-        ['Every morning I wake up at seven.', 'כל בוקר אני מתעוררת בשבע.'],
-        ['I brush my teeth before I go to bed.', 'אני מצחצחת שיניים לפני שאני הולכת לישון.'],
-        ['After school I do my homework.', 'אחרי בית הספר אני מכינה שיעורי בית.'],
-        ['I put on my shoes and my coat.', 'אני נועלת נעליים ולובשת מעיל.'],
-        ['In the afternoon I play with my friends.', 'אחר הצהריים אני משחקת עם החברים שלי.'],
-        ['In the evening I take a warm bath.', 'בערב אני מתרחצת באמבטיה חמה.'],
-        ['I help my mom set the table.', 'אני עוזרת לאמא לערוך את השולחן.'],
-        ['At night I read a book in bed.', 'בלילה אני קוראת ספר במיטה.']
+        ['Every morning I wake up at seven.', 'כל בוקר אני מתעורר/ת בשבע.'],
+        ['I brush my teeth before I go to bed.', 'אני מצחצח/ת שיניים לפני שאני הולך/ת לישון.'],
+        ['After school I do my homework.', 'אחרי בית הספר אני מכין/ה שיעורי בית.'],
+        ['I put on my shoes and my coat.', 'אני נועל/ת נעליים ולובש/ת מעיל.'],
+        ['In the afternoon I play with my friends.', 'אחר הצהריים אני משחק/ת עם החברים שלי.'],
+        ['In the evening I take a warm bath.', 'בערב אני מתרחץ/ת באמבטיה חמה.'],
+        ['I help my mom set the table.', 'אני עוזר/ת לאמא לערוך את השולחן.'],
+        ['At night I read a book in bed.', 'בלילה אני קורא/ת ספר במיטה.']
       ] }
 ];
 
@@ -4460,16 +4461,16 @@ const Repeat = {
 };
 
 const REPEAT_HINTS = {
-    start: 'הַקְשִׁיבִי לְ-Googy, וְאָז לְחַצִי עַל 🎤 וְחִזְרִי אַחֲרֶיהָ',
-    listening: 'אִמְרִי אֶת הַמִּשְׁפָּט בְּקוֹל 🗣️',
+    start: 'מַקְשִׁיבִים לְ-Googy, לוֹחֲצִים עַל 🎤 וְחוֹזְרִים אַחֲרֶיהָ',
+    listening: 'אוֹמְרִים אֶת הַמִּשְׁפָּט בְּקוֹל 🗣️',
     tapWord: 'אֶפְשָׁר לִלְחֹץ עַל מִלָּה כְּדֵי לִשְׁמֹעַ אוֹתָהּ 👆',
-    noRecognition: 'בַּדַּפְדְּפָן הַזֶּה אֵין זִהוּי דִּבּוּר, אָז אֶפְשָׁר לְהַקְשִׁיב וְלַחֲזֹר בְּקוֹל. כְּדֵי לְקַבֵּל כּוֹכָבִים, פִּתְחִי אֶת הַמִּשְׂחָק בְּ-Chrome אוֹ בְּ-Safari.',
-    'no-speech': 'לֹא שָׁמַעְתִּי כְּלוּם — לְחַצִי עַל 🎤 וְדַבְּרִי בְּקוֹל 🙂',
+    noRecognition: 'בַּדַּפְדְּפָן הַזֶּה אֵין זִהוּי דִּבּוּר, אָז אֶפְשָׁר לְהַקְשִׁיב וְלַחֲזֹר בְּקוֹל. כְּדֵי לְקַבֵּל כּוֹכָבִים, צָרִיךְ לִפְתֹּחַ אֶת הַמִּשְׂחָק בְּ-Chrome אוֹ בְּ-Safari.',
+    'no-speech': 'לֹא שָׁמַעְתִּי כְּלוּם — לוֹחֲצִים עַל 🎤 וּמְדַבְּרִים בְּקוֹל 🙂',
     'not-allowed': 'צָרִיךְ לְאַשֵּׁר לַדַּפְדְּפָן גִּישָׁה לַמִּיקְרוֹפוֹן 🎤',
     'service-not-allowed': 'צָרִיךְ לְאַשֵּׁר לַדַּפְדְּפָן גִּישָׁה לַמִּיקְרוֹפוֹן 🎤',
     'audio-capture': 'לֹא מָצָאתִי מִיקְרוֹפוֹן 🎤',
     network: 'זִהוּי הַדִּבּוּר צָרִיךְ חִבּוּר לָאִינְטֶרְנֶט 📶',
-    micFailed: 'הַמִּיקְרוֹפוֹן לֹא עָבַד — נַסִּי שׁוּב 🎤'
+    micFailed: 'הַמִּיקְרוֹפוֹן לֹא עָבַד — נַסּוּ שׁוּב 🎤'
 };
 
 // What Googy says after a try: by stars, and for a low score whether another try is left.
@@ -4491,7 +4492,7 @@ function goToRepeat(level) {
     stopAllGames();
     Repeat.level = level === 'medium' ? 'medium' : 'easy';
     showGoogyTopics('מָה נְתַרְגֵּל הַיּוֹם? 🦜',
-        'Googy אוֹמֶרֶת מִשְׁפָּט בְּאַנְגְּלִית, וְאַתְּ חוֹזֶרֶת אַחֲרֶיהָ 🎤',
+        'Googy אוֹמֶרֶת מִשְׁפָּט בְּאַנְגְּלִית, וְחוֹזְרִים אַחֲרֶיהָ 🎤',
         REPEAT_TOPICS, startRepeat);
 }
 
@@ -4555,7 +4556,7 @@ function updateRepeatControls() {
     show('repeat-skip', canHear && attempts === 0);
     const mic = document.getElementById('repeat-mic');
     mic.classList.toggle('listening', listening);
-    mic.textContent = listening ? '👂 אֲנִי מַקְשִׁיבָה...' : '🎤 עַכְשָׁו אַתְּ!';
+    mic.textContent = listening ? '👂 אֲנִי מַקְשִׁיבָה...' : '🎤 עַכְשָׁו לַחֲזֹר!';
     document.getElementById('repeat-listen').disabled = listening;
     document.getElementById('repeat-slow').disabled = listening;
     document.getElementById('repeat-next').textContent =
@@ -4705,8 +4706,8 @@ function repeatJudge(candidates) {
 function repeatMessage(stars, canRetry) {
     if (stars === 3) return 'מֻשְׁלָם! 🌟';
     if (stars === 2) return 'יָפֶה מְאֹד! 👏';
-    if (stars === 1) return canRetry ? 'כִּמְעַט! נַסִּי שׁוּב 💪' : 'כִּמְעַט! 💪';
-    return canRetry ? 'בּוֹאִי נְנַסֶּה שׁוּב 💪' : 'לֹא נוֹרָא, מַמְשִׁיכִים! 💪';
+    if (stars === 1) return canRetry ? 'כִּמְעַט! עוֹד נִסָּיוֹן 💪' : 'כִּמְעַט! 💪';
+    return canRetry ? 'בּוֹאוּ נְנַסֶּה שׁוּב 💪' : 'לֹא נוֹרָא, מַמְשִׁיכִים! 💪';
 }
 
 // "Next", or skipping a sentence that wasn't tried (it gets no points).
@@ -4741,14 +4742,14 @@ function finishRepeat() {
     end.appendChild(googyEl('div', 'reading-title', scored && !stars ? 'בַּפַּעַם הַבָּאָה נַצְלִיחַ! 💪' : 'כָּל הַכָּבוֹד! 🎉'));
     if (scored) {
         end.appendChild(googyEl('div', 'repeat-end-line',
-            'אָמַרְתְּ ' + Repeat.said + ' מִתּוֹךְ ' + Repeat.items.length + ' מִשְׁפָּטִים'));
+            Repeat.said + ' מִתּוֹךְ ' + Repeat.items.length + ' מִשְׁפָּטִים נֶאֶמְרוּ'));
         const starsEl = googyEl('div', 'stars-earned');
         renderStarsEarned(starsEl, stars);
         end.append(starsEl, googyEl('div', 'repeat-end-points', '⭐ ' + Repeat.total + ' / ' + max + ' נְקֻדּוֹת'));
         const result = GaiaBoards.finish('english', 'repeat_' + Repeat.level, GaiaBoards.grade(Repeat.total, max));
         if (result) end.appendChild(GaiaBoards.resultCard(result));
     } else {
-        end.appendChild(googyEl('div', 'repeat-end-line', 'הִקְשַׁבְתְּ לְכָל הַמִּשְׁפָּטִים 👂'));
+        end.appendChild(googyEl('div', 'repeat-end-line', 'שָׁמַעְנוּ אֶת כָּל הַמִּשְׁפָּטִים 👂'));
     }
     const again = googyEl('button', 'big-btn btn-googy', 'סִיבּוּב נוֹסָף 🔁');
     again.onclick = () => startRepeat(Repeat.topic.id);
@@ -4791,11 +4792,11 @@ const BOARD_GAMES = {
         .concat([2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => ['mult_' + n, '✖️ ' + n])),
     hebrew: [['1', 'אוֹת רִאשׁוֹנָה'], ['2', 'אוֹת אַחֲרוֹנָה'], ['3', 'אוֹת חֲסֵרָה']],
     reading: readingData.map((cat, i) => ['cat_' + i, cat.label]),
-    english: [['4', 'אַלְפָּבֵית'], ['0', 'כְּתִיב מִילָה'], ['1', 'אוֹת רִאשׁוֹנָה'], ['2', 'אוֹת אַחֲרוֹנָה'],
-              ['3', 'אוֹת חֲסֵרָה'], ['repeat_easy', '🦜 חִזְרִי – קַל'], ['repeat_medium', '🦜 חִזְרִי – קְצָת יוֹתֵר']],
+    english: [['4', 'אַלְפָּבֵית'], ['0', 'כְּתִיב מִלָּה'], ['1', 'אוֹת רִאשׁוֹנָה'], ['2', 'אוֹת אַחֲרוֹנָה'],
+              ['3', 'אוֹת חֲסֵרָה'], ['repeat_easy', '🦜 חוֹזְרִים – קַל'], ['repeat_medium', '🦜 חוֹזְרִים – קְצָת יוֹתֵר']],
     geography: [['1', 'מְדִינוֹת מֻכָּרוֹת'], ['2', 'כָּל הַמְּדִינוֹת']],
-    biology: [['1', 'אֵיבָרִים עִיקָרִיִּים'], ['2', 'כָּל הָאֵיבָרִים']],
-    memory: [['words_easy', 'מִילִים – קַל'], ['words_hard', 'מִילִים – קָשֶׁה'], ['flags_easy', 'דְּגָלִים – קַל'], ['flags_hard', 'דְּגָלִים – קָשֶׁה']],
+    biology: [['1', 'אֵיבָרִים עִקָּרִיִּים'], ['2', 'כָּל הָאֵיבָרִים']],
+    memory: [['words_easy', 'מִלִּים – קַל'], ['words_hard', 'מִלִּים – קָשֶׁה'], ['flags_easy', 'דְּגָלִים – קַל'], ['flags_hard', 'דְּגָלִים – קָשֶׁה']],
     puzzle: [['2x2', '2×2'], ['3x3', '3×3'], ['3x4', '3×4']]
 };
 
@@ -4938,9 +4939,9 @@ const GaiaBoards = (function () {
         const input = node('input', 'name-input');
         input.type = 'text';
         input.maxLength = 20;
-        input.placeholder = 'הַשֵּׁם שֶׁלָּךְ...';
+        input.placeholder = 'שֵׁם...';
         input.autocomplete = 'off';
-        const save = node('button', 'big-btn btn-save', 'שִׁמְרִי 💾');
+        const save = node('button', 'big-btn btn-save', 'שְׁמִירָה 💾');
         save.type = 'submit';
         form.append(input, save);
         form.onsubmit = event => {
@@ -4970,15 +4971,15 @@ const GaiaBoards = (function () {
         open.onclick = () => openBoard(result.land, result.game);
 
         const showPlace = () => {
-            status.textContent = 'שׁוֹמֶרֶת... ⏳';
+            status.textContent = 'שׁוֹמְרִים... ⏳';
             placeOf(result, (place, count) => {
                 if (!card.isConnected) return;
                 const best = result.best;
                 let text;
                 if (result.improved) {
-                    text = place === 1 ? '🥇 אַתְּ בְּרֹאשׁ הַלּוּחַ!' : place ? '🎉 שִׂיא חָדָשׁ! מָקוֹם ' + place + ' בַּלּוּחַ' : '🎉 שִׂיא חָדָשׁ!';
+                    text = place === 1 ? '🥇 מָקוֹם רִאשׁוֹן בַּלּוּחַ!' : place ? '🎉 שִׂיא חָדָשׁ! מָקוֹם ' + place + ' בַּלּוּחַ' : '🎉 שִׂיא חָדָשׁ!';
                 } else {
-                    text = 'הַשִּׂיא שֶׁלָּךְ: צִיּוּן ' + best.grade + ', ' + time(best.ms) + (place ? ' (מָקוֹם ' + place + ')' : '');
+                    text = 'הַשִּׂיא הָאִישִׁי: צִיּוּן ' + best.grade + ', ' + time(best.ms) + (place ? ' (מָקוֹם ' + place + ')' : '');
                 }
                 status.textContent = text;
             });
@@ -4986,7 +4987,7 @@ const GaiaBoards = (function () {
         if (result.player) {
             showPlace();
         } else {
-            status.textContent = 'כִּתְבִי אֶת הַשֵּׁם שֶׁלָּךְ כְּדֵי לְהִכָּנֵס לַלּוּחַ:';
+            status.textContent = 'כְּדֵי לְהִכָּנֵס לַלּוּחַ, כּוֹתְבִים שֵׁם:';
             const form = nameForm(name => {
                 const player = GaiaPlayer.add(name);
                 if (!player) return;
@@ -5032,7 +5033,7 @@ const GaiaBoards = (function () {
     function showBoard() {
         const land = boardLand, game = boardGame;
         const note = document.getElementById('board-note');
-        note.textContent = db ? 'טוֹעֶנֶת אֶת הַלּוּחַ הַמְּשֻׁתָּף... ⏳' : '';
+        note.textContent = db ? 'טוֹעֲנִים אֶת הַלּוּחַ הַמְּשֻׁתָּף... ⏳' : '';
         load(land, game, (rows, source) => {
             if (land !== boardLand || game !== boardGame) return;   // another tab was picked
             renderRows(rows);
@@ -5055,7 +5056,7 @@ const GaiaBoards = (function () {
         });
         if (!rows.length) {
             const tr = node('tr');
-            const td = node('td', 'bt-empty', 'עוֹד אֵין תּוֹצָאוֹת כָּאן. אַתְּ יְכוֹלָה לִהְיוֹת הָרִאשׁוֹנָה! 🏁');
+            const td = node('td', 'bt-empty', 'עוֹד אֵין תּוֹצָאוֹת כָּאן — זֶה הַזְּמַן לִהְיוֹת רִאשׁוֹנִים! 🏁');
             td.colSpan = 4;
             tr.appendChild(td);
             body.appendChild(tr);
@@ -5065,8 +5066,8 @@ const GaiaBoards = (function () {
     function updateBoardPlayer() {
         const me = GaiaPlayer.current();
         document.getElementById('board-player').textContent = me
-            ? '👤 מְשַׂחֶקֶת עַכְשָׁו: ' + me.name + ' (לְהַחְלִיף?)'
-            : '👤 מִי מְשַׂחֶקֶת?';
+            ? '👤 בַּמִּשְׂחָק: ' + me.name + ' (לְהַחְלִיף?)'
+            : '👤 מִי בַּמִּשְׂחָק?';
     }
 
     // --- who's playing ---
@@ -5082,8 +5083,8 @@ const GaiaBoards = (function () {
             list.appendChild(btn);
         });
         document.getElementById('player-new-label').textContent = GaiaPlayer.list().length
-            ? 'שַׂחְקָנִית חֲדָשָׁה? כִּתְבִי אֶת הַשֵּׁם שֶׁלָּךְ:'
-            : 'כִּתְבִי אֶת הַשֵּׁם שֶׁלָּךְ, כְּדֵי שֶׁהַתּוֹצָאוֹת יִכָּנְסוּ לַלּוּחַ:';
+            ? 'שֵׁם חָדָשׁ? כּוֹתְבִים אוֹתוֹ כָּאן:'
+            : 'כּוֹתְבִים שֵׁם, וְהַתּוֹצָאוֹת יִכָּנְסוּ לַלּוּחַ:';
         document.getElementById('player-name-input').value = '';
         playerModal.hidden = false;
     }
@@ -5181,13 +5182,13 @@ const GaiaBoards = (function () {
         english: {
             title: '🌊 מִפְרַץ הָאַנְגְּלִית', hue: '--land-english',
             buttons: [
-                { cls: 'btn-english', label: 'אַלְפָּבֵית וְצְלִילִים 🔡', fn: () => startEnglishGame(4), levelKey: '4' },
-                { cls: 'btn-level-1', label: 'כְּתִיב מִילָה (קַל) 🖼️',   fn: () => startEnglishGame(0), levelKey: '0' },
+                { cls: 'btn-english', label: 'אַלְפָּבֵית וּצְלִילִים 🔡', fn: () => startEnglishGame(4), levelKey: '4' },
+                { cls: 'btn-level-1', label: 'כְּתִיב מִלָּה (קַל) 🖼️',   fn: () => startEnglishGame(0), levelKey: '0' },
                 { cls: 'btn-level-2', label: 'אוֹת רִאשׁוֹנָה',           fn: () => startEnglishGame(1), levelKey: '1' },
                 { cls: 'btn-level-3', label: 'אוֹת אַחֲרוֹנָה',           fn: () => startEnglishGame(2), levelKey: '2' },
                 { cls: 'btn-english', label: 'אוֹת חֲסֵרָה (קָשֶׁה)',      fn: () => startEnglishGame(3), levelKey: '3' },
-                { cls: 'btn-googy', label: 'חִזְרִי אַחֲרֵי Googy 🦜 (קַל)', fn: () => goToRepeat('easy'), levelKey: 'repeat_easy' },
-                { cls: 'btn-googy', label: 'חִזְרִי אַחֲרֵי Googy 🦜 (קְצָת יוֹתֵר)', fn: () => goToRepeat('medium'), levelKey: 'repeat_medium' },
+                { cls: 'btn-googy', label: 'חוֹזְרִים אַחֲרֵי Googy 🦜 (קַל)', fn: () => goToRepeat('easy'), levelKey: 'repeat_easy' },
+                { cls: 'btn-googy', label: 'חוֹזְרִים אַחֲרֵי Googy 🦜 (קְצָת יוֹתֵר)', fn: () => goToRepeat('medium'), levelKey: 'repeat_medium' },
                 { cls: 'btn-googy', label: 'שִׂיחָה עִם Googy 💬 (קַל)', fn: () => goToGoogy('easy'), levelKey: 'googy_easy', when: googyAvailable },
                 { cls: 'btn-googy', label: 'שִׂיחָה עִם Googy 💬 (קְצָת יוֹתֵר)', fn: () => goToGoogy('medium'), levelKey: 'googy_medium', when: googyAvailable }
             ]
@@ -5202,15 +5203,15 @@ const GaiaBoards = (function () {
         biology: {
             title: '🫀 מְעָרַת הַגּוּף', hue: '--land-biology',
             buttons: [
-                { cls: 'btn-level-1', label: 'אֵיבָרִים עִיקָרִיִּים', fn: () => startBiologyGame(1), levelKey: '1' },
+                { cls: 'btn-level-1', label: 'אֵיבָרִים עִקָּרִיִּים', fn: () => startBiologyGame(1), levelKey: '1' },
                 { cls: 'btn-level-2', label: 'כָּל הָאֵיבָרִים',       fn: () => startBiologyGame(2), levelKey: '2' }
             ]
         },
         memory: {
             title: '🃏 אִי הַזִּכָּרוֹן', hue: '--land-memory',
             buttons: [
-                { cls: 'btn-level-1', label: 'מִילִים – קַל (6 זוּגוֹת)',  fn: () => startMemoryGame('words', 'easy'), levelKey: 'words_easy' },
-                { cls: 'btn-level-2', label: 'מִילִים – קָשֶׁה (8 זוּגוֹת)', fn: () => startMemoryGame('words', 'hard'), levelKey: 'words_hard' },
+                { cls: 'btn-level-1', label: 'מִלִּים – קַל (6 זוּגוֹת)',  fn: () => startMemoryGame('words', 'easy'), levelKey: 'words_easy' },
+                { cls: 'btn-level-2', label: 'מִלִּים – קָשֶׁה (8 זוּגוֹת)', fn: () => startMemoryGame('words', 'hard'), levelKey: 'words_hard' },
                 { cls: 'btn-geography', label: 'דְּגָלִים – קַל (6 זוּגוֹת)',  fn: () => startMemoryGame('flags', 'easy'), levelKey: 'flags_easy' },
                 { cls: 'btn-geography', label: 'דְּגָלִים – קָשֶׁה (8 זוּגוֹת)', fn: () => startMemoryGame('flags', 'hard'), levelKey: 'flags_hard' }
             ]
@@ -5221,20 +5222,20 @@ const GaiaBoards = (function () {
                 { cls: 'btn-puzzle', label: 'קַל — 2×2',      fn: () => startPuzzle(2, 2, 'numbers'), levelKey: '2x2' },
                 { cls: 'btn-puzzle', label: 'בֵּינוֹנִי — 3×3', fn: () => startPuzzle(3, 3, 'numbers'), levelKey: '3x3' },
                 { cls: 'btn-puzzle', label: 'קָשֶׁה — 3×4',    fn: () => startPuzzle(3, 4, 'numbers'), levelKey: '3x4' },
-                { cls: 'btn-level-3', label: 'פַּאזֶל תְּמוּנָה 🖼️', fn: () => goToPuzzleMenu('image') }
+                { cls: 'btn-level-3', label: 'פָּאזֶל תְּמוּנָה 🖼️', fn: () => goToPuzzleMenu('image') }
             ]
         }
     };
 
     // In every land one of the sisters tells the child what waits there.
     const LAND_GUIDES = {
-        math:      ['yoovy', 'בּוֹאִי נְטַפֵּס עַל הַר הַחֶשְׁבּוֹן! כָּל תַּרְגִּיל הוּא עוֹד צַעַד לַפִּסְגָּה ⛰️'],
-        hebrew:    ['googy', 'בַּיַּעַר הַזֶּה הִתְחַבְּאוּ אוֹתִיּוֹת. עִזְרִי לִי לִמְצֹא אוֹתָן! 🔍'],
-        reading:   ['yoovy', 'אֲנִי הֲכִי אוֹהֶבֶת סִפּוּרִים! בּוֹאִי נִקְרָא יַחַד 📖'],
+        math:      ['yoovy', 'בּוֹאוּ נְטַפֵּס עַל הַר הַחֶשְׁבּוֹן! כָּל תַּרְגִּיל הוּא עוֹד צַעַד לַפִּסְגָּה ⛰️'],
+        hebrew:    ['googy', 'בַּיַּעַר הַזֶּה הִתְחַבְּאוּ אוֹתִיּוֹת. עִזְרוּ לִי לִמְצֹא אוֹתָן! 🔍'],
+        reading:   ['yoovy', 'אֲנִי הֲכִי אוֹהֶבֶת סִפּוּרִים! בּוֹאוּ נִקְרָא יַחַד 📖'],
         english:   ['googy', 'הֵלוֹ! בַּמִּפְרָץ הַזֶּה מְדַבְּרִים אַנְגְּלִית 🌊'],
-        geography: ['yoovy', 'כָּל דֶּגֶל שַׁיָּךְ לִמְדִינָה אַחֶרֶת. כַּמָּה אַתְּ מַכִּירָה? 🌍'],
-        biology:   ['googy', 'מָה יֵשׁ לָנוּ בְּתוֹךְ הַגּוּף? בּוֹאִי נְגַלֶּה! 🫀'],
-        memory:    ['yoovy', 'בּוֹאִי נִרְאֶה מִי זוֹכֶרֶת יוֹתֵר טוֹב! 🃏'],
+        geography: ['yoovy', 'כָּל דֶּגֶל שַׁיָּךְ לִמְדִינָה אַחֶרֶת. כַּמָּה מֵהֶם אַתֶּם מַכִּירִים? 🌍'],
+        biology:   ['googy', 'מָה יֵשׁ לָנוּ בְּתוֹךְ הַגּוּף? בּוֹאוּ נְגַלֶּה! 🫀'],
+        memory:    ['yoovy', 'בּוֹאוּ נִבְדֹּק אֶת הַזִּכָּרוֹן! 🃏'],
         puzzle:    ['googy', 'עַל הַגֶּשֶׁר הַזֶּה הַחֲתִיכוֹת הִתְבַּלְבְּלוּ. נְסַדֵּר אוֹתָן? 🧩']
     };
 
