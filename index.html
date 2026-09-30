@@ -659,6 +659,8 @@
         .map-cloud::before { content:''; position:absolute; width:60%; height:150%; top:-50%; left:15%; background:white; border-radius:50%; }
         .map-cloud::after  { content:''; position:absolute; width:44%; height:130%; top:-40%; right:12%; background:white; border-radius:50%; }
         #map-scene { display: block; width: 100%; height: auto; position: relative; z-index: 1; }
+        /* on screens taller than the map, the meadow continues below it */
+        #map-scene-holder { background: oklch(0.80 0.13 142); min-height: calc(100dvh - 60px); }
 
         #map-topbar {
             position: sticky; top: 0; z-index: 5;
@@ -715,7 +717,22 @@
         .land-plaque .lp-badge { font-size: 0.95rem; color: oklch(0.68 0.16 70); font-weight: 700; }
         .land-icon-circle {
             transition: transform 180ms var(--ease-out-quart);
+            transform-box: fill-box; transform-origin: 50% 100%;
         }
+        /* the landscape comes alive a little: water, flags, the boat, birds, the cave's heart */
+        .map-wave { animation: map-wave 3.2s ease-in-out infinite alternate; }
+        .map-flag { transform-box: fill-box; transform-origin: 0 50%; animation: map-flag 1.4s ease-in-out infinite alternate; }
+        .map-boat { animation: map-bob 2.6s ease-in-out infinite alternate; }
+        .map-birds { animation: map-birds 9s ease-in-out infinite alternate; }
+        .map-sparkle, .map-lamp { animation: map-twinkle 1.8s ease-in-out infinite alternate; }
+        .map-float { animation: map-bob 2.2s ease-in-out infinite alternate; }
+        .map-glow { transform-box: fill-box; transform-origin: center; animation: map-pulse 1.6s ease-in-out infinite alternate; }
+        @keyframes map-wave { from { transform: translateX(-4px); } to { transform: translateX(4px); } }
+        @keyframes map-flag { from { transform: scaleX(1); } to { transform: scaleX(0.75) skewY(4deg); } }
+        @keyframes map-bob { from { transform: translateY(-2px); } to { transform: translateY(2px); } }
+        @keyframes map-birds { from { transform: translate(0, 0); } to { transform: translate(40px, -12px); } }
+        @keyframes map-twinkle { from { opacity: 0.35; } to { opacity: 1; } }
+        @keyframes map-pulse { from { transform: scale(0.85); opacity: 0.7; } to { transform: scale(1.1); opacity: 1; } }
         .land-hit:active .land-icon-circle { transform: translateY(3px) scale(0.96); }
 
         /* Land entry panel (in-flow, slides up inside map screen) */
@@ -896,7 +913,8 @@
 
         /* --- reduced motion: collapse map/parallax/character motion to instant --- */
         @media (prefers-reduced-motion: reduce) {
-            #gaia-char .girl, .kg-cloud, .kg-sparkle, .kg-star, .map-cloud { animation: none !important; }
+            #gaia-char .girl, .kg-cloud, .kg-sparkle, .kg-star, .map-cloud,
+            .map-wave, .map-flag, .map-boat, .map-birds, .map-sparkle, .map-lamp, .map-float, .map-glow { animation: none !important; }
             .map-cloud { transform: none !important; }
             #gaia-map-avatar { transition: none !important; }
             .big-btn, .answer-btn, .mult-opt-btn, .reading-opt-btn,
@@ -5140,15 +5158,15 @@ const GaiaBoards = (function () {
 
     // Land definitions (top -> bottom). x,y are on the winding path (RTL feel).
     const LANDS = [
-        { key: 'castle',    name: 'טִירַת יוּבִי וְגוּגִי', emoji: '🏰', hueVar: '--gold',           x: 400, y: 120,  anchor: true },
-        { key: 'math',      name: 'הַר הַחֶשְׁבּוֹן',   emoji: '🏔️', hueVar: '--land-math',      x: 600, y: 285 },
-        { key: 'hebrew',    name: 'יַעַר הַמִּלִּים',   emoji: '🌳', hueVar: '--land-hebrew',    x: 230, y: 430 },
-        { key: 'reading',   name: 'עֵמֶק הַסִּפּוּרִים', emoji: '📖', hueVar: '--land-reading',   x: 570, y: 575 },
-        { key: 'english',   name: 'מִפְרַץ הָאַנְגְּלִית', emoji: '🌊', hueVar: '--land-english', x: 220, y: 720 },
-        { key: 'geography', name: 'מִדְבַּר הַדְּגָלִים', emoji: '🏜️', hueVar: '--land-geography', x: 600, y: 870 },
-        { key: 'biology',   name: 'מְעָרַת הַגּוּף',   emoji: '🫀', hueVar: '--land-biology',    x: 240, y: 1020 },
-        { key: 'memory',    name: 'אִי הַזִּכָּרוֹן',   emoji: '🃏', hueVar: '--land-memory',     x: 570, y: 1170 },
-        { key: 'puzzle',    name: 'גֶּשֶׁר הַפָּאזֶל',  emoji: '🔢', hueVar: '--land-puzzle',     x: 250, y: 1330 }
+        { key: 'castle',    name: 'טִירַת יוּבִי וְגוּגִי', x: 400, y: 120,  anchor: true },
+        { key: 'math',      name: 'הַר הַחֶשְׁבּוֹן',   x: 600, y: 285 },
+        { key: 'hebrew',    name: 'יַעַר הַמִּלִּים',   x: 230, y: 430 },
+        { key: 'reading',   name: 'עֵמֶק הַסִּפּוּרִים', x: 570, y: 575 },
+        { key: 'english',   name: 'מִפְרַץ הָאַנְגְּלִית', x: 220, y: 720 },
+        { key: 'geography', name: 'מִדְבַּר הַדְּגָלִים', x: 600, y: 870 },
+        { key: 'biology',   name: 'מְעָרַת הַגּוּף',   x: 240, y: 1020 },
+        { key: 'memory',    name: 'אִי הַזִּכָּרוֹן',   x: 570, y: 1170 },
+        { key: 'puzzle',    name: 'גֶּשֶׁר הַפָּאזֶל',  x: 250, y: 1330 }
     ];
 
     // Level buttons per land — same start* functions used today.
@@ -5256,6 +5274,218 @@ const GaiaBoards = (function () {
         return n;
     }
 
+    // ---- Map art: the landscape and one drawn landmark per land ----
+    // Everything is SVG markup: land art is drawn around (0,0) and moved to the land's spot.
+    const MAP_WATER = 'oklch(0.74 0.11 225)', MAP_WATER_DEEP = 'oklch(0.66 0.12 235)';
+
+    function mapDefs() {
+        return '' +
+            '<linearGradient id="meadowGrad" x1="0" y1="0" x2="0" y2="1">' +
+                '<stop offset="0" stop-color="oklch(0.91 0.08 140)"/><stop offset="0.55" stop-color="oklch(0.86 0.11 138)"/>' +
+                '<stop offset="1" stop-color="oklch(0.80 0.13 142)"/></linearGradient>' +
+            '<linearGradient id="seaGrad" x1="0" y1="0" x2="1" y2="1">' +
+                '<stop offset="0" stop-color="oklch(0.80 0.10 220)"/><stop offset="1" stop-color="' + MAP_WATER_DEEP + '"/></linearGradient>' +
+            '<radialGradient id="heartGlow"><stop offset="0" stop-color="oklch(0.85 0.16 10)" stop-opacity="0.9"/>' +
+                '<stop offset="1" stop-color="oklch(0.85 0.16 10)" stop-opacity="0"/></radialGradient>' +
+            '<radialGradient id="lampGlow"><stop offset="0" stop-color="#FFF6B0" stop-opacity="0.95"/>' +
+                '<stop offset="1" stop-color="#FFF6B0" stop-opacity="0"/></radialGradient>' +
+            // small pieces of scenery, placed many times with <use>
+            '<g id="dec-tree"><rect x="-3" y="-4" width="6" height="16" rx="2" fill="#8A5A3C"/>' +
+                '<circle cx="0" cy="-14" r="13" fill="oklch(0.62 0.15 145)"/><circle cx="-8" cy="-8" r="9" fill="oklch(0.58 0.15 145)"/>' +
+                '<circle cx="8" cy="-9" r="9" fill="oklch(0.66 0.15 140)"/><circle cx="-3" cy="-19" r="4" fill="oklch(0.74 0.14 135)" opacity="0.8"/></g>' +
+            '<g id="dec-pine"><rect x="-2.5" y="4" width="5" height="10" fill="#7A4E32"/>' +
+                '<path d="M0 -30 L-14 -6 L14 -6 Z" fill="oklch(0.52 0.12 160)"/><path d="M0 -20 L-17 6 L17 6 Z" fill="oklch(0.47 0.12 160)"/></g>' +
+            '<g id="dec-bush"><circle cx="-8" cy="0" r="8" fill="oklch(0.64 0.15 140)"/><circle cx="3" cy="-4" r="9" fill="oklch(0.68 0.15 138)"/>' +
+                '<circle cx="11" cy="1" r="7" fill="oklch(0.60 0.15 142)"/><circle cx="-2" cy="-7" r="2" fill="#FF7EB3"/><circle cx="7" cy="-2" r="2" fill="#FFD54F"/></g>' +
+            '<g id="dec-flowers"><circle cx="-7" cy="0" r="3" fill="#FF7EB3"/><circle cx="0" cy="-5" r="3" fill="#FFD54F"/>' +
+                '<circle cx="7" cy="1" r="3" fill="#B39DDB"/><circle cx="-7" cy="0" r="1.1" fill="#fff"/><circle cx="0" cy="-5" r="1.1" fill="#fff"/><circle cx="7" cy="1" r="1.1" fill="#fff"/></g>' +
+            '<g id="dec-rock"><path d="M-12 4 Q-10 -8 0 -9 Q11 -8 13 4 Z" fill="oklch(0.70 0.02 60)"/><path d="M0 -9 Q11 -8 13 4 L4 4 Z" fill="oklch(0.62 0.02 60)"/></g>' +
+            '<g id="dec-cactus"><rect x="-4" y="-22" width="8" height="26" rx="4" fill="oklch(0.62 0.14 150)"/>' +
+                '<path d="M-4 -8 h-5 a3 3 0 0 1 -3 -3 v-6" stroke="oklch(0.62 0.14 150)" stroke-width="5" fill="none" stroke-linecap="round"/>' +
+                '<path d="M4 -12 h5 a3 3 0 0 0 3 -3 v-5" stroke="oklch(0.62 0.14 150)" stroke-width="5" fill="none" stroke-linecap="round"/></g>' +
+            '<g id="dec-bird"><path d="M-7 0 Q-3.5 -4 0 0 Q3.5 -4 7 0" stroke="oklch(0.35 0.03 260)" stroke-width="1.8" fill="none" stroke-linecap="round"/></g>';
+    }
+
+    function use(id, x, y, s) {
+        return '<use href="#' + id + '" transform="translate(' + x + ' ' + y + ')' + (s && s !== 1 ? ' scale(' + s + ')' : '') + '"/>';
+    }
+
+    // The ground under the road: hills, mountains, sea, river, desert, forest and small scenery.
+    function mapTerrain() {
+        let t = '';
+        // far mountains behind the castle and the math mountain
+        t += '<path d="M430 250 L500 150 L545 190 L610 95 L665 165 L720 105 L800 175 L800 250 Z" fill="oklch(0.86 0.04 250)" opacity="0.85"/>';
+        t += '<path d="M610 95 L628 122 L614 118 L602 128 L592 121 Z M720 105 L737 130 L724 126 L713 134 L704 128 Z" fill="#fff" opacity="0.9"/>';
+        t += '<path d="M0 250 Q90 175 190 205 Q260 225 330 250 Z" fill="oklch(0.88 0.08 145)"/>';
+        // the castle's hill
+        t += '<ellipse cx="400" cy="175" rx="170" ry="45" fill="oklch(0.89 0.09 142)"/>';
+        // forest floor
+        t += '<path d="M0 340 Q120 330 190 370 Q260 410 250 470 Q240 540 150 560 Q70 575 0 560 Z" fill="oklch(0.74 0.12 150)" opacity="0.55"/>';
+        // the bay (left) and its waves
+        t += '<path d="M0 598 C70 606 128 642 158 688 C182 728 162 772 112 792 C72 808 30 806 0 802 Z" fill="url(#seaGrad)"/>';
+        t += '<path class="map-wave" d="M18 650 q12 -6 24 0 t24 0 M40 720 q12 -6 24 0 t24 0 M12 770 q12 -6 24 0 t24 0" stroke="#fff" stroke-width="2.5" fill="none" opacity="0.7" stroke-linecap="round"/>';
+        // the desert
+        t += '<path d="M800 772 C700 786 600 776 520 806 C440 838 432 902 472 942 C522 988 652 978 800 962 Z" fill="oklch(0.88 0.09 80)"/>';
+        t += '<path d="M500 930 Q560 900 620 925 T740 925" stroke="oklch(0.80 0.10 75)" stroke-width="3" fill="none" opacity="0.8"/>';
+        // rocky ground near the cave
+        t += '<path d="M70 985 Q150 945 260 952 Q368 962 384 1020 Q370 1074 262 1084 Q146 1094 82 1060 Q42 1022 70 985 Z" fill="oklch(0.80 0.05 85)" opacity="0.4"/>';
+        // the sea around the memory island, and the river under the puzzle bridge
+        t += '<path d="M800 1052 C735 1072 642 1112 640 1168 C638 1222 700 1256 800 1276 Z" fill="url(#seaGrad)"/>';
+        t += '<path d="M820 1262 C640 1286 420 1330 250 1352 C150 1364 60 1380 -20 1392" stroke="' + MAP_WATER + '" stroke-width="42" fill="none" stroke-linecap="round"/>';
+        t += '<path class="map-wave" d="M700 1280 q12 -6 24 0 t24 0 M480 1318 q12 -6 24 0 t24 0 M90 1372 q12 -6 24 0 t24 0 M720 1140 q12 -6 24 0 t24 0" stroke="#fff" stroke-width="2.5" fill="none" opacity="0.7" stroke-linecap="round"/>';
+        // scenery
+        [[60, 360, 'dec-pine', 1.2], [118, 392, 'dec-tree', 1.1], [52, 448, 'dec-pine', 1.3], [100, 515, 'dec-tree', 1], [160, 330, 'dec-pine', 1],
+         [300, 240, 'dec-tree', 0.9], [720, 440, 'dec-bush', 1.2], [760, 500, 'dec-flowers', 1.3], [395, 430, 'dec-flowers', 1.3],
+         [455, 455, 'dec-bush', 1], [360, 590, 'dec-flowers', 1.2], [420, 715, 'dec-bush', 1.1], [370, 740, 'dec-flowers', 1.2],
+         [740, 620, 'dec-tree', 1], [770, 690, 'dec-bush', 1], [680, 815, 'dec-cactus', 1.1], [760, 900, 'dec-cactus', 1.3],
+         [520, 950, 'dec-rock', 1], [360, 870, 'dec-bush', 1.1], [320, 905, 'dec-flowers', 1.1], [80, 990, 'dec-rock', 1.4],
+         [120, 1062, 'dec-rock', 1], [400, 1010, 'dec-rock', 1.2], [745, 1005, 'dec-bush', 1], [380, 1170, 'dec-tree', 1.1],
+         [430, 1200, 'dec-flowers', 1.2], [60, 1150, 'dec-tree', 1.2], [95, 1230, 'dec-pine', 1.2], [40, 1290, 'dec-bush', 1.1],
+         [520, 1420, 'dec-flowers', 1.2], [640, 1440, 'dec-bush', 1.1], [720, 1400, 'dec-tree', 1.1], [440, 1460, 'dec-rock', 1]
+        ].forEach(function (d) { t += use(d[2], d[0], d[1], d[3]); });
+        // birds over the castle
+        t += '<g class="map-birds">' + use('dec-bird', 170, 95, 1.2) + use('dec-bird', 200, 115, 1) + use('dec-bird', 650, 60, 1.1) + '</g>';
+        return t;
+    }
+
+    // One landmark per land, drawn around (0,0); its base stands at y≈+40, the name plaque is below.
+    const LAND_ART = {
+        castle: function () {
+            return '' +
+                '<ellipse cx="0" cy="42" rx="92" ry="14" fill="oklch(0.80 0.12 140)"/>' +
+                '<rect x="-64" y="-26" width="26" height="68" fill="#F3EAFF" stroke="#CDB8EE" stroke-width="2"/>' +
+                '<rect x="38" y="-26" width="26" height="68" fill="#F3EAFF" stroke="#CDB8EE" stroke-width="2"/>' +
+                '<path d="M-69 -26 L-51 -66 L-33 -26 Z M33 -26 L51 -66 L69 -26 Z" fill="#F06FA7"/>' +
+                '<rect x="-40" y="-6" width="80" height="48" fill="#F8F2FF" stroke="#CDB8EE" stroke-width="2"/>' +
+                '<path d="M-40 -6 v-9 h10 v9 h10 v-9 h10 v9 h10 v-9 h10 v9 h10 v-9 h10 v9 h10 v-9 h0" fill="#F8F2FF" stroke="#CDB8EE" stroke-width="2" stroke-linejoin="round"/>' +
+                '<rect x="-17" y="-48" width="34" height="44" fill="#F8F2FF" stroke="#CDB8EE" stroke-width="2"/>' +
+                '<path d="M-23 -48 L0 -92 L23 -48 Z" fill="#9C5BD6"/>' +
+                '<path d="M-23 -48 L0 -92 L0 -48 Z" fill="#B57BE8"/>' +
+                '<line x1="0" y1="-92" x2="0" y2="-108" stroke="#7A5A3A" stroke-width="2.5"/>' +
+                '<path class="map-flag" d="M0 -108 L18 -103 L0 -97 Z" fill="#FFC83D"/>' +
+                '<line x1="-51" y1="-66" x2="-51" y2="-78" stroke="#7A5A3A" stroke-width="2"/><path class="map-flag" d="M-51 -78 L-38 -74 L-51 -70 Z" fill="#7FD1FF"/>' +
+                '<line x1="51" y1="-66" x2="51" y2="-78" stroke="#7A5A3A" stroke-width="2"/><path class="map-flag" d="M51 -78 L64 -74 L51 -70 Z" fill="#7FD1FF"/>' +
+                '<path d="M-11 42 v-20 a11 11 0 0 1 22 0 v20 Z" fill="#9A6440"/><circle cx="6" cy="31" r="1.6" fill="#FFD54F"/>' +
+                '<path d="M-6 -24 v-8 a6 6 0 0 1 12 0 v8 Z M-57 -4 v-8 a6 6 0 0 1 12 0 v8 Z M45 -4 v-8 a6 6 0 0 1 12 0 v8 Z" fill="#7C6BD6"/>' +
+                '<path d="M-30 12 h12 M18 12 h12" stroke="#CDB8EE" stroke-width="2"/>' +
+                '<g class="map-sparkle"><path d="M-80 -40 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3 Z" fill="#FFE066"/>' +
+                '<path d="M78 -52 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 Z" fill="#FFE066"/></g>';
+        },
+        math: function () {
+            return '' +
+                '<path d="M-86 42 L-34 -26 L-6 6 L30 -62 L88 42 Z" fill="oklch(0.66 0.06 250)"/>' +
+                '<path d="M30 -62 L88 42 L44 42 L20 0 Z" fill="oklch(0.58 0.06 255)"/>' +
+                '<path d="M-34 -26 L-6 6 L-20 42 L-86 42 Z" fill="oklch(0.72 0.06 248)"/>' +
+                '<path d="M30 -62 L44 -36 L36 -30 L29 -38 L21 -30 L16 -35 Z" fill="#fff"/>' +
+                '<path d="M-34 -26 L-24 -13 L-30 -10 L-35 -15 L-41 -10 L-45 -13 Z" fill="#fff"/>' +
+                '<path d="M-2 42 Q16 26 4 14 T22 -10 T30 -40" stroke="#fff" stroke-width="2.5" stroke-dasharray="4 5" fill="none" opacity="0.85"/>' +
+                '<line x1="30" y1="-62" x2="30" y2="-86" stroke="#7A5A3A" stroke-width="2.5"/>' +
+                '<path class="map-flag" d="M30 -86 L54 -86 L54 -70 L30 -70 Z" fill="#EF5350"/>' +
+                '<path d="M42 -83 v10 M37 -78 h10" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/>' +
+                '<circle cx="-60" cy="34" r="11" fill="#FFB74D"/><path d="M-65 34 h10 M-60 29 v10" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/>' +
+                '<circle cx="66" cy="32" r="11" fill="#4FC3F7"/><path d="M62 28 l8 8 M70 28 l-8 8" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/>' +
+                '<circle cx="-30" cy="40" r="9" fill="#81C784"/><path d="M-34 40 h8" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/>';
+        },
+        hebrew: function () {
+            return '' +
+                '<ellipse cx="0" cy="40" rx="86" ry="12" fill="oklch(0.66 0.13 150)" opacity="0.6"/>' +
+                use('dec-pine', -52, 18, 1.9) + use('dec-tree', 40, 20, 1.9) + use('dec-pine', 58, 30, 1.3) + use('dec-tree', -24, 32, 1.3) +
+                '<rect x="-4" y="6" width="5" height="34" fill="#8A5A3C"/>' +
+                '<rect x="-30" y="-6" width="58" height="22" rx="5" fill="#D7A064" stroke="#A8743E" stroke-width="2"/>' +
+                '<text x="-1" y="10" text-anchor="middle" font-family="Varela Round, sans-serif" font-size="16" font-weight="700" fill="#5A3A1E">אבג</text>' +
+                '<circle cx="22" cy="-40" r="3" fill="#FF7EB3"/><circle cx="-58" cy="-28" r="3" fill="#FFD54F"/>';
+        },
+        reading: function () {
+            return '' +
+                '<ellipse cx="0" cy="40" rx="84" ry="13" fill="oklch(0.78 0.12 140)"/>' +
+                '<path d="M0 30 C-22 20 -52 18 -72 26 L-72 -20 C-52 -28 -22 -26 0 -14 C22 -26 52 -28 72 -20 L72 26 C52 18 22 20 0 30 Z" fill="#9C5BD6" transform="translate(0 6)"/>' +
+                '<path d="M0 30 C-22 20 -52 18 -68 24 L-68 -22 C-52 -30 -22 -28 0 -16 Z" fill="#FFFBF0" stroke="#E2D2B0" stroke-width="1.5"/>' +
+                '<path d="M0 30 C22 20 52 18 68 24 L68 -22 C52 -30 22 -28 0 -16 Z" fill="#FFF6E2" stroke="#E2D2B0" stroke-width="1.5"/>' +
+                '<path d="M-58 -10 C-44 -15 -26 -14 -10 -7 M-58 0 C-44 -5 -26 -4 -10 3 M-58 10 C-44 5 -30 6 -16 12 M10 -7 C26 -14 44 -15 58 -10 M10 3 C26 -4 44 -5 58 0 M16 12 C30 6 44 5 58 10" stroke="#C9B89A" stroke-width="2" fill="none" stroke-linecap="round"/>' +
+                '<path d="M4 -16 L4 44 L10 38 L16 44 L16 -12" fill="#EF5350"/>' +
+                '<g class="map-float"><text x="-34" y="-40" font-family="Varela Round, sans-serif" font-size="18" font-weight="700" fill="#9C5BD6">א</text>' +
+                '<text x="26" y="-50" font-family="Varela Round, sans-serif" font-size="15" font-weight="700" fill="#F06FA7">ב</text>' +
+                '<path d="M-4 -58 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 Z" fill="#FFD54F"/></g>';
+        },
+        english: function () {
+            return '' +
+                '<path d="M-92 44 C-86 12 -58 -2 -30 6 C-12 12 -6 30 0 44 Z" fill="url(#seaGrad)"/>' +
+                '<path class="map-wave" d="M-80 30 q8 -5 16 0 t16 0" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.8"/>' +
+                '<g class="map-boat"><path d="M-72 22 L-34 22 L-40 33 L-66 33 Z" fill="#E0553F"/>' +
+                '<line x1="-53" y1="22" x2="-53" y2="-18" stroke="#7A5A3A" stroke-width="2"/>' +
+                '<path d="M-51 -16 L-51 18 L-28 18 Z" fill="#fff" stroke="#DDD" stroke-width="1"/>' +
+                '<text x="-44" y="12" text-anchor="middle" font-family="Fredoka, sans-serif" font-size="8" font-weight="700" fill="#1E88E5">ABC</text></g>' +
+                '<ellipse cx="36" cy="42" rx="46" ry="9" fill="oklch(0.80 0.12 140)"/>' +
+                '<path d="M22 42 L28 -34 L46 -34 L52 42 Z" fill="#fff" stroke="#DDD" stroke-width="1.5"/>' +
+                '<path d="M24.6 9 L49.4 9 L50.7 26 L23.3 26 Z M27 -20 L47 -20 L48.2 -6 L25.8 -6 Z" fill="#E53935"/>' +
+                '<rect x="24" y="-40" width="26" height="7" rx="2" fill="#546E7A"/>' +
+                '<circle class="map-lamp" cx="37" cy="-50" r="16" fill="url(#lampGlow)"/>' +
+                '<rect x="29" y="-56" width="16" height="16" rx="3" fill="#FFF3A0" stroke="#546E7A" stroke-width="2"/>' +
+                '<path d="M26 -56 L37 -68 L48 -56 Z" fill="#E53935"/>' +
+                '<path d="M33 42 v-11 a4 4 0 0 1 8 0 v11 Z" fill="#6D4C41"/>';
+        },
+        geography: function () {
+            return '' +
+                '<path d="M-90 44 C-62 14 -30 16 -4 32 C22 8 58 6 90 44 Z" fill="oklch(0.84 0.11 78)"/>' +
+                '<path d="M-60 44 C-40 30 -18 30 4 44 Z" fill="oklch(0.90 0.09 82)"/>' +
+                use('dec-cactus', 50, 24, 2.1) +
+                '<rect x="-38" y="-40" width="5" height="80" rx="2" fill="#8A5A3C"/>' +
+                '<path d="M-33 -36 L4 -36 L12 -29 L4 -22 L-33 -22 Z" fill="#E6A15A" stroke="#B87838" stroke-width="1.5"/>' +
+                '<path d="M-38 -14 L-72 -14 L-80 -7 L-72 0 L-38 0 Z" fill="#E6A15A" stroke="#B87838" stroke-width="1.5"/>' +
+                '<rect x="-24" y="-33" width="11" height="8" fill="#1E88E5"/><rect x="-24" y="-31" width="11" height="2" fill="#fff"/>' +
+                '<rect x="-8" y="-33" width="11" height="8" fill="#E53935"/><rect x="-8" y="-30" width="11" height="2" fill="#FFD54F"/>' +
+                '<rect x="-67" y="-11" width="11" height="8" fill="#43A047"/><rect x="-60" y="-11" width="4" height="8" fill="#fff"/>' +
+                '<circle cx="18" cy="-54" r="11" fill="#FFD54F"/><circle cx="18" cy="-54" r="17" fill="#FFE082" opacity="0.35"/>';
+        },
+        biology: function () {
+            return '' +
+                '<path d="M-88 44 C-86 -18 -46 -62 0 -62 C48 -62 86 -18 88 44 Z" fill="oklch(0.66 0.04 60)"/>' +
+                '<path d="M0 -62 C48 -62 86 -18 88 44 L40 44 C40 0 24 -40 0 -62 Z" fill="oklch(0.58 0.04 55)"/>' +
+                '<path d="M-60 -10 q10 -6 20 -2 M44 -22 q10 -2 16 6 M-30 -44 q10 -4 18 0" stroke="oklch(0.52 0.04 55)" stroke-width="2.5" fill="none" stroke-linecap="round"/>' +
+                '<path d="M-36 44 C-36 2 -19 -18 0 -18 C19 -18 36 2 36 44 Z" fill="oklch(0.28 0.05 300)"/>' +
+                '<circle class="map-glow" cx="0" cy="20" r="26" fill="url(#heartGlow)"/>' +
+                '<path d="M0 34 C-16 23 -20 11 -11 5 C-5 1 0 5 0 10 C0 5 5 1 11 5 C20 11 16 23 0 34 Z" fill="#FF5C7A"/>' +
+                '<path d="M-24 -6 l4 10 4 -10 Z M-6 -18 l4 11 4 -11 Z M12 -14 l4 10 4 -10 Z" fill="oklch(0.58 0.04 55)"/>' +
+                use('dec-rock', -62, 40, 1.1) + use('dec-rock', 60, 42, 0.9);
+        },
+        memory: function () {
+            return '' +
+                '<ellipse cx="0" cy="32" rx="92" ry="24" fill="url(#seaGrad)"/>' +
+                '<path class="map-wave" d="M-78 38 q8 -5 16 0 t16 0 M50 42 q8 -5 16 0 t16 0" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.8"/>' +
+                '<ellipse cx="0" cy="28" rx="62" ry="15" fill="#F5D99A"/><ellipse cx="0" cy="25" rx="50" ry="10" fill="#FAE3AE"/>' +
+                '<path d="M12 28 C14 6 18 -18 26 -40" stroke="#8A5A3C" stroke-width="6" fill="none" stroke-linecap="round"/>' +
+                '<path d="M26 -40 C12 -52 -6 -48 -14 -38 C0 -44 12 -42 26 -40 Z M26 -40 C36 -56 56 -56 64 -44 C50 -48 38 -46 26 -40 Z M26 -40 C22 -60 36 -72 48 -70 C36 -62 30 -52 26 -40 Z M26 -40 C12 -38 0 -26 -2 -16 C8 -26 16 -32 26 -40 Z M26 -40 C40 -38 52 -26 54 -14 C44 -24 36 -32 26 -40 Z" fill="oklch(0.64 0.15 145)"/>' +
+                '<circle cx="23" cy="-36" r="3.5" fill="#8A5A3C"/><circle cx="30" cy="-35" r="3.5" fill="#7A4E32"/>' +
+                '<g transform="translate(-30 18) rotate(-14)"><rect x="-11" y="-15" width="22" height="30" rx="4" fill="#7E57C2" stroke="#fff" stroke-width="2"/>' +
+                '<text x="0" y="5" text-anchor="middle" font-family="Fredoka, sans-serif" font-size="15" font-weight="700" fill="#fff">?</text></g>' +
+                '<g transform="translate(-6 22) rotate(10)"><rect x="-11" y="-15" width="22" height="30" rx="4" fill="#fff" stroke="#7E57C2" stroke-width="2"/>' +
+                '<path d="M0 -6 l3 6 6 1 -4.5 4 1 6 -5.5 -3 -5.5 3 1 -6 -4.5 -4 6 -1 Z" fill="#FFC107"/></g>';
+        },
+        puzzle: function () {
+            // the road runs over the bridge; rainbow puzzle pieces hold it up
+            const colors = ['#EF5350', '#FFA726', '#FFEE58', '#66BB6A', '#29B6F6', '#7E57C2', '#EC407A'];
+            let blocks = '';
+            for (let i = 0; i < 7; i++) {
+                // under the deck's curve (a quadratic from (-84,28) through control (0,-28) to (84,28))
+                const x = -66 + i * 22, t = (x / 84 + 1) / 2;
+                const y = 28 * (1 - t) * (1 - t) - 56 * t * (1 - t) + 28 * t * t + 24;
+                const angle = Math.atan((224 * t - 112) / 168) * 180 / Math.PI;
+                blocks += '<g transform="translate(' + x.toFixed(1) + ' ' + y.toFixed(1) + ') rotate(' + angle.toFixed(1) + ')">' +
+                    '<rect x="-11" y="-9" width="22" height="18" rx="2" fill="' + colors[i] + '" stroke="rgba(0,0,0,0.15)" stroke-width="1"/>' +
+                    '<circle cx="0" cy="9" r="4" fill="' + colors[i] + '"/></g>';
+            }
+            const deck = 'M-84 28 Q0 -28 84 28';
+            return '' +
+                '<rect x="-90" y="24" width="14" height="24" rx="3" fill="oklch(0.70 0.02 60)"/><rect x="76" y="24" width="14" height="24" rx="3" fill="oklch(0.70 0.02 60)"/>' +
+                blocks +
+                '<path d="' + deck + '" stroke="oklch(0.72 0.05 80)" stroke-width="34" fill="none"/>' +
+                '<path d="' + deck + '" stroke="oklch(0.86 0.06 85)" stroke-width="24" fill="none"/>' +
+                '<path d="' + deck + '" stroke="#fff" stroke-width="3" stroke-dasharray="2 26" fill="none" opacity="0.9"/>' +
+                '<path d="M-82 8 Q0 -46 82 8" stroke="#8A5A3C" stroke-width="3" fill="none" stroke-linecap="round"/>' +
+                '<path d="M-60 -3 v12 M-30 -14 v12 M0 -18 v12 M30 -14 v12 M60 -3 v12" stroke="#8A5A3C" stroke-width="2.5" stroke-linecap="round"/>';
+        }
+    };
+
     function buildScene() {
         const holder = document.getElementById('map-scene-holder');
         if (!holder) return;
@@ -5268,16 +5498,10 @@ const GaiaBoards = (function () {
             xmlns: SVG_NS
         }, holder);
 
-        // Meadow gradient base
-        const defs = el('defs', {}, svg);
-        const grad = el('linearGradient', { id: 'meadowGrad', x1: '0', y1: '0', x2: '0', y2: '1' }, defs);
-        el('stop', { offset: '0', 'stop-color': 'oklch(0.90 0.09 140)' }, grad);
-        el('stop', { offset: '1', 'stop-color': 'oklch(0.80 0.12 140)' }, grad);
+        // meadow, then the landscape under the road
+        el('defs', {}, svg).innerHTML = mapDefs();
         el('rect', { x: 0, y: 0, width: VIEW_W, height: VIEW_H, fill: 'url(#meadowGrad)' }, svg);
-
-        // decorative hills
-        el('path', { d: 'M0,300 Q200,220 400,300 T800,300 L800,0 L0,0 Z', fill: 'oklch(0.92 0.06 150)', opacity: '0.5' }, svg);
-        el('path', { d: 'M0,900 Q250,820 500,900 T800,900 L800,1500 L0,1500 Z', fill: 'oklch(0.76 0.13 140)', opacity: '0.4' }, svg);
+        el('g', { class: 'map-terrain' }, svg).innerHTML = mapTerrain();
 
         // The winding path connecting all lands
         let d = 'M ' + LANDS[0].x + ' ' + LANDS[0].y;
@@ -5294,22 +5518,13 @@ const GaiaBoards = (function () {
         // Lands
         LANDS.forEach(function (land) {
             const g = el('g', { class: 'land-hit', 'data-land': land.key, tabindex: '0', role: 'button' }, svg);
-            const hue = cssVar(land.hueVar) || cssVar('--gold');
 
-            // invisible unified hit area — covers the circle, the gap below it and a fat-finger margin
-            el('circle', { cx: land.x, cy: land.y, r: 72, fill: 'transparent', 'pointer-events': 'all' }, g);
+            // invisible unified hit area — covers the landmark, the gap below it and a fat-finger margin
+            el('circle', { cx: land.x, cy: land.y, r: 80, fill: 'transparent', 'pointer-events': 'all' }, g);
 
-            // shadow
-            el('ellipse', { cx: land.x, cy: land.y + 44, rx: 46, ry: 12, fill: 'oklch(0.3 0.05 300 / 0.18)' }, g);
-            // circle base
-            const circle = el('g', { class: 'land-icon-circle' }, g);
-            el('circle', { cx: land.x, cy: land.y, r: 46, fill: 'white', opacity: '0.95' }, circle);
-            el('circle', { cx: land.x, cy: land.y, r: 46, fill: 'none', stroke: hue, 'stroke-width': 6 }, circle);
-            const emo = el('text', {
-                x: land.x, y: land.y + 2, 'text-anchor': 'middle', 'dominant-baseline': 'central',
-                'font-size': 46
-            }, circle);
-            emo.textContent = land.emoji;
+            // the land's landmark (the inner group takes the press effect, the outer one the position)
+            const spot = el('g', { transform: 'translate(' + land.x + ' ' + land.y + ')' }, g);
+            el('g', { class: 'land-icon-circle' }, spot).innerHTML = LAND_ART[land.key]();
 
             // plaque via foreignObject (so we get real Hebrew + nikkud + badge)
             const foW = 210, foH = 70;
@@ -5355,7 +5570,7 @@ const GaiaBoards = (function () {
     function placeAvatar(landKey, instant) {
         if (!avatarEl) return;
         const land = landByKey(landKey) || CASTLE;
-        const x = land.x, y = land.y - 60;
+        const x = land.x + (land.x > VIEW_W / 2 ? -104 : 104), y = land.y + 25;
         if (instant || reduceMotion) {
             avatarEl.setAttribute('transform', 'translate(' + x + ' ' + y + ')');
         } else {
