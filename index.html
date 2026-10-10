@@ -1587,7 +1587,7 @@
 </script>
 <script>
 // ===== YOOVY & GOOGY: THE CHARACTERS =====
-// Googy (Gaia, 6.5): golden hair in soft waves past her shoulders, loose curls at the ends, blue eyes, pink dress.
+// Googy (Gaia, 6.5): golden hair in soft waves just below her shoulders, loose curls at the ends, blue eyes, pink dress.
 // Yoovy (Yuval, 9): taller, long straight blonde hair, blue eyes, purple shirt.
 // Both stand on the same ground line (y≈224), so side by side Yoovy is taller.
 // mode 'head' crops the same drawing to the face (the avatars in chats and on the map).
@@ -1660,10 +1660,10 @@ function drawGoogy(mode) {
     const lock = (d, w) => `<path d="${d}" stroke="${L.hairLine}" stroke-width="${w + 2.2}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>` +
         `<path d="${d}" stroke="${L.hair}" stroke-width="${w}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
     const wave = (d, color, w, o) => `<path d="${d}" stroke="${color}" stroke-width="${w}" fill="none" stroke-linecap="round" opacity="${o}"/>`;
-    // soft waves behind her, down past her shoulders, the ends turned up in loose curls
+    // soft waves behind her, just below her shoulders, the ends turned up in loose curls
     const back =
-        `<path d="M60 59 C41 59 29 72 28 92 C27 104 23 112 25 124 C27 134 21 141 24 150 C26 156 33 156 35 150 C37 156 43 156 44 148 L76 148 C77 156 83 156 85 150 C87 156 94 156 96 150 C99 141 93 134 95 124 C97 112 93 104 92 92 C91 72 79 59 60 59 Z" fill="${L.hairDark}" stroke="${L.hairLine}" stroke-width="1.1" stroke-linejoin="round"/>` +
-        wave('M30 100 C27 112 31 122 28 134 M90 100 C93 112 89 122 92 134', L.hairLine, 1.2, 0.5);
+        `<path d="M60 59 C41 59 29 72 28 92 C27 102 23 110 25 120 C27 128 22 133 25 139 C27 145 33 145 35 139 C37 145 43 145 44 137 L76 137 C77 145 83 145 85 139 C87 145 93 145 95 139 C98 133 93 128 95 120 C97 110 93 102 92 92 C91 72 79 59 60 59 Z" fill="${L.hairDark}" stroke="${L.hairLine}" stroke-width="1.1" stroke-linejoin="round"/>` +
+        wave('M30 98 C27 107 31 116 28 128 M90 98 C93 107 89 116 92 128', L.hairLine, 1.2, 0.5);
     const body =
         `<path d="M52 186 L52 212 M68 186 L68 212" stroke="${GIRL_SKIN}" stroke-width="8.5" stroke-linecap="round"/>` +
         `<path d="M47.6 206 h8.8 M63.6 206 h8.8" stroke="#fff" stroke-width="7" stroke-linecap="round"/>` +
@@ -1682,12 +1682,12 @@ function drawGoogy(mode) {
         `<rect x="55" y="119" width="10" height="10" rx="3" fill="${GIRL_SKIN_SHADE}"/>`;
     // wavy locks in front of her shoulders, each ending in a loose curl
     const front =
-        lock('M29 94 C25 106 33 114 28 126 C25 134 31 140 28 147 Q27 152 32 152', 6) +
-        lock('M91 94 C95 106 87 114 92 126 C95 134 89 140 92 147 Q93 152 88 152', 6) +
-        lock('M35 86 C29 98 41 108 35 120 C30 131 40 138 36 146 Q34 152 41 151', 8.5) +
-        lock('M85 86 C91 98 79 108 85 120 C90 131 80 138 84 146 Q86 152 79 151', 8.5) +
-        wave('M33 93 C30 101 37 108 34 117 M87 93 C90 101 83 108 86 117', L.hairLight, 1.6, 0.85) +
-        wave('M35 124 C33 130 38 136 36 141 M85 124 C87 130 82 136 84 141', L.hairDark, 1.2, 0.7) +
+        lock('M29 94 C25 103 33 110 28 119 C25 126 31 131 28 137 Q27 142 32 142', 6) +
+        lock('M91 94 C95 103 87 110 92 119 C95 126 89 131 92 137 Q93 142 88 142', 6) +
+        lock('M35 86 C29 96 41 104 35 114 C31 123 40 130 36 136 Q34 142 41 141', 8.5) +
+        lock('M85 86 C91 96 79 104 85 114 C89 123 80 130 84 136 Q86 142 79 141', 8.5) +
+        wave('M33 92 C30 99 37 105 34 112 M87 92 C90 99 83 105 86 112', L.hairLight, 1.6, 0.85) +
+        wave('M35 118 C33 123 38 128 36 133 M85 118 C87 123 82 128 84 133', L.hairDark, 1.2, 0.7) +
         girlArm('g-cheer', -1, 'M44 136 Q30 127 24 107', 23, 104) + girlArm('g-cheer', 1, 'M76 136 Q90 127 96 107', 97, 104);
     const head =
         `<ellipse cx="${cx}" cy="${cy}" rx="28.5" ry="29" fill="${GIRL_SKIN}" stroke="${GIRL_SKIN_LINE}" stroke-width="1"/>` +
