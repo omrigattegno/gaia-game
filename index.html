@@ -142,10 +142,71 @@
         #gaia-char.gaia-sad .girl { animation: gaia-shake 0.5s ease-in-out; }
         #gaia-char.gaia-dance .girl { animation: gaia-dance 0.4s ease-in-out infinite alternate; }
         #gaia-char.gaia-dance .girl-googy { animation-direction: alternate-reverse; }
-        /* faces: a smile, or a small frown and worried brows when an answer was wrong */
-        .girl .g-mouth-sad, .girl .g-brows-sad,
+        /* faces: every mood is drawn; by default a smile, and open eyes that blink now and then */
+        .girl .g-mouth-grin, .girl .g-mouth-sad, .girl .g-mouth-o, .girl .g-brows-sad, .girl .g-brows-up,
+        .girl .g-eyes-happy, .girl .g-drop { display: none; }
+        .girl .g-eyes { transform-box: fill-box; transform-origin: center; animation: g-blink 4.6s infinite; }
+        .girl-yoovy .g-eyes { animation-delay: -2.3s; }
+        @keyframes g-blink { 0%, 93%, 100% { transform: scaleY(1); } 96% { transform: scaleY(0.1); } }
+        /* a right answer (and the end of a game): laughing eyes and a big grin */
+        #gaia-char.gaia-happy .g-eyes-open, #gaia-char.gaia-dance .g-eyes-open,
+        #gaia-char.gaia-happy .g-mouth-happy, #gaia-char.gaia-dance .g-mouth-happy { display: none; }
+        #gaia-char.gaia-happy .g-eyes-happy, #gaia-char.gaia-dance .g-eyes-happy,
+        #gaia-char.gaia-happy .g-mouth-grin, #gaia-char.gaia-dance .g-mouth-grin { display: inline; }
+        /* a wrong answer: worried brows, a small frown, eyes looking down, a drop of worry */
         #gaia-char.gaia-sad .g-mouth-happy, #gaia-char.gaia-sad .g-brows-happy { display: none; }
-        #gaia-char.gaia-sad .g-mouth-sad, #gaia-char.gaia-sad .g-brows-sad { display: inline; }
+        #gaia-char.gaia-sad .g-mouth-sad, #gaia-char.gaia-sad .g-brows-sad, #gaia-char.gaia-sad .g-drop { display: inline; }
+        #gaia-char.gaia-sad .g-look { transform: translateY(1.6px); }
+        /* the time ran out: "oh!" with raised brows */
+        #gaia-char.gaia-surprised .g-mouth-happy, #gaia-char.gaia-surprised .g-brows-happy { display: none; }
+        #gaia-char.gaia-surprised .g-mouth-o, #gaia-char.gaia-surprised .g-brows-up { display: inline; }
+        /* the arms turn at the shoulder; to cheer, raised arms drawn over the hair take their place */
+        .girl .g-arm, .girl .g-cheer { transform-box: fill-box; }
+        .girl .g-arm { transition: transform 0.25s var(--ease-out-quart); }
+        .girl .g-arm-l { transform-origin: 100% 0; }
+        .girl .g-arm-r { transform-origin: 0 0; }
+        .girl .g-cheer-l { transform-origin: 100% 100%; }
+        .girl .g-cheer-r { transform-origin: 0 100%; }
+        .girl .g-cheer, #gaia-char.gaia-happy .g-arm, #gaia-char.gaia-dance .g-arm { display: none; }
+        #gaia-char.gaia-happy .g-cheer, #gaia-char.gaia-dance .g-cheer { display: inline; }
+        #gaia-char.gaia-happy .g-cheer { animation: g-cheer-pop 0.3s var(--ease-out-quart); }
+        #gaia-char.gaia-dance .g-cheer-l { animation: g-dance-l 0.4s ease-in-out infinite alternate; }
+        #gaia-char.gaia-dance .g-cheer-r { animation: g-dance-r 0.4s ease-in-out infinite alternate; }
+        #gaia-char.gaia-surprised .g-arm-l { transform: rotate(40deg); }
+        #gaia-char.gaia-surprised .g-arm-r { transform: rotate(-40deg); }
+        #gaia-char.gaia-surprised .girl { animation: gaia-surprise 0.5s var(--ease-out-quart); }
+        @keyframes g-cheer-pop { from { transform: scale(0.6); } to { transform: none; } }
+        @keyframes g-dance-l { from { transform: rotate(-18deg); } to { transform: rotate(12deg); } }
+        @keyframes g-dance-r { from { transform: rotate(18deg); } to { transform: rotate(-12deg); } }
+        @keyframes gaia-surprise { 0% { transform: translateY(0); } 35% { transform: translateY(-14px) scale(1.03); } 100% { transform: translateY(0); } }
+        /* hello! on the welcome screen each sister waves now and then: her raised arm (over the
+           hair) takes the place of the hanging one, and swings */
+        .welcome-girls .girl-yoovy .g-cheer-r, .welcome-girls .girl-googy .g-cheer-l { display: inline; opacity: 0; }
+        .welcome-girls .girl-yoovy .g-cheer-r { animation: g-wave-up-r 6s ease-in-out infinite; }
+        .welcome-girls .girl-yoovy .g-arm-r { animation: g-wave-down 6s ease-in-out infinite; }
+        .welcome-girls .girl-googy .g-cheer-l { animation: g-wave-up-l 6s ease-in-out -3s infinite; }
+        .welcome-girls .girl-googy .g-arm-l { animation: g-wave-down 6s ease-in-out -3s infinite; }
+        @keyframes g-wave-down { 0%, 62%, 90%, 100% { opacity: 1; } 64%, 88% { opacity: 0; } }
+        @keyframes g-wave-up-r {
+            0%, 62%, 90%, 100% { opacity: 0; transform: rotate(0); }
+            64%, 88% { opacity: 1; transform: rotate(0); }
+            70%, 82% { opacity: 1; transform: rotate(16deg); }
+            76% { opacity: 1; transform: rotate(-8deg); }
+        }
+        @keyframes g-wave-up-l {
+            0%, 62%, 90%, 100% { opacity: 0; transform: rotate(0); }
+            64%, 88% { opacity: 1; transform: rotate(0); }
+            70%, 82% { opacity: 1; transform: rotate(-16deg); }
+            76% { opacity: 1; transform: rotate(8deg); }
+        }
+        /* on the map they walk from land to land, swinging their arms */
+        #gaia-map-avatar.walking .map-walker { animation: g-walk 0.22s ease-in-out infinite alternate; }
+        #gaia-map-avatar.walking .map-walker + .map-walker { animation-delay: -0.11s; }
+        #gaia-map-avatar.walking .g-arm-l { animation: g-swing-l 0.22s ease-in-out infinite alternate; }
+        #gaia-map-avatar.walking .g-arm-r { animation: g-swing-r 0.22s ease-in-out infinite alternate; }
+        @keyframes g-walk { from { transform: translateY(0); } to { transform: translateY(-5px); } }
+        @keyframes g-swing-l { from { transform: rotate(-18deg); } to { transform: rotate(18deg); } }
+        @keyframes g-swing-r { from { transform: rotate(18deg); } to { transform: rotate(-18deg); } }
         /* the welcome screen and the map show the girls themselves */
         body:has(#welcome-screen.active) #gaia-char, body:has(#main-menu.active) #gaia-char { display: none; }
         @media (max-height: 700px) {   /* short phones: smaller, so they cover less of the game */
@@ -1086,12 +1147,14 @@
             #gaia-char .girl, .kg-cloud, .kg-sparkle, .kg-star, .map-cloud,
             .map-wave, .map-flag, .map-boat, .map-birds, .map-sparkle, .map-lamp, .map-float, .map-glow,
             .sc-float, .sc-sway, .sc-spin, .sc-beat, .end-rays, .end-cup, .end-confetti i,
+            .girl .g-eyes, .girl .g-arm, .girl .g-cheer, .map-walker,
             .stars-earned span, .feedback, .memory-card, .trophy-pop,
             #options button.opt-correct::after, .mult-opt-btn.correct::after, .reading-opt-btn.correct::after,
             .mult-opt-btn.wrong::after, .reading-opt-btn.wrong::after { animation: none !important; }
             .end-confetti { display: none; }
             .map-cloud { transform: none !important; }
             #gaia-map-avatar { transition: none !important; }
+            .girl .g-arm { transition: none !important; }
             .big-btn, .answer-btn, .mult-opt-btn, .reading-opt-btn,
             #land-panel, #land-scrim, .land-icon-circle,
             .btn-squash { transition: none !important; animation: none !important; }
@@ -1524,112 +1587,167 @@
 </script>
 <script>
 // ===== YOOVY & GOOGY: THE CHARACTERS =====
-// Googy (Gaia, 6.5): golden curls down past her shoulders, blue eyes, pink dress.
+// Googy (Gaia, 6.5): golden hair in soft waves past her shoulders, loose curls at the ends, blue eyes, pink dress.
 // Yoovy (Yuval, 9): taller, long straight blonde hair, blue eyes, purple shirt.
 // Both stand on the same ground line (y≈224), so side by side Yoovy is taller.
 // mode 'head' crops the same drawing to the face (the avatars in chats and on the map).
+// Each face carries every mood (a smile, a grin, a frown, an "oh!"; open, laughing and blinking
+// eyes) and CSS shows the one that fits (see #gaia-char.gaia-*). The arms are groups that turn
+// at the shoulder, so the girls can cheer, dance and wave.
 const GIRL_LOOKS = {
-    googy: { hair: '#F2B53A', hairDark: '#D9952B', hairLight: '#FFD877', eyes: '#3F80D8', pupil: '#1C3C78',
+    googy: { hair: '#F2B53A', hairDark: '#D9952B', hairLine: '#B9781E', hairLight: '#FFD877', eyes: '#3F80D8', eyesLight: '#9ACBFF', pupil: '#1C3C78',
              brows: '#C98A32', dress: '#FF7EB3', dressLight: '#FFA6CB', dressDark: '#E85C98', shoes: '#E0407F' },
-    yoovy: { hair: '#EDC66B', hairDark: '#CDA04A', hairLight: '#FBE4A8', eyes: '#3F80D8', pupil: '#1C3C78',
+    yoovy: { hair: '#EDC66B', hairDark: '#CDA04A', hairLine: '#A97E2C', hairLight: '#FBE4A8', eyes: '#3F80D8', eyesLight: '#9ACBFF', pupil: '#1C3C78',
              brows: '#B98A45', shirt: '#8E6CEF', shirtDark: '#7353D6', skirt: '#4A7BD0', skirtDark: '#3A64B0', shoes: '#8E6CEF' }
 };
-const GIRL_SKIN = '#FFDBC4', GIRL_SKIN_SHADE = '#F4C3A6', GIRL_CHEEK = '#FF98B3';
+const GIRL_SKIN = '#FFDBC4', GIRL_SKIN_SHADE = '#F4C3A6', GIRL_SKIN_LINE = '#E7AC8C', GIRL_CHEEK = '#FF98B3', GIRL_MOUTH = '#C93D66';
 
 function girlFace(cx, cy, look, big, mode) {
     // eyes: big and round for Googy, a little smaller for Yoovy
-    const ex = big ? 13 : 12, ey = cy + 4, rx = big ? 6.2 : 5.4, ry = big ? 7.2 : 6.4;
+    const ex = big ? 13 : 12, ey = cy + 4, rx = big ? 6.2 : 5.4, ry = big ? 7.2 : 6.4, P = look.pupil;
     const eye = x =>
         `<ellipse cx="${x}" cy="${ey}" rx="${rx}" ry="${ry}" fill="${look.eyes}"/>` +
-        `<ellipse cx="${x}" cy="${ey + 0.6}" rx="${rx * 0.55}" ry="${ry * 0.55}" fill="${look.pupil}"/>` +
-        `<circle cx="${x + rx * 0.35}" cy="${ey - ry * 0.4}" r="${big ? 2.2 : 1.9}" fill="#fff"/>` +
-        `<circle cx="${x - rx * 0.35}" cy="${ey + ry * 0.45}" r="0.9" fill="#fff" opacity="0.8"/>`;
-    const lashes =
-        `<path d="M${cx - ex - rx + 0.5} ${ey - ry * 0.55} l-3.2 -2.2 M${cx + ex + rx - 0.5} ${ey - ry * 0.55} l3.2 -2.2" stroke="${look.pupil}" stroke-width="1.4" stroke-linecap="round"/>`;
-    const browsHappy =
-        `<path class="g-brows-happy" d="M${cx - ex - 5} ${ey - ry - 3.5} Q${cx - ex} ${ey - ry - 6.5} ${cx - ex + 5} ${ey - ry - 4} M${cx + ex - 5} ${ey - ry - 4} Q${cx + ex} ${ey - ry - 6.5} ${cx + ex + 5} ${ey - ry - 3.5}" stroke="${look.brows}" stroke-width="1.7" fill="none" stroke-linecap="round"/>`;
-    const browsSad =
-        `<path class="g-brows-sad" d="M${cx - ex - 5} ${ey - ry - 3} L${cx - ex + 5} ${ey - ry - 6.5} M${cx + ex - 5} ${ey - ry - 6.5} L${cx + ex + 5} ${ey - ry - 3}" stroke="${look.brows}" stroke-width="1.7" fill="none" stroke-linecap="round"/>`;
-    const cheeks =
-        `<ellipse cx="${cx - ex - 3}" cy="${ey + 10}" rx="5.5" ry="3.4" fill="${GIRL_CHEEK}" opacity="0.55"/>` +
-        `<ellipse cx="${cx + ex + 3}" cy="${ey + 10}" rx="5.5" ry="3.4" fill="${GIRL_CHEEK}" opacity="0.55"/>`;
+        `<ellipse cx="${x}" cy="${ey + ry * 0.4}" rx="${rx * 0.7}" ry="${ry * 0.42}" fill="${look.eyesLight}" opacity="0.6"/>` +
+        `<g class="g-look"><ellipse cx="${x}" cy="${ey + 0.6}" rx="${rx * 0.52}" ry="${ry * 0.56}" fill="${P}"/>` +
+        `<circle cx="${x + rx * 0.36}" cy="${ey - ry * 0.38}" r="${big ? 2.4 : 2.1}" fill="#fff"/>` +
+        `<circle cx="${x - rx * 0.34}" cy="${ey + ry * 0.4}" r="1.05" fill="#fff" opacity="0.9"/></g>`;
+    const lid = x => `M${x - rx - 0.8} ${ey - ry * 0.3} Q${x} ${ey - ry - 2.4} ${x + rx + 0.8} ${ey - ry * 0.3}`;
+    // the open eyes blink (.g-eyes); the lid line and the lashes stay
+    const eyesOpen = `<g class="g-eyes-open"><g class="g-eyes">${eye(cx - ex)}${eye(cx + ex)}</g>` +
+        `<path d="${lid(cx - ex)} ${lid(cx + ex)}" stroke="${P}" stroke-width="2.1" fill="none" stroke-linecap="round"/>` +
+        `<path d="M${cx - ex - rx} ${ey - ry * 0.42} l-3.6 -1.8 M${cx - ex - rx + 1.6} ${ey - ry * 0.8} l-2.6 -2.8 ` +
+        `M${cx + ex + rx} ${ey - ry * 0.42} l3.6 -1.8 M${cx + ex + rx - 1.6} ${ey - ry * 0.8} l2.6 -2.8" stroke="${P}" stroke-width="1.5" stroke-linecap="round"/></g>`;
+    // laughing eyes, shut in a smile: ^ ^
+    const eyesHappy = `<path class="g-eyes-happy" d="M${cx - ex - rx} ${ey + 2} Q${cx - ex} ${ey - ry} ${cx - ex + rx} ${ey + 2} ` +
+        `M${cx + ex - rx} ${ey + 2} Q${cx + ex} ${ey - ry} ${cx + ex + rx} ${ey + 2}" stroke="${P}" stroke-width="2.6" fill="none" stroke-linecap="round"/>`;
+    const brow = (dy, inner) => `M${cx - ex - 5} ${ey - ry - 3.5 + dy} Q${cx - ex} ${ey - ry - 6.5 + dy} ${cx - ex + 5} ${ey - ry - 4 + dy + inner} ` +
+        `M${cx + ex - 5} ${ey - ry - 4 + dy + inner} Q${cx + ex} ${ey - ry - 6.5 + dy} ${cx + ex + 5} ${ey - ry - 3.5 + dy}`;
+    const brows =
+        `<path class="g-brows-happy" d="${brow(0, 0)}" stroke="${look.brows}" stroke-width="1.8" fill="none" stroke-linecap="round"/>` +
+        `<path class="g-brows-up" d="${brow(-3.5, 0)}" stroke="${look.brows}" stroke-width="1.8" fill="none" stroke-linecap="round"/>` +
+        // worried: the inner ends go up
+        `<path class="g-brows-sad" d="M${cx - ex - 5} ${ey - ry - 3} L${cx - ex + 5} ${ey - ry - 7} M${cx + ex - 5} ${ey - ry - 7} L${cx + ex + 5} ${ey - ry - 3}" stroke="${look.brows}" stroke-width="1.8" fill="none" stroke-linecap="round"/>`;
+    // a soft blush: a wide light ellipse under a smaller, stronger one
+    const cheek = x => `<ellipse cx="${x}" cy="${ey + 10}" rx="6.8" ry="4.2" fill="${GIRL_CHEEK}" opacity="0.28"/>` +
+        `<ellipse cx="${x}" cy="${ey + 10}" rx="4.2" ry="2.6" fill="${GIRL_CHEEK}" opacity="0.42"/>`;
     const nose = `<path d="M${cx - 1.8} ${ey + 7.5} Q${cx} ${ey + 9} ${cx + 1.8} ${ey + 7.5}" stroke="#E3A184" stroke-width="1.3" fill="none" stroke-linecap="round"/>`;
     const my = ey + 14;
-    const mouth = mode === 'head'
+    const mouths = mode === 'head'
         // the avatars talk: this mouth opens and closes (see .googy-avatar.talking)
-        ? `<path class="g-mouth" d="M${cx - 6} ${my - 1} Q${cx} ${my + 6} ${cx + 6} ${my - 1} Q${cx} ${my + 1.5} ${cx - 6} ${my - 1} Z" fill="#D2456E"/>`
-        : `<path class="g-mouth-happy" d="M${cx - 7} ${my - 1.5} Q${cx} ${my + 7} ${cx + 7} ${my - 1.5} Q${cx} ${my + 1.5} ${cx - 7} ${my - 1.5} Z" fill="#D2456E"/>` +
-          `<path class="g-mouth-sad" d="M${cx - 5.5} ${my + 3} Q${cx} ${my - 2} ${cx + 5.5} ${my + 3}" stroke="#D2456E" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
-    return eye(cx - ex) + eye(cx + ex) + lashes + browsHappy + browsSad + cheeks + nose + mouth;
+        ? `<path class="g-mouth" d="M${cx - 6} ${my - 1} Q${cx} ${my + 6} ${cx + 6} ${my - 1} Q${cx} ${my + 1.5} ${cx - 6} ${my - 1} Z" fill="${GIRL_MOUTH}"/>`
+        : `<path class="g-mouth-happy" d="M${cx - 7} ${my - 1.5} Q${cx} ${my + 7} ${cx + 7} ${my - 1.5} Q${cx} ${my + 1.5} ${cx - 7} ${my - 1.5} Z" fill="${GIRL_MOUTH}"/>` +
+          // a big laugh: open, with teeth and a tongue
+          `<g class="g-mouth-grin"><path d="M${cx - 8.5} ${my - 2} Q${cx} ${my + 12} ${cx + 8.5} ${my - 2} Q${cx} ${my} ${cx - 8.5} ${my - 2} Z" fill="${GIRL_MOUTH}"/>` +
+          `<path d="M${cx - 6.5} ${my - 0.9} Q${cx} ${my + 1.2} ${cx + 6.5} ${my - 0.9} L${cx + 5.8} ${my + 1.4} Q${cx} ${my + 3.2} ${cx - 5.8} ${my + 1.4} Z" fill="#fff"/>` +
+          `<ellipse cx="${cx}" cy="${my + 6.4}" rx="4.2" ry="2.4" fill="#FF8FA8"/></g>` +
+          `<path class="g-mouth-sad" d="M${cx - 5.5} ${my + 3} Q${cx} ${my - 2} ${cx + 5.5} ${my + 3}" stroke="${GIRL_MOUTH}" stroke-width="2.2" fill="none" stroke-linecap="round"/>` +
+          `<ellipse class="g-mouth-o" cx="${cx}" cy="${my + 2}" rx="3.6" ry="4.6" fill="${GIRL_MOUTH}"/>` +
+          // a drop of worry on the forehead
+          `<path class="g-drop" d="M${cx + ex + 11} ${ey - 16} q-3.8 5.4 0 7.6 q3.8 -2.2 0 -7.6 Z" fill="#9AD8FF" stroke="#5AA9E6" stroke-width="0.9"/>`;
+    return eyesOpen + eyesHappy + brows + cheek(cx - ex - 3) + cheek(cx + ex + 3) + nose + mouths;
+}
+
+// An arm: 'g-arm' hangs from the shoulder at the top end of its box and turns there; 'g-cheer' is
+// the same arm raised, drawn over the hair, shown instead when the girls cheer. side -1 is on the left.
+function girlArm(kind, side, d, hx, hy) {
+    return `<g class="${kind} ${kind}-${side < 0 ? 'l' : 'r'}"><path d="${d}" stroke="${GIRL_SKIN}" stroke-width="8" fill="none" stroke-linecap="round"/>` +
+        `<circle cx="${hx}" cy="${hy}" r="5.3" fill="${GIRL_SKIN}" stroke="${GIRL_SKIN_LINE}" stroke-width="0.8"/></g>`;
 }
 
 function drawGoogy(mode) {
     const L = GIRL_LOOKS.googy, cx = 60, cy = 98;
-    const curls = (list, fill, stroke) => list.map(([x, y, r]) =>
-        `<circle cx="${x}" cy="${cy + y}" r="${r}" fill="${fill}"${stroke ? ` stroke="${stroke}" stroke-width="1"` : ''}/>`).join('');
-    // long curls behind her, down past the shoulders
-    const back = curls([[0, -6, 35], [-32, 4, 11.5], [-35, 17, 11.5], [-33, 30, 10.5], [-29, 42, 9], [-22, 49, 6.5],
-                        [32, 4, 11.5], [35, 17, 11.5], [33, 30, 10.5], [29, 42, 9], [22, 49, 6.5]].map(([x, y, r]) => [cx + x, y, r]), L.hairDark) +
-        curls([[-32, 9, 6.5], [-34, 23, 6.5], [-30, 36, 5.5], [32, 9, 6.5], [34, 23, 6.5], [30, 36, 5.5]].map(([x, y, r]) => [cx + x, y, r]), L.hair);
+    // a wavy lock: an outlined band along a curve
+    const lock = (d, w) => `<path d="${d}" stroke="${L.hairLine}" stroke-width="${w + 2.2}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>` +
+        `<path d="${d}" stroke="${L.hair}" stroke-width="${w}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+    const wave = (d, color, w, o) => `<path d="${d}" stroke="${color}" stroke-width="${w}" fill="none" stroke-linecap="round" opacity="${o}"/>`;
+    // soft waves behind her, down past her shoulders, the ends turned up in loose curls
+    const back =
+        `<path d="M60 59 C41 59 29 72 28 92 C27 104 23 112 25 124 C27 134 21 141 24 150 C26 156 33 156 35 150 C37 156 43 156 44 148 L76 148 C77 156 83 156 85 150 C87 156 94 156 96 150 C99 141 93 134 95 124 C97 112 93 104 92 92 C91 72 79 59 60 59 Z" fill="${L.hairDark}" stroke="${L.hairLine}" stroke-width="1.1" stroke-linejoin="round"/>` +
+        wave('M30 100 C27 112 31 122 28 134 M90 100 C93 112 89 122 92 134', L.hairLine, 1.2, 0.5);
     const body =
         `<path d="M52 186 L52 212 M68 186 L68 212" stroke="${GIRL_SKIN}" stroke-width="8.5" stroke-linecap="round"/>` +
-        `<path d="M47.5 211 h9 M63.5 211 h9" stroke="#fff" stroke-width="5" stroke-linecap="round"/>` +
-        `<ellipse cx="50" cy="218" rx="8.5" ry="5.2" fill="${L.shoes}"/><ellipse cx="70" cy="218" rx="8.5" ry="5.2" fill="${L.shoes}"/>` +
-        `<path class="g-arm-l" d="M44 138 Q36 152 33 164" stroke="${GIRL_SKIN}" stroke-width="8" fill="none" stroke-linecap="round"/>` +
-        `<path class="g-arm-r" d="M76 138 Q84 152 87 164" stroke="${GIRL_SKIN}" stroke-width="8" fill="none" stroke-linecap="round"/>` +
-        `<circle cx="33" cy="166" r="5.2" fill="${GIRL_SKIN}"/><circle cx="87" cy="166" r="5.2" fill="${GIRL_SKIN}"/>` +
-        `<path d="M46 128 Q60 123 74 128 L86 184 Q60 192 34 184 Z" fill="${L.dress}"/>` +
-        `<path d="M34 184 Q60 192 86 184 L85 179.5 Q60 187.5 35 179.5 Z" fill="${L.dressDark}"/>` +
-        `<circle cx="44" cy="135" r="7.8" fill="${L.dressLight}"/><circle cx="76" cy="135" r="7.8" fill="${L.dressLight}"/>` +
-        `<path d="M53 127 Q56.5 133.5 60 128 Q63.5 133.5 67 127" fill="#fff" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>` +
-        `<path d="M60 149 l2.3 4.8 5.2 .6 -3.8 3.6 1 5.2 -4.7 -2.6 -4.7 2.6 1 -5.2 -3.8 -3.6 5.2 -.6 z" fill="#FFD54F"/>` +
+        `<path d="M47.6 206 h8.8 M63.6 206 h8.8" stroke="#fff" stroke-width="7" stroke-linecap="round"/>` +
+        // shoes with a strap
+        `<ellipse cx="50" cy="218" rx="8.6" ry="5.3" fill="${L.shoes}"/><ellipse cx="70" cy="218" rx="8.6" ry="5.3" fill="${L.shoes}"/>` +
+        `<path d="M46 214.5 h8 M66 214.5 h8" stroke="#B42C63" stroke-width="1.6" stroke-linecap="round"/>` +
+        `<ellipse cx="47" cy="216.5" rx="2.4" ry="1.3" fill="#fff" opacity="0.45"/><ellipse cx="67" cy="216.5" rx="2.4" ry="1.3" fill="#fff" opacity="0.45"/>` +
+        girlArm('g-arm', -1, 'M44 138 Q36 152 33 164', 33, 166) + girlArm('g-arm', 1, 'M76 138 Q84 152 87 164', 87, 166) +
+        // the dress, with a scalloped hem
+        `<path d="M46 128 Q60 123 74 128 L86 182 Q60 190 34 182 Z" fill="${L.dress}" stroke="${L.dressDark}" stroke-width="1.2"/>` +
+        `<path d="M34 182 Q60 190 86 182 L86.6 185 a4.4 4.4 0 0 1 -8.6 1.3 a4.4 4.4 0 0 1 -8.6 1 a4.4 4.4 0 0 1 -8.8 0.4 a4.4 4.4 0 0 1 -8.8 -0.4 a4.4 4.4 0 0 1 -8.6 -1 a4.4 4.4 0 0 1 -8.6 -1.3 Z" fill="${L.dressDark}"/>` +
+        `<path d="M41 168 Q60 174 79 168" stroke="#fff" stroke-width="1.6" fill="none" stroke-dasharray="2 3" opacity="0.7"/>` +
+        `<circle cx="44" cy="135" r="7.8" fill="${L.dressLight}" stroke="${L.dressDark}" stroke-width="1"/><circle cx="76" cy="135" r="7.8" fill="${L.dressLight}" stroke="${L.dressDark}" stroke-width="1"/>` +
+        `<path d="M53 127 Q56.5 134 60 128.5 Q63.5 134 67 127" fill="#fff" stroke="#F3D3E2" stroke-width="1" stroke-linejoin="round"/>` +
+        `<path d="M60 147 l2.6 5.4 5.8 .7 -4.3 4 1.1 5.8 -5.2 -2.9 -5.2 2.9 1.1 -5.8 -4.3 -4 5.8 -.7 z" fill="#FFD54F" stroke="#F2B53A" stroke-width="0.8" stroke-linejoin="round"/>` +
         `<rect x="55" y="119" width="10" height="10" rx="3" fill="${GIRL_SKIN_SHADE}"/>`;
-    const top = [[-27, -14, 11.5], [-17, -26, 12.5], [-2, -31, 13.5], [14, -28, 12.5], [25, -17, 11.5], [30, -4, 7.5], [-30, -4, 7.5]];
-    const fringe = [[-18, -18, 7.5], [-7, -23, 8], [6, -23, 8], [17, -18, 7.5]];
-    const shine = [[-20, -31, 3], [-4, -38, 3.2], [12, -34, 3], [-11, -27, 2.4], [9, -27, 2.4], [-29, -20, 2.6], [27, -22, 2.6]];
+    // wavy locks in front of her shoulders, each ending in a loose curl
+    const front =
+        lock('M29 94 C25 106 33 114 28 126 C25 134 31 140 28 147 Q27 152 32 152', 6) +
+        lock('M91 94 C95 106 87 114 92 126 C95 134 89 140 92 147 Q93 152 88 152', 6) +
+        lock('M35 86 C29 98 41 108 35 120 C30 131 40 138 36 146 Q34 152 41 151', 8.5) +
+        lock('M85 86 C91 98 79 108 85 120 C90 131 80 138 84 146 Q86 152 79 151', 8.5) +
+        wave('M33 93 C30 101 37 108 34 117 M87 93 C90 101 83 108 86 117', L.hairLight, 1.6, 0.85) +
+        wave('M35 124 C33 130 38 136 36 141 M85 124 C87 130 82 136 84 141', L.hairDark, 1.2, 0.7) +
+        girlArm('g-cheer', -1, 'M44 136 Q30 127 24 107', 23, 104) + girlArm('g-cheer', 1, 'M76 136 Q90 127 96 107', 97, 104);
     const head =
-        `<ellipse cx="${cx}" cy="${cy}" rx="28.5" ry="29" fill="${GIRL_SKIN}"/>` +
+        `<ellipse cx="${cx}" cy="${cy}" rx="28.5" ry="29" fill="${GIRL_SKIN}" stroke="${GIRL_SKIN_LINE}" stroke-width="1"/>` +
+        `<path d="M${cx - 24} ${cy - 10} Q${cx} ${cy} ${cx + 24} ${cy - 10}" stroke="${GIRL_SKIN_SHADE}" stroke-width="5" fill="none" opacity="0.7"/>` +
         girlFace(cx, cy, L, true, mode) +
-        curls(top.map(([x, y, r]) => [cx + x, y, r]), L.hair, L.hairDark) +
-        curls(fringe.map(([x, y, r]) => [cx + x, y, r]), L.hair, L.hairDark) +
-        curls(shine.map(([x, y, r]) => [cx + x, y, r]), L.hairLight) +
-        // a pink flower in her curls
-        `<g transform="translate(${cx + 27} ${cy - 31})"><circle cx="0" cy="-4" r="3.4" fill="#FF6FA5"/><circle cx="3.8" cy="-1.2" r="3.4" fill="#FF6FA5"/>` +
-        `<circle cx="2.4" cy="3.2" r="3.4" fill="#FF6FA5"/><circle cx="-2.4" cy="3.2" r="3.4" fill="#FF6FA5"/><circle cx="-3.8" cy="-1.2" r="3.4" fill="#FF6FA5"/>` +
-        `<circle cx="0" cy="0" r="2.3" fill="#FFD54F"/></g>`;
-    return back + body + head;
+        // a soft crown with side-swept waves over the forehead
+        `<path d="M31 94 C27 72 40 61 58 61 C64 58 72 60 76 63 C86 67 93 78 89 94 C87 87 84 82 79 79 C77 85 71 88 64 86 C60 84 55 88 49 88 C44 88 40 85 38 82 C35 86 32 90 31 94 Z" fill="${L.hair}" stroke="${L.hairLine}" stroke-width="1.1" stroke-linejoin="round"/>` +
+        wave('M44 66 C50 63 58 62 66 63', L.hairLight, 3.2, 0.9) +
+        wave('M40 72 C36 76 40 80 38 85 M56 66 C51 71 57 77 53 85 M70 66 C75 70 69 77 72 84 M82 72 C87 76 83 82 87 89', L.hairDark, 1.3, 0.6) +
+        // a pink flower in her hair
+        `<g transform="translate(${cx + 25} ${cy - 30})"><circle cx="0" cy="-4" r="3.6" fill="#FF6FA5"/><circle cx="3.9" cy="-1.2" r="3.6" fill="#FF6FA5"/>` +
+        `<circle cx="2.4" cy="3.3" r="3.6" fill="#FF6FA5"/><circle cx="-2.4" cy="3.3" r="3.6" fill="#FF6FA5"/><circle cx="-3.9" cy="-1.2" r="3.6" fill="#FF6FA5"/>` +
+        `<circle cx="0" cy="0" r="2.4" fill="#FFD54F" stroke="#F2A93B" stroke-width="0.6"/><circle cx="-1.6" cy="-4.6" r="1" fill="#fff" opacity="0.7"/></g>`;
+    return back + body + front + head;
 }
 
 function drawYoovy(mode) {
     const L = GIRL_LOOKS.yoovy, cx = 60, cy = 70;
+    const strands = (d, color, w, o) => `<path d="${d}" stroke="${color}" stroke-width="${w}" fill="none" stroke-linecap="round" opacity="${o}"/>`;
     // long straight hair behind her, down to the middle of her back
     const back =
-        `<path d="M29 66 Q29 30 60 30 Q91 30 91 66 L96 146 Q88 152 78 148 L60 151 L42 148 Q32 152 24 146 Z" fill="${L.hairDark}"/>`;
+        `<path d="M29 66 Q29 30 60 30 Q91 30 91 66 L96 146 Q91 151 85 148 L78 151 L71 148 L60 152 L49 148 L42 151 L35 148 Q29 151 24 146 Z" fill="${L.hairDark}" stroke="${L.hairLine}" stroke-width="1.1" stroke-linejoin="round"/>` +
+        strands('M33 80 L30 140 M40 96 L38 146 M87 80 L90 140 M80 96 L82 146', L.hairLine, 1.2, 0.45);
     const body =
         `<path d="M52 182 L52 214 M68 182 L68 214" stroke="${GIRL_SKIN}" stroke-width="8.5" stroke-linecap="round"/>` +
-        `<ellipse cx="50" cy="219" rx="9.5" ry="5.5" fill="#fff" stroke="${L.shoes}" stroke-width="2"/>` +
-        `<ellipse cx="70" cy="219" rx="9.5" ry="5.5" fill="#fff" stroke="${L.shoes}" stroke-width="2"/>` +
-        `<path class="g-arm-l" d="M41 112 Q32 132 30 154" stroke="${GIRL_SKIN}" stroke-width="8" fill="none" stroke-linecap="round"/>` +
-        `<path class="g-arm-r" d="M79 112 Q88 132 90 154" stroke="${GIRL_SKIN}" stroke-width="8" fill="none" stroke-linecap="round"/>` +
-        `<circle cx="30" cy="156" r="5.2" fill="${GIRL_SKIN}"/><circle cx="90" cy="156" r="5.2" fill="${GIRL_SKIN}"/>` +
-        // skirt, then the shirt with short sleeves
-        `<path d="M42 150 L78 150 L88 184 Q60 190 32 184 Z" fill="${L.skirt}"/>` +
+        `<path d="M47.6 208 h8.8 M63.6 208 h8.8" stroke="#fff" stroke-width="7" stroke-linecap="round"/>` +
+        // sneakers: white with purple, a sole and laces
+        `<path d="M40.5 219 Q41 212.5 50 212.5 Q59.5 212.5 59.5 219 Z M60.5 219 Q61 212.5 70 212.5 Q79.5 212.5 79.5 219 Z" fill="#fff" stroke="${L.shoes}" stroke-width="2" stroke-linejoin="round"/>` +
+        `<path d="M40 220.5 h20 M60 220.5 h20" stroke="${L.shirtDark}" stroke-width="2.6" stroke-linecap="round"/>` +
+        `<path d="M47 215 h5 M48 217.5 h4 M67 215 h5 M68 217.5 h4" stroke="${L.shoes}" stroke-width="1.2" stroke-linecap="round"/>` +
+        girlArm('g-arm', -1, 'M41 112 Q32 132 30 154', 30, 156) + girlArm('g-arm', 1, 'M79 112 Q88 132 90 154', 90, 156) +
+        // a pleated skirt, then the shirt with short sleeves and a heart
+        `<path d="M42 150 L78 150 L88 184 Q60 190 32 184 Z" fill="${L.skirt}" stroke="${L.skirtDark}" stroke-width="1.2" stroke-linejoin="round"/>` +
         `<path d="M32 184 Q60 190 88 184 L87 180 Q60 186 33 180 Z" fill="${L.skirtDark}"/>` +
-        `<path d="M43 104 Q60 99 77 104 L80 154 Q60 158 40 154 Z" fill="${L.shirt}"/>` +
+        strands('M50 152 L46 183 M60 152 L60 186 M70 152 L74 183', L.skirtDark, 1.3, 0.9) +
+        `<path d="M43 104 Q60 99 77 104 L80 154 Q60 158 40 154 Z" fill="${L.shirt}" stroke="${L.shirtDark}" stroke-width="1.2" stroke-linejoin="round"/>` +
         `<path d="M43 104 Q34 108 33 122 L42 124 Z M77 104 Q86 108 87 122 L78 124 Z" fill="${L.shirtDark}"/>` +
-        `<path d="M60 136 C55 130 49 134 53 139 L60 145 L67 139 C71 134 65 130 60 136 Z" fill="#FFD54F"/>` +
-        `<rect x="55" y="94" width="10" height="11" rx="3" fill="${GIRL_SKIN_SHADE}"/>`;
+        `<path d="M33.5 119 L42 121 M86.5 119 L78 121" stroke="#fff" stroke-width="1.4" opacity="0.6"/>` +
+        `<path d="M41 150 Q60 154 79 150" stroke="${L.shirtDark}" stroke-width="2.2" fill="none"/>` +
+        `<path d="M60 136 C55 130 49 134 53 139 L60 145 L67 139 C71 134 65 130 60 136 Z" fill="#FFD54F" stroke="#F2B53A" stroke-width="0.8" stroke-linejoin="round"/>` +
+        `<rect x="55" y="94" width="10" height="11" rx="3" fill="${GIRL_SKIN_SHADE}"/>` +
+        `<path d="M52 103 Q60 109 68 103" stroke="${L.shirtDark}" stroke-width="2" fill="none" stroke-linecap="round"/>`;
     const head =
-        `<ellipse cx="${cx}" cy="${cy}" rx="27.5" ry="30.5" fill="${GIRL_SKIN}"/>` +
+        `<ellipse cx="${cx}" cy="${cy}" rx="27.5" ry="30.5" fill="${GIRL_SKIN}" stroke="${GIRL_SKIN_LINE}" stroke-width="1"/>` +
+        `<path d="M${cx - 23} ${cy - 12} Q${cx} ${cy - 4} ${cx + 23} ${cy - 12}" stroke="${GIRL_SKIN_SHADE}" stroke-width="5" fill="none" opacity="0.6"/>` +
         girlFace(cx, cy, L, false, mode) +
         // straight fringe swept to one side, the parting on her right
-        `<path d="M31 72 C29 44 42 31 62 31 C81 31 92 44 90 72 C87 60 83 54 78 50 C74 57 64 58 50 55 C44 56 36 62 31 72 Z" fill="${L.hair}"/>` +
-        `<path d="M50 34 C60 33 70 38 76 46" stroke="${L.hairLight}" stroke-width="2.4" fill="none" stroke-linecap="round" opacity="0.8"/>` +
-        // long locks in front of her shoulders
-        `<path d="M31 66 C30 90 31 112 33 128 L40 126 C38 108 37 88 36 70 Z" fill="${L.hair}"/>` +
-        `<path d="M89 66 C90 90 89 112 87 128 L80 126 C82 108 83 88 84 70 Z" fill="${L.hair}"/>` +
-        // headband
-        `<path d="M33 52 Q60 25 87 52" stroke="#FF6FA5" stroke-width="4.5" fill="none" stroke-linecap="round"/>`;
+        `<path d="M31 72 C29 44 42 31 62 31 C81 31 92 44 90 72 C87 60 83 54 78 50 C74 57 64 58 50 55 C44 56 36 62 31 72 Z" fill="${L.hair}" stroke="${L.hairLine}" stroke-width="1.1" stroke-linejoin="round"/>` +
+        strands('M44 40 C40 46 36 56 34 66 M56 36 C50 42 46 50 44 55 M70 36 C74 40 77 45 78 50 M84 46 C86 52 88 60 89 68', L.hairDark, 1.2, 0.7) +
+        // the shine on straight hair
+        strands('M44 41 C52 35 64 34 74 39', L.hairLight, 3.4, 0.9) + strands('M80 44 C83 47 85 50 86 53', L.hairLight, 2.4, 0.8) +
+        // long locks in front of her shoulders, ending in points
+        `<path d="M31 66 C30 90 31 112 34 132 L37 126 L40 130 C38 108 37 88 36 70 Z M89 66 C90 90 89 112 86 132 L83 126 L80 130 C82 108 83 88 84 70 Z" fill="${L.hair}" stroke="${L.hairLine}" stroke-width="1" stroke-linejoin="round"/>` +
+        strands('M33.5 76 L34 120 M86.5 76 L86 120', L.hairLight, 1.4, 0.8) +
+        girlArm('g-cheer', -1, 'M41 111 Q27 101 21 82', 20, 79) + girlArm('g-cheer', 1, 'M79 111 Q93 101 99 82', 100, 79) +
+        // headband with a little bow
+        `<path d="M33 52 Q60 25 87 52" stroke="#FF6FA5" stroke-width="4.8" fill="none" stroke-linecap="round"/>` +
+        `<path d="M38 43 Q50 33 60 32" stroke="#fff" stroke-width="1.2" fill="none" opacity="0.6" stroke-linecap="round"/>` +
+        `<g transform="translate(83 45) rotate(25)"><path d="M0 0 L-7 -5 L-7 5 Z M0 0 L7 -5 L7 5 Z" fill="#FF6FA5" stroke="#E0407F" stroke-width="0.8" stroke-linejoin="round"/>` +
+        `<circle cx="0" cy="0" r="2.2" fill="#E0407F"/></g>`;
     return back + body + head;
 }
 
@@ -2099,9 +2217,9 @@ const GaiaPlayer = (function () {
             const name = player ? ', ' + player.name : '';
             let message;
 
-            if (hour >= 22 || hour < 6)  message = "מְאֻחָר מְאוֹד! 😴 שֵׁינָה טוֹבָה אַחֲרֵי מִשְׂחָק אֶחָד!";
+            if (hour >= 22 || hour < 6)  message = "מְאֻחָר מְאוֹד" + name + "! 😴 שֵׁינָה טוֹבָה אַחֲרֵי מִשְׂחָק אֶחָד!";
             else if (day === 6)          message = "שַׁבָּת שָׁלוֹם" + name + "! ✡️ שַׁבָּת שֶׁל לִמּוּד";
-            else if (day === 5)          message = "יוֹם שִׁשִּׁי! 🎉 הַשָּׁבוּעַ נִגְמָר — בּוֹאוּ נְשַׂחֵק!";
+            else if (day === 5)          message = "יוֹם שִׁשִּׁי" + name + "! 🎉 הַשָּׁבוּעַ נִגְמָר — בּוֹאוּ נְשַׂחֵק!";
             else if (hour < 10)          message = "בֹּקֶר טוֹב" + name + "! ☀️ מוּכָנִים לִלְמֹד?";
             else if (hour < 13)          message = "בֹּקֶר נֶהְדָּר" + name + "! 🌟 בּוֹאוּ נְשַׂחֵק!";
             else if (hour < 16)          message = "צָהֳרַיִם טוֹבִים" + name + "! 🌞 זְמַן מִשְׂחָק!";
@@ -2581,8 +2699,8 @@ const GaiaPlayer = (function () {
             } catch(e) {}
         }
 
-        // Yoovy & Googy's mood: 'idle' | 'happy' | 'sad' | 'dance' (their faces follow via CSS).
-        // happy/sad fall back to idle.
+        // Yoovy & Googy's mood: 'idle' | 'happy' | 'sad' | 'surprised' | 'dance' (faces and arms
+        // follow via CSS). happy, sad and surprised fall back to idle.
         let gaiaResetTimer = null;
         function setGaiaState(state) {
             const el = document.getElementById('gaia-char');
@@ -2603,8 +2721,8 @@ const GaiaPlayer = (function () {
                     setTimeout(() => s.remove(), 820);
                 });
             }
-            if (state === 'happy' || state === 'sad') {
-                gaiaResetTimer = setTimeout(() => { el.className = 'gaia-idle'; }, state === 'happy' ? 1200 : 900);
+            if (state === 'happy' || state === 'sad' || state === 'surprised') {
+                gaiaResetTimer = setTimeout(() => { el.className = 'gaia-idle'; }, state === 'sad' ? 900 : 1200);
             }
         }
 
@@ -2703,7 +2821,7 @@ const GaiaPlayer = (function () {
         function timeoutAnswer() {
             answerLocked = true;
             lockOptions();
-            playSound('timeout');
+            playSound('timeout'); setGaiaState('surprised');
             score -= 5;
             if (score < 0) score = 0;
             questionCount++;
@@ -5451,7 +5569,7 @@ const GaiaBoards = (function () {
     const CASTLE = LANDS[0];
 
     let built = false;
-    let avatarEl = null;
+    let avatarEl = null, walkTimer = null;
 
     function cssVar(name) {
         return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -6058,11 +6176,12 @@ const GaiaBoards = (function () {
             }
         });
 
-        // Yoovy and Googy walk together on the map, standing on top of the last land played
+        // Yoovy and Googy walk together on the map, standing beside the last land played
         const av = el('g', { id: 'gaia-map-avatar' }, svg);
         el('ellipse', { cx: 1, cy: 17, rx: 40, ry: 7, fill: 'oklch(0.3 0.05 300 / 0.22)' }, av);
-        [[-46, drawGoogy('full')], [-8, drawYoovy('full')]].forEach(function (pair) {
-            el('svg', { x: pair[0], y: -85, width: 57, height: 105, viewBox: '0 12 120 222', class: 'girl' }, av).innerHTML = pair[1];
+        [[-46, 'googy', drawGoogy('full')], [-8, 'yoovy', drawYoovy('full')]].forEach(function (g) {
+            const walker = el('g', { class: 'map-walker' }, av);
+            el('svg', { x: g[0], y: -85, width: 57, height: 105, viewBox: '0 12 120 222', class: 'girl girl-' + g[1] }, walker).innerHTML = g[2];
         });
         avatarEl = av;
 
@@ -6082,6 +6201,10 @@ const GaiaBoards = (function () {
         } else {
             avatarEl.style.transition = 'transform 700ms cubic-bezier(0.25, 1, 0.5, 1)';
             avatarEl.setAttribute('transform', 'translate(' + x + ' ' + y + ')');
+            // they walk while they move
+            avatarEl.classList.add('walking');
+            clearTimeout(walkTimer);
+            walkTimer = setTimeout(function () { avatarEl.classList.remove('walking'); }, 700);
         }
     }
 
