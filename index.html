@@ -1142,6 +1142,183 @@
         #repeat-end .repeat-end-line { font-size: 1.2rem; color: var(--ink-soft); }
         #repeat-end .repeat-end-points { font-size: 1.3rem; font-weight: 700; color: oklch(0.60 0.15 70); margin-bottom: 8px; }
 
+        /* =========================================================
+           THE ROYAL INTRO: golden gates, the castle at night, the sisters in crowns
+           One timeline: each part's animation-delay is the second it starts.
+           ========================================================= */
+        #intro {
+            position: fixed; inset: 0; z-index: 1000; overflow: hidden; direction: rtl;
+            background: radial-gradient(130% 95% at 50% 100%, oklch(0.36 0.14 305) 0%, oklch(0.23 0.10 290) 50%, oklch(0.14 0.06 280) 100%);
+            font-family: 'Varela Round', 'Fredoka', sans-serif;
+            animation: in-out 0.8s 10.5s ease-in forwards;
+        }
+        #intro.in-skipping { animation: in-out 0.35s ease-in forwards; pointer-events: none; }
+        @keyframes in-out { to { opacity: 0; visibility: hidden; } }
+        @keyframes in-fade { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes in-on { to { opacity: 1; } }
+        @keyframes in-off { to { opacity: 0; } }
+        .in-star { position: absolute; border-radius: 50%; background: #fff; animation: in-twinkle var(--t) ease-in-out var(--d) infinite alternate; }
+        @keyframes in-twinkle { from { opacity: 0.2; transform: scale(0.6); } to { opacity: 1; transform: scale(1.2); } }
+        /* the light of the castle, and slow rays turning behind it */
+        .in-glow, .in-rays, .in-flash { position: absolute; left: 50%; bottom: 30vh; border-radius: 50%; }
+        .in-glow {
+            width: 140vmax; height: 140vmax; margin: 0 0 -70vmax -70vmax; opacity: 0.3;
+            background: radial-gradient(circle, oklch(0.96 0.10 90 / 0.6) 0%, oklch(0.86 0.14 80 / 0.25) 16%, transparent 42%);
+            animation: in-on 1.4s 1.5s ease-out forwards;
+        }
+        .in-rays {
+            width: 160vmax; height: 160vmax; margin: 0 0 -80vmax -80vmax; opacity: 0;
+            background: repeating-conic-gradient(oklch(0.96 0.12 90 / 0.16) 0deg 6deg, oklch(0.96 0.12 90 / 0) 6deg 16deg);
+            -webkit-mask: radial-gradient(circle, #000 6%, transparent 50%); mask: radial-gradient(circle, #000 6%, transparent 50%);
+            animation: in-on 1.5s 2s forwards, end-spin 50s linear infinite;
+        }
+        .in-ground { position: absolute; left: 0; right: 0; bottom: 0; height: 30vh; background: linear-gradient(oklch(0.33 0.11 300), oklch(0.17 0.07 288)); }
+        .in-ground::before {   /* the gate's light on the courtyard */
+            content: ''; position: absolute; left: 50%; top: 0; width: 90vw; height: 70%; transform: translateX(-50%);
+            background: radial-gradient(50% 100% at 50% 0%, oklch(0.88 0.12 85 / 0.38), transparent 70%);
+        }
+        .in-castle {
+            position: absolute; left: 50%; bottom: calc(30vh - 1px); width: min(94vw, 62vh); transform-origin: 50% 100%;
+            animation: in-push 4.2s 1.3s cubic-bezier(.2, .7, .2, 1) both;
+        }
+        @keyframes in-push { from { transform: translateX(-50%) scale(1.14); } to { transform: translateX(-50%) scale(1); } }
+        .in-castle .in-win { animation: in-twinkle 1.6s ease-in-out infinite alternate; }
+        .in-castle .in-flag { transform-box: fill-box; transform-origin: 0 50%; animation: map-flag 1.1s ease-in-out infinite alternate; }
+        .in-castle .in-flame { transform-box: fill-box; transform-origin: 50% 100%; animation: in-flicker 0.3s ease-in-out infinite alternate; }
+        @keyframes in-flicker { from { transform: scale(0.85, 1.05); } to { transform: scale(1.1, 0.9); } }
+        /* the red carpet rolls out of the gate */
+        .in-carpet {
+            position: absolute; left: 50%; bottom: 0; height: 30vh; width: min(94vw, 62vh); transform-origin: 50% 0;
+            animation: in-unroll 0.9s 3s cubic-bezier(.3, .8, .3, 1) both;
+        }
+        @keyframes in-unroll { from { transform: translateX(-50%) scaleY(0); } to { transform: translateX(-50%) scaleY(1); } }
+        .in-scene { position: absolute; inset: 0; transform-origin: 50% 72%; animation: in-zoom 1.9s 8.6s ease-in forwards; }
+        @keyframes in-zoom { to { transform: scale(1.22); } }
+        .in-lanterns { position: absolute; left: 50%; bottom: 0; height: 30vh; width: min(94vw, 62vh); transform: translateX(-50%); }
+        .in-lantern {
+            position: absolute; width: calc(var(--s) * 14px); height: calc(var(--s) * 58px); transform: translateX(-50%); opacity: 0;
+            background: linear-gradient(#7A5512, #7A5512) 50% 100% / 18% 78% no-repeat;
+            animation: in-on 0.4s var(--d) ease-out forwards;
+        }
+        .in-lantern::before {   /* the lamp */
+            content: ''; position: absolute; left: 50%; top: 0; width: 100%; aspect-ratio: 1; transform: translateX(-50%); border-radius: 40% 40% 30% 30%;
+            background: radial-gradient(circle at 50% 40%, #FFFBE6, #FFD866 55%, #E09A2B); box-shadow: 0 0 calc(var(--s) * 18px) calc(var(--s) * 6px) oklch(0.9 0.14 85 / 0.55);
+        }
+        /* the sisters walk out of the gate, then cheer */
+        .in-girls {
+            position: absolute; left: 50%; bottom: 1.5vh; height: min(34vh, 290px); display: flex; align-items: flex-end;
+            transform-origin: 50% 100%; animation: in-walk-in 2.8s 3.6s cubic-bezier(.35, .1, .3, 1) both;
+        }
+        @keyframes in-walk-in {
+            from { transform: translate(-50%, -28.5vh) scale(0.2); opacity: 0; }
+            8% { opacity: 1; }
+            to { transform: translate(-50%, 0) scale(1); opacity: 1; }
+        }
+        .in-girls .girl { height: 100%; width: auto; animation: in-bob 0.35s 3.6s ease-in-out 8 alternate; }
+        .in-girls .girl-googy { margin-right: -16%; animation-delay: 3.78s; }
+        @keyframes in-bob { from { transform: translateY(0); } to { transform: translateY(-3.5%); } }
+        .in-girls .g-arm-l { animation: g-swing-l 0.35s 3.6s ease-in-out 8 alternate, in-off 0.01s 6.4s forwards; }
+        .in-girls .g-arm-r { animation: g-swing-r 0.35s 3.6s ease-in-out 8 alternate, in-off 0.01s 6.4s forwards; }
+        .in-girls .g-eyes-open, .in-girls .g-mouth-happy { animation: in-off 0.01s 6.4s forwards; }
+        .in-girls .g-cheer, .in-girls .g-eyes-happy, .in-girls .g-mouth-grin { display: inline; opacity: 0; animation: in-on 0.01s 6.4s forwards; }
+        .in-girls .g-cheer-l { animation: in-on 0.01s 6.4s forwards, g-dance-l 0.4s 6.4s ease-in-out 8 alternate; }
+        .in-girls .g-cheer-r { animation: in-on 0.01s 6.4s forwards, g-dance-r 0.4s 6.4s ease-in-out 8 alternate; }
+        .in-girls .in-spark { transform-box: fill-box; transform-origin: center; opacity: 0; animation: in-spark 0.8s 6.4s ease-in-out infinite alternate; }
+        @keyframes in-spark { from { opacity: 0; transform: scale(0.4); } to { opacity: 1; transform: scale(1.2) rotate(45deg); } }
+        /* fireworks: a rocket goes up, then the rays fly out and fade */
+        .in-fw { position: absolute; width: 0; height: 0; }
+        .in-fw i {
+            position: absolute; left: -3px; top: -3px; width: 6px; height: 6px; border-radius: 50%; opacity: 0;
+            background: var(--c); box-shadow: 0 0 8px 2px var(--c);
+            animation: in-ray 1.5s var(--d) cubic-bezier(.15, .7, .3, 1) forwards;
+        }
+        @keyframes in-ray {
+            0% { transform: rotate(var(--a)) translateY(0) scale(1.5); opacity: 1; }
+            70% { opacity: 1; }
+            100% { transform: rotate(var(--a)) translateY(calc(-1 * var(--r))) scale(0.4); opacity: 0; }
+        }
+        .in-fw b {
+            position: absolute; left: -1.5px; top: 0; width: 3px; height: 34px; border-radius: 2px; opacity: 0;
+            background: linear-gradient(oklch(0.98 0.05 90), transparent);
+            animation: in-rocket 0.55s calc(var(--d) - 0.55s) ease-out forwards;
+        }
+        @keyframes in-rocket { from { transform: translateY(45vh); opacity: 1; } 90% { opacity: 1; } to { transform: translateY(0); opacity: 0; } }
+        /* gold glitter falling */
+        .in-glitter {
+            position: absolute; top: -3vh; width: 9px; height: 9px; opacity: 0; background: var(--c);
+            clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+            animation: in-fall var(--t) linear var(--d) forwards;
+        }
+        @keyframes in-fall { 0% { transform: translateY(0) rotate(0); opacity: 0; } 10% { opacity: 1; } 100% { transform: translateY(108vh) rotate(540deg); opacity: 0.3; } }
+        /* the title, in gold */
+        .in-title { position: absolute; left: 0; right: 0; top: 6vh; text-align: center; pointer-events: none; padding: 0 12px; }
+        .in-logo { direction: ltr; unicode-bidi: isolate; font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: clamp(2.5rem, 12vw, 4.8rem); line-height: 1.1; }
+        .in-logo .gl {
+            display: inline-block; opacity: 0; color: #FFE08A;
+            text-shadow: 0 3px 0 #B8862B, 0 6px 0 #7A5512, 0 0 24px oklch(0.9 0.15 85 / 0.8);
+            animation: in-letter 0.6s var(--d) cubic-bezier(.2, 1.6, .4, 1) forwards, in-shine 2.4s calc(var(--d) + 1.2s) ease-in-out infinite;
+        }
+        .in-logo .gl-space { width: 0.28em; }
+        .in-logo .in-amp { color: #FFB3D6; font-size: 0.8em; text-shadow: 0 3px 0 #B0306F, 0 0 20px oklch(0.85 0.15 350 / 0.8); }
+        @keyframes in-letter { from { opacity: 0; transform: translateY(-34px) scale(0.3) rotate(-15deg); } to { opacity: 1; transform: none; } }
+        @keyframes in-shine { 0%, 80%, 100% { filter: brightness(1); } 88% { filter: brightness(1.45); } }
+        .in-sub, .in-sub2 { opacity: 0; color: #FFF1C4; text-shadow: 0 2px 10px oklch(0.2 0.08 290 / 0.7); }
+        .in-sub { margin-top: 1.2vh; font-size: clamp(1.3rem, 5.6vw, 2rem); animation: in-rise 0.8s 7.7s ease-out forwards; }
+        .in-sub2 { margin-top: 0.6vh; font-size: clamp(1.05rem, 4.4vw, 1.5rem); animation: in-rise 0.8s 8.4s ease-out forwards; }
+        @keyframes in-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+        /* the golden gates, closed on the kingdom's crest, swing open */
+        .in-gates { position: absolute; inset: 0; perspective: 1400px; pointer-events: none; }
+        .in-gate {
+            position: absolute; top: 0; bottom: 0; width: 50.3%; overflow: hidden; backface-visibility: hidden;
+            background:
+                linear-gradient(90deg, oklch(0.25 0.08 70 / 0.45), transparent 7%, transparent 93%, oklch(0.25 0.08 70 / 0.45)),
+                repeating-linear-gradient(0deg, transparent 0 46px, oklch(0.45 0.10 70 / 0.28) 46px 48px),
+                linear-gradient(100deg, #8C5A12 0%, #D9A43A 22%, #F7DC84 45%, #E2B04A 65%, #A8721E 100%);
+            animation: in-open-l 1.8s 1.3s cubic-bezier(.55, 0, .3, 1) forwards;
+        }
+        .in-gate-l { left: 0; transform-origin: 0 50%; }
+        .in-gate-r {
+            right: 0; transform-origin: 100% 50%; animation-name: in-open-r;
+            background:
+                linear-gradient(90deg, oklch(0.25 0.08 70 / 0.45), transparent 7%, transparent 93%, oklch(0.25 0.08 70 / 0.45)),
+                repeating-linear-gradient(0deg, transparent 0 46px, oklch(0.45 0.10 70 / 0.28) 46px 48px),
+                linear-gradient(260deg, #8C5A12 0%, #D9A43A 22%, #F7DC84 45%, #E2B04A 65%, #A8721E 100%);
+        }
+        @keyframes in-open-l { 0% { transform: rotateY(0); } 12% { transform: rotateY(-3deg); } 80% { opacity: 1; } 100% { transform: rotateY(100deg); opacity: 0; } }
+        @keyframes in-open-r { 0% { transform: rotateY(0); } 12% { transform: rotateY(3deg); } 80% { opacity: 1; } 100% { transform: rotateY(-100deg); opacity: 0; } }
+        .in-gate::before {   /* the arched panel */
+            content: ''; position: absolute; inset: 9vh 13% 7vh 13%;
+            border: 5px solid #FCE7A0; border-radius: 45% 45% 10px 10px / 18% 18% 10px 10px;
+            box-shadow: inset 0 0 0 3px #A97A22, 0 0 0 3px #A97A22, inset 0 0 40px oklch(0.35 0.10 60 / 0.35);
+        }
+        .in-gate::after {   /* rivets down the frame */
+            content: ''; position: absolute; top: 3vh; bottom: 3vh; width: 14px; left: 4%;
+            background: radial-gradient(circle, #FFF3C0 0 3px, #8A5A12 3.5px 4.5px, transparent 5px) 0 0 / 14px 34px repeat-y;
+        }
+        .in-gate-r::after { left: auto; right: 4%; }
+        .in-crest {
+            position: absolute; top: 50%; width: min(56vw, 300px, 40vh); aspect-ratio: 1; border-radius: 50%;
+            background: radial-gradient(circle at 42% 35%, oklch(0.56 0.20 300), oklch(0.30 0.14 292) 72%);
+            border: 8px solid #F2C94C; box-shadow: 0 0 0 4px #9C6B12, inset 0 0 0 4px #FFE9A6;
+            display: grid; place-items: center; animation: in-crest 1.3s ease-in-out both;
+        }
+        .in-gate-l .in-crest { right: 0; transform: translate(50%, -50%); }
+        .in-gate-r .in-crest { left: 0; transform: translate(-50%, -50%); }
+        .in-crest svg { width: 78%; height: 78%; }
+        @keyframes in-crest { 0% { filter: brightness(0.6); } 60% { filter: brightness(1.25); } 100% { filter: brightness(1); } }
+        /* the end: a golden flash from the gate, the map behind it */
+        .in-flash {
+            width: 300vmax; height: 300vmax; margin: 0 0 -150vmax -150vmax; opacity: 0; transform: scale(0.02);
+            background: radial-gradient(circle, #FFFDF2 0%, #FFF3C4 35%, oklch(0.97 0.06 90 / 0) 70%);
+            animation: in-flash 1s 9.6s ease-in forwards;
+        }
+        @keyframes in-flash { 0% { opacity: 0; transform: scale(0.02); } 30% { opacity: 1; } 100% { opacity: 1; transform: scale(1); } }
+        .in-skip {
+            position: absolute; top: max(14px, env(safe-area-inset-top)); left: 14px; z-index: 5;
+            border: 2px solid oklch(1 0 0 / 0.5); border-radius: 999px; padding: 8px 16px; cursor: pointer;
+            font: inherit; font-size: 1.05rem; color: #fff; background: oklch(0.2 0.05 290 / 0.45);
+        }
+
         /* --- reduced motion: collapse map/parallax/character motion to instant --- */
         @media (prefers-reduced-motion: reduce) {
             #gaia-char .girl, .kg-cloud, .kg-sparkle, .kg-star, .map-cloud,
@@ -2270,6 +2447,12 @@ const GaiaPlayer = (function () {
                 }
             })();
             initAudio();
+            // the kingdom's gates open first (see THE ROYAL INTRO), then the map
+            if (window.GaiaIntro) GaiaIntro.play(enterKingdom);
+            else enterKingdom();
+        }
+
+        function enterKingdom() {
             showScreen('main-menu');
             if (window.initAdventureMap) initAdventureMap();
             GaiaBoards.refreshPlayerChip();
@@ -3370,6 +3553,205 @@ const GaiaPlayer = (function () {
             }
         }
     </script>
+<script>
+// ===== THE ROYAL INTRO =====
+// "יוֹצְאִים לַדֶּרֶךְ" opens the kingdom with a short scene: golden gates swing open on the
+// castle at night, fireworks go up, a red carpet rolls out, and Yoovy and Googy, in crowns and
+// capes, walk out to greet the player under a royal fanfare. The scene is one CSS timeline
+// (see THE ROYAL INTRO in the styles); the map is set up under its last golden flash.
+// "דִּלּוּג" (or Escape) skips it, and it is not played at all under reduced motion.
+(function () {
+    const LENGTH = 11000, HANDOFF = 10300;
+    const rand = (a, b) => a + Math.random() * (b - a);
+    // fireworks: where (in % of the screen), when (s), and their colour
+    const BURSTS = [[22, 17, 4.2, '#FFD866'], [78, 13, 4.8, '#FF7EB3'], [50, 8, 5.4, '#9FE6FF'], [30, 30, 6.2, '#C9B3FF'],
+                    [70, 27, 6.9, '#FFD866'], [14, 40, 7.6, '#FF9CCB'], [86, 36, 8.3, '#FFFFFF'], [42, 20, 9.0, '#FFD866']];
+
+    function castleSVG() {
+        const tower = (cx, top, w, roofH, roof, flag) => {
+            let t = `<rect x="${cx - w / 2}" y="${top}" width="${w}" height="${520 - top}" fill="url(#in-wall)"/>` +
+                `<rect x="${cx + w * 0.12}" y="${top}" width="${w * 0.38}" height="${520 - top}" fill="#3A1D6E" opacity="0.08"/>` +
+                `<path d="M${cx - w / 2 - 9} ${top + 2} L${cx} ${top - roofH} L${cx + w / 2 + 9} ${top + 2} Z" fill="url(#${roof})"/>` +
+                `<path d="M${cx - w / 2 - 9} ${top + 2} L${cx} ${top - roofH} L${cx - w * 0.08} ${top + 2} Z" fill="#fff" opacity="0.14"/>` +
+                `<rect x="${cx - w / 2 - 6}" y="${top - 3}" width="${w + 12}" height="9" rx="2" fill="url(#in-gold)"/>` +
+                `<line x1="${cx}" y1="${top - roofH}" x2="${cx}" y2="${top - roofH - 30}" stroke="#B8862B" stroke-width="3"/>` +
+                `<circle cx="${cx}" cy="${top - roofH}" r="5" fill="#F2C94C"/>` +
+                `<path class="in-flag" d="M${cx} ${top - roofH - 30} L${cx + 26} ${top - roofH - 23} L${cx} ${top - roofH - 15} Z" fill="${flag}"/>`;
+            for (let y = top + 34; y < 470; y += 64) {
+                t += `<circle cx="${cx}" cy="${y + 14}" r="20" fill="url(#in-win-glow)"/>` +
+                    `<path class="in-win" style="animation-delay:-${rand(0, 1.6).toFixed(2)}s" d="M${cx - 8} ${y + 24} V${y + 8} A8 8 0 0 1 ${cx + 8} ${y + 8} V${y + 24} Z" fill="#FFD866" stroke="#B8862B" stroke-width="1.5"/>`;
+            }
+            return t;
+        };
+        const merlons = (x0, x1, y) => { let m = ''; for (let x = x0; x < x1; x += 26) m += `<rect x="${x}" y="${y}" width="16" height="16" fill="url(#in-wall)"/>`; return m; };
+        const banner = x => `<path d="M${x} 276 h30 v104 l-15 -12 l-15 12 Z" fill="#6A3FB5" stroke="#F2C94C" stroke-width="3" stroke-linejoin="round"/>` +
+            `<path d="M${x + 7} 312 l2 -12 5 6 3 -9 3 9 5 -6 2 12 Z" fill="#F2C94C"/>`;
+        return `<svg class="in-castle" viewBox="0 0 800 540" aria-hidden="true">
+            <defs>
+                <linearGradient id="in-wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FBF5FF"/><stop offset="1" stop-color="#CDB9EE"/></linearGradient>
+                <linearGradient id="in-roof" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9C6BF0"/><stop offset="0.55" stop-color="#7444D6"/><stop offset="1" stop-color="#4F2AA6"/></linearGradient>
+                <linearGradient id="in-roof-pink" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FF96C8"/><stop offset="0.55" stop-color="#E2559A"/><stop offset="1" stop-color="#AE2F6E"/></linearGradient>
+                <linearGradient id="in-gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF0B0"/><stop offset="0.5" stop-color="#F2C94C"/><stop offset="1" stop-color="#B8862B"/></linearGradient>
+                <radialGradient id="in-door"><stop offset="0" stop-color="#FFFDF0"/><stop offset="0.6" stop-color="#FFE08A"/><stop offset="1" stop-color="#F0A93A"/></radialGradient>
+                <radialGradient id="in-win-glow"><stop offset="0" stop-color="#FFE9A0" stop-opacity="0.85"/><stop offset="1" stop-color="#FFE9A0" stop-opacity="0"/></radialGradient>
+            </defs>
+            <ellipse cx="400" cy="522" rx="430" ry="34" fill="#2A1554" opacity="0.6"/>
+            <rect x="122" y="360" width="44" height="160" fill="url(#in-wall)"/>${merlons(122, 166, 346)}
+            <rect x="634" y="360" width="44" height="160" fill="url(#in-wall)"/>${merlons(634, 678, 346)}
+            ${tower(90, 292, 74, 96, 'in-roof', '#FF7EB3')}${tower(710, 292, 74, 96, 'in-roof', '#FF7EB3')}
+            ${tower(205, 200, 92, 122, 'in-roof-pink', '#FFD866')}${tower(595, 200, 92, 122, 'in-roof-pink', '#FFD866')}
+            <rect x="262" y="262" width="276" height="258" fill="url(#in-wall)"/>${merlons(262, 538, 246)}
+            <rect x="258" y="258" width="284" height="8" fill="url(#in-gold)"/>
+            ${tower(400, 128, 124, 122, 'in-roof', '#FFD866')}
+            <circle cx="400" cy="190" r="27" fill="#F2C94C"/><circle cx="400" cy="190" r="21" fill="#7444D6"/>
+            <path d="M400 169 V211 M379 190 H421 M385 175 L415 205 M415 175 L385 205" stroke="#FFD866" stroke-width="3"/><circle cx="400" cy="190" r="7" fill="#FF7EB3"/>
+            ${banner(290)}${banner(480)}
+            <path d="M352 520 V446 A48 48 0 0 1 448 446 V520 Z" fill="url(#in-door)"/>
+            <path d="M352 520 V446 A48 48 0 0 1 448 446 V520" fill="none" stroke="#F2C94C" stroke-width="7"/>
+            <path d="M392 392 h16 l-3 12 h-10 Z" fill="#F2C94C"/>
+            <g transform="translate(330 470)"><rect x="-3" y="0" width="6" height="22" fill="#7A5512"/><circle cx="0" cy="-8" r="13" fill="url(#in-win-glow)"/><path class="in-flame" d="M0 -18 C6 -10 6 -3 0 0 C-6 -3 -6 -10 0 -18 Z" fill="#FFB238"/></g>
+            <g transform="translate(470 470)"><rect x="-3" y="0" width="6" height="22" fill="#7A5512"/><circle cx="0" cy="-8" r="13" fill="url(#in-win-glow)"/><path class="in-flame" d="M0 -18 C6 -10 6 -3 0 0 C-6 -3 -6 -10 0 -18 Z" fill="#FFB238"/></g>
+            <path d="M330 520 h140 v7 h-140 Z M318 527 h164 v7 h-164 Z M306 534 h188 v6 h-188 Z" fill="#EADCFF"/>
+        </svg>`;
+    }
+
+    // the crest on the gates: a crown over "Y&G"
+    const CREST = `<svg viewBox="0 0 100 100" aria-hidden="true">
+        <path d="M30 40 L28 18 L40 28 L50 12 L60 28 L72 18 L70 40 Z" fill="#F2C94C" stroke="#9C6B12" stroke-width="2" stroke-linejoin="round"/>
+        <circle cx="50" cy="31" r="3.4" fill="#E53935"/><circle cx="38" cy="34" r="2.4" fill="#42A5F5"/><circle cx="62" cy="34" r="2.4" fill="#42A5F5"/>
+        <text x="50" y="74" text-anchor="middle" direction="ltr" font-family="Fredoka, sans-serif" font-weight="700" font-size="30" fill="#FFE08A" stroke="#9C6B12" stroke-width="1">Y&amp;G</text>
+        <path d="M24 84 Q50 94 76 84" stroke="#F2C94C" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    </svg>`;
+
+    // a sister in her crown and cape (the cape behind her, the crown on top)
+    function royalGirl(who) {
+        const yoovy = who === 'yoovy';
+        const sh = yoovy ? 102 : 126, head = yoovy ? 31 : 61;
+        const cape = yoovy ? ['#5E35B1', '#40238A'] : ['#C2185B', '#8E1046'];
+        const back =
+            `<path d="M42 ${sh} Q60 ${sh - 5} 78 ${sh} L101 214 Q60 227 19 214 Z" fill="${cape[0]}" stroke="#F2C94C" stroke-width="3" stroke-linejoin="round"/>` +
+            `<path d="M46 ${sh + 6} L30 210 M74 ${sh + 6} L90 210" stroke="${cape[1]}" stroke-width="2.5" opacity="0.8"/>` +
+            // ermine at the hem: white with little black tails
+            `<path d="M20 212 Q60 225 100 212 L101 219 Q60 233 19 219 Z" fill="#fff"/>` +
+            `<path d="M34 219 v4 M50 222 v4 M66 222 v4 M82 219 v4" stroke="#2B2233" stroke-width="2.4" stroke-linecap="round"/>`;
+        const spark = (x, y, d) => `<path class="in-spark" style="animation-delay:${d}s" d="M${x} ${y - 6} L${x + 1.6} ${y - 1.6} L${x + 6} ${y} L${x + 1.6} ${y + 1.6} L${x} ${y + 6} L${x - 1.6} ${y + 1.6} L${x - 6} ${y} L${x - 1.6} ${y - 1.6} Z" fill="#FFF6C8"/>`;
+        const crown = `<g transform="rotate(${yoovy ? 6 : -8} 60 ${head})">` +
+            `<path d="M44 ${head + 3} L42 ${head - 15} L51 ${head - 7} L60 ${head - 21} L69 ${head - 7} L78 ${head - 15} L76 ${head + 3} Z" fill="#F2C94C" stroke="#9C6B12" stroke-width="1.6" stroke-linejoin="round"/>` +
+            `<path d="M44 ${head - 2} L76 ${head - 2}" stroke="#FFF0B0" stroke-width="2"/>` +
+            `<circle cx="60" cy="${head - 6}" r="3.2" fill="#E53935"/><circle cx="50" cy="${head - 3}" r="2.2" fill="#42A5F5"/><circle cx="70" cy="${head - 3}" r="2.2" fill="#42A5F5"/>` +
+            `<circle cx="42" cy="${head - 16}" r="2" fill="#fff"/><circle cx="60" cy="${head - 22}" r="2.2" fill="#fff"/><circle cx="78" cy="${head - 16}" r="2" fill="#fff"/></g>` +
+            spark(40, head - 24, 6.4) + spark(82, head - 20, 6.8);
+        const clasp = `<circle cx="60" cy="${sh + 2}" r="4.2" fill="#F2C94C" stroke="#9C6B12" stroke-width="1.2"/>`;
+        const drawing = yoovy ? drawYoovy('full') : drawGoogy('full');
+        return `<svg class="girl girl-${who}" viewBox="-4 4 128 232" aria-hidden="true">${back}${drawing}${clasp}${crown}</svg>`;
+    }
+
+    function build() {
+        const box = document.createElement('div');
+        box.id = 'intro';
+        box.setAttribute('aria-label', 'פְּתִיחָה: שַׁעֲרֵי הַמַּמְלָכָה נִפְתָּחִים');
+        let sky = '';
+        for (let i = 0; i < 55; i++) {
+            const s = rand(1.5, 3.6).toFixed(1);
+            sky += `<i class="in-star" style="left:${rand(0, 100).toFixed(1)}%;top:${rand(0, 62).toFixed(1)}%;width:${s}px;height:${s}px;--t:${rand(1.4, 3).toFixed(2)}s;--d:-${rand(0, 3).toFixed(2)}s"></i>`;
+        }
+        let fireworks = '';
+        BURSTS.forEach(([x, y, d, c]) => {
+            let rays = '';
+            for (let a = 0; a < 360; a += 30) rays += `<i style="--a:${a}deg"></i>`;
+            fireworks += `<div class="in-fw" style="left:${x}%;top:${y}%;--d:${d}s;--c:${c};--r:${Math.round(rand(55, 85))}px"><b></b>${rays}</div>`;
+        });
+        let glitter = '';
+        for (let i = 0; i < 26; i++) {
+            glitter += `<i class="in-glitter" style="left:${rand(2, 98).toFixed(1)}%;--d:${rand(3.6, 9.2).toFixed(2)}s;--t:${rand(3, 5).toFixed(2)}s;--c:${i % 4 ? '#FFE27A' : '#FFB3D6'}"></i>`;
+        }
+        // lanterns light up along the carpet as it rolls out, far ones smaller
+        let lanterns = '';
+        [[0.45, 34, 78, 3.25], [0.7, 26, 46, 3.45], [1, 15, 10, 3.65]].forEach(([sc, x, b, d]) => {
+            [x, 100 - x].forEach(lx => { lanterns += `<i class="in-lantern" style="left:${lx}%;bottom:${b}%;--s:${sc};--d:${d}s"></i>`; });
+        });
+        let letters = '', i = 0;
+        for (const ch of 'Yoovy & Googy') {
+            if (ch === ' ') { letters += '<span class="gl gl-space"> </span>'; continue; }
+            letters += `<span class="gl${ch === '&' ? ' in-amp' : ''}" style="--d:${(6.8 + i++ * 0.07).toFixed(2)}s">${ch === '&' ? '&amp;' : ch}</span>`;
+        }
+        box.innerHTML =
+            `<div class="in-scene"><div class="in-sky">${sky}</div><div class="in-glow"></div><div class="in-rays"></div>` +
+            castleSVG() + `<div class="in-ground"></div>` +
+            `<svg class="in-carpet" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">` +
+            `<polygon points="45,0 55,0 86,100 14,100" fill="#B5123F"/><polygon points="46.5,0 53.5,0 78,100 22,100" fill="#D81B60"/>` +
+            `<polygon points="45,0 46.2,0 17,100 14,100" fill="#F2C94C"/><polygon points="53.8,0 55,0 86,100 83,100" fill="#F2C94C"/></svg>` +
+            `<div class="in-lanterns">${lanterns}</div>` +
+            `<div class="in-fireworks">${fireworks}</div>` +
+            `<div class="in-girls">${royalGirl('yoovy')}${royalGirl('googy')}</div>` +
+            `<div class="in-glitters">${glitter}</div></div>` +
+            `<div class="in-title"><div class="in-logo" aria-label="Yoovy &amp; Googy">${letters}</div>` +
+            `<div class="in-sub">✦ מַמְלֶכֶת הַיֶּדַע ✦</div><div class="in-sub2">יוּבִי וְגוּגִי מְזַמְּנוֹת אֶתְכֶם לְמַסָּע!</div></div>` +
+            `<div class="in-gates"><div class="in-gate in-gate-l"><div class="in-crest">${CREST}</div></div>` +
+            `<div class="in-gate in-gate-r"><div class="in-crest">${CREST}</div></div></div>` +
+            `<div class="in-flash"></div>` +
+            `<button class="in-skip" type="button">דִּלּוּג ⏭</button>`;
+        return box;
+    }
+
+    // A royal fanfare on the page's audio (the start button's tap has woken it): horns as the
+    // gates open, a soft thump for each firework, a triumphant chord as the sisters arrive,
+    // and a sparkle for the title. Returns the bus, so a skip can fade it out.
+    function fanfare() {
+        if (!audioCtx || audioCtx.state !== 'running') return null;
+        const bus = audioCtx.createGain(), soft = audioCtx.createBiquadFilter();
+        soft.type = 'lowpass'; soft.frequency.value = 2400;
+        soft.connect(bus); bus.connect(audioCtx.destination);
+        const t0 = audioCtx.currentTime + 0.05;
+        const tone = (f, at, dur, type, peak, out) => {
+            const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+            o.type = type; o.frequency.setValueAtTime(f, t0 + at);
+            g.gain.setValueAtTime(0.0001, t0 + at);
+            g.gain.exponentialRampToValueAtTime(peak, t0 + at + 0.03);
+            g.gain.setValueAtTime(peak, t0 + at + Math.max(0.04, dur - 0.1));
+            g.gain.exponentialRampToValueAtTime(0.0001, t0 + at + dur);
+            o.connect(g); g.connect(out || soft); o.start(t0 + at); o.stop(t0 + at + dur + 0.05);
+            return o;
+        };
+        const horn = (f, at, dur) => { tone(f, at, dur, 'sawtooth', 0.04); tone(f, at, dur, 'triangle', 0.1); tone(f / 2, at, dur, 'triangle', 0.045); };
+        [[392, 1.25, 0.15], [392, 1.43, 0.15], [392, 1.61, 0.15], [523.25, 1.79, 0.62], [659.25, 2.46, 0.2], [783.99, 2.7, 1.2]].forEach(n => horn(n[0], n[1], n[2]));
+        horn(523.25, 2.7, 1.2);
+        [[523.25, 6.35, 0.16], [659.25, 6.53, 0.16], [783.99, 6.71, 0.16], [1046.5, 6.89, 1.4]].forEach(n => horn(n[0], n[1], n[2]));
+        horn(659.25, 6.89, 1.4); horn(783.99, 6.89, 1.4);
+        [2093, 2637, 3136, 4186].forEach((f, i) => tone(f, 7.05 + i * 0.09, 0.35, 'sine', 0.03, bus));
+        BURSTS.forEach(([, , d]) => {
+            const o = tone(170, d, 0.28, 'sine', 0.11, bus);
+            o.frequency.exponentialRampToValueAtTime(48, t0 + d + 0.25);
+        });
+        return bus;
+    }
+
+    // Plays the scene, then calls onDone (once, under the last flash, or at once on a skip).
+    function play(onDone) {
+        if (document.getElementById('intro')) return;
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) { onDone(); return; }
+        const box = build();
+        document.body.appendChild(box);
+        const sound = fanfare();
+        let handed = false;
+        const handoff = () => { if (!handed) { handed = true; onDone(); } };
+        const end = () => { box.remove(); document.removeEventListener('keydown', onKey); };
+        const timers = [setTimeout(handoff, HANDOFF), setTimeout(end, LENGTH)];
+        const skip = () => {
+            timers.forEach(clearTimeout);
+            box.classList.add('in-skipping');
+            if (sound) sound.gain.setTargetAtTime(0, audioCtx.currentTime, 0.04);
+            handoff();
+            setTimeout(end, 400);
+        };
+        const onKey = e => { if (e.key === 'Escape') skip(); };
+        box.querySelector('.in-skip').addEventListener('click', skip);
+        document.addEventListener('keydown', onKey);
+    }
+
+    window.GaiaIntro = { play };
+})();
+</script>
 <script>
 // ===== READING & COMPREHENSION MODULE =====
 
