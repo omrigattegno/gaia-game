@@ -1318,6 +1318,18 @@
             border: 2px solid oklch(1 0 0 / 0.5); border-radius: 999px; padding: 8px 16px; cursor: pointer;
             font: inherit; font-size: 1.05rem; color: #fff; background: oklch(0.2 0.05 290 / 0.45);
         }
+        /* the 3D film (intro3d.js): its canvas under the same title, flash and skip button */
+        #intro.in3d { background: #07051a; animation: in-out 0.7s 13.3s ease-in forwards; }
+        .in3d-stage, .in3d-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+        .in3d .in-title { top: max(4vh, env(safe-area-inset-top)); z-index: 1; }
+        .in3d .in-title::before {   /* a soft shade behind the title, so it reads over the castle and fireworks */
+            content: ''; position: absolute; left: 50%; top: -7vh; z-index: -1; width: min(140vw, 960px); height: 36vh;
+            transform: translateX(-50%); opacity: 0; animation: in-on 0.9s 10.6s ease-out forwards;
+            background: radial-gradient(closest-side, oklch(0.16 0.06 290 / 0.38), oklch(0.16 0.06 290 / 0));
+        }
+        .in3d .in-sub { animation-delay: 11.55s; }
+        .in3d .in-sub2 { animation-delay: 12.1s; }
+        .in3d .in-flash { bottom: 42vh; animation-delay: 12.75s; }
 
         /* --- reduced motion: collapse map/parallax/character motion to instant --- */
         @media (prefers-reduced-motion: reduce) {
@@ -3555,11 +3567,12 @@ const GaiaPlayer = (function () {
     </script>
 <script>
 // ===== THE ROYAL INTRO =====
-// "יוֹצְאִים לַדֶּרֶךְ" opens the kingdom with a short scene: golden gates swing open on the
-// castle at night, fireworks go up, a red carpet rolls out, and Yoovy and Googy, in crowns and
-// capes, walk out to greet the player under a royal fanfare. The scene is one CSS timeline
-// (see THE ROYAL INTRO in the styles); the map is set up under its last golden flash.
-// "דִּלּוּג" (or Escape) skips it, and it is not played at all under reduced motion.
+// "יוֹצְאִים לַדֶּרֶךְ" opens the kingdom with a short film: the golden gates swing open on the
+// castle at night, fireworks go up, and Yoovy and Googy, in crowns and capes, walk out to greet
+// the player under a royal fanfare. It is a real-time 3D film (intro3d.js, built from intro3d/
+// with three.js) when this device can play it smoothly; otherwise a drawn scene, one CSS
+// timeline (see THE ROYAL INTRO in the styles). Either way the map is set up under the last
+// golden flash. "דִּלּוּג" (or Escape) skips it, and nothing plays under reduced motion.
 (function () {
     const LENGTH = 11000, HANDOFF = 10300;
     const rand = (a, b) => a + Math.random() * (b - a);
@@ -3646,6 +3659,17 @@ const GaiaPlayer = (function () {
         return `<svg class="girl girl-${who}" viewBox="-4 4 128 232" aria-hidden="true">${back}${drawing}${clasp}${crown}</svg>`;
     }
 
+    // the title in gold, its letters dropping in one by one from t0 (s)
+    function titleHTML(t0) {
+        let letters = '', i = 0;
+        for (const ch of 'Yoovy & Googy') {
+            if (ch === ' ') { letters += '<span class="gl gl-space"> </span>'; continue; }
+            letters += `<span class="gl${ch === '&' ? ' in-amp' : ''}" style="--d:${(t0 + i++ * 0.07).toFixed(2)}s">${ch === '&' ? '&amp;' : ch}</span>`;
+        }
+        return `<div class="in-title"><div class="in-logo" aria-label="Yoovy &amp; Googy">${letters}</div>` +
+            `<div class="in-sub">✦ מַמְלֶכֶת הַיֶּדַע ✦</div><div class="in-sub2">יוּבִי וְגוּגִי מְזַמְּנוֹת אֶתְכֶם לְמַסָּע!</div></div>`;
+    }
+
     function build() {
         const box = document.createElement('div');
         box.id = 'intro';
@@ -3670,11 +3694,6 @@ const GaiaPlayer = (function () {
         [[0.45, 34, 78, 3.25], [0.7, 26, 46, 3.45], [1, 15, 10, 3.65]].forEach(([sc, x, b, d]) => {
             [x, 100 - x].forEach(lx => { lanterns += `<i class="in-lantern" style="left:${lx}%;bottom:${b}%;--s:${sc};--d:${d}s"></i>`; });
         });
-        let letters = '', i = 0;
-        for (const ch of 'Yoovy & Googy') {
-            if (ch === ' ') { letters += '<span class="gl gl-space"> </span>'; continue; }
-            letters += `<span class="gl${ch === '&' ? ' in-amp' : ''}" style="--d:${(6.8 + i++ * 0.07).toFixed(2)}s">${ch === '&' ? '&amp;' : ch}</span>`;
-        }
         box.innerHTML =
             `<div class="in-scene"><div class="in-sky">${sky}</div><div class="in-glow"></div><div class="in-rays"></div>` +
             castleSVG() + `<div class="in-ground"></div>` +
@@ -3684,9 +3703,7 @@ const GaiaPlayer = (function () {
             `<div class="in-lanterns">${lanterns}</div>` +
             `<div class="in-fireworks">${fireworks}</div>` +
             `<div class="in-girls">${royalGirl('yoovy')}${royalGirl('googy')}</div>` +
-            `<div class="in-glitters">${glitter}</div></div>` +
-            `<div class="in-title"><div class="in-logo" aria-label="Yoovy &amp; Googy">${letters}</div>` +
-            `<div class="in-sub">✦ מַמְלֶכֶת הַיֶּדַע ✦</div><div class="in-sub2">יוּבִי וְגוּגִי מְזַמְּנוֹת אֶתְכֶם לְמַסָּע!</div></div>` +
+            `<div class="in-glitters">${glitter}</div></div>` + titleHTML(6.8) +
             `<div class="in-gates"><div class="in-gate in-gate-l"><div class="in-crest">${CREST}</div></div>` +
             `<div class="in-gate in-gate-r"><div class="in-crest">${CREST}</div></div></div>` +
             `<div class="in-flash"></div>` +
@@ -3696,8 +3713,10 @@ const GaiaPlayer = (function () {
 
     // A royal fanfare on the page's audio (the start button's tap has woken it): horns as the
     // gates open, a soft thump for each firework, a triumphant chord as the sisters arrive,
-    // and a sparkle for the title. Returns the bus, so a skip can fade it out.
-    function fanfare() {
+    // and a sparkle for the title, at the times in s (seconds). Returns the bus, so a skip can
+    // fade it out.
+    const SCHEDULE_2D = { horns: 1.25, chord: 6.35, title: 7.05, glints: [], bursts: BURSTS.map(b => b[2]), thump: 0.11 };
+    function fanfare(s) {
         if (!audioCtx || audioCtx.state !== 'running') return null;
         const bus = audioCtx.createGain(), soft = audioCtx.createBiquadFilter();
         soft.type = 'lowpass'; soft.frequency.value = 2400;
@@ -3714,29 +3733,66 @@ const GaiaPlayer = (function () {
             return o;
         };
         const horn = (f, at, dur) => { tone(f, at, dur, 'sawtooth', 0.04); tone(f, at, dur, 'triangle', 0.1); tone(f / 2, at, dur, 'triangle', 0.045); };
-        [[392, 1.25, 0.15], [392, 1.43, 0.15], [392, 1.61, 0.15], [523.25, 1.79, 0.62], [659.25, 2.46, 0.2], [783.99, 2.7, 1.2]].forEach(n => horn(n[0], n[1], n[2]));
-        horn(523.25, 2.7, 1.2);
-        [[523.25, 6.35, 0.16], [659.25, 6.53, 0.16], [783.99, 6.71, 0.16], [1046.5, 6.89, 1.4]].forEach(n => horn(n[0], n[1], n[2]));
-        horn(659.25, 6.89, 1.4); horn(783.99, 6.89, 1.4);
-        [2093, 2637, 3136, 4186].forEach((f, i) => tone(f, 7.05 + i * 0.09, 0.35, 'sine', 0.03, bus));
-        BURSTS.forEach(([, , d]) => {
-            const o = tone(170, d, 0.28, 'sine', 0.11, bus);
+        const H = s.horns, C = s.chord;
+        [[392, 0, 0.15], [392, 0.18, 0.15], [392, 0.36, 0.15], [523.25, 0.54, 0.62], [659.25, 1.21, 0.2], [783.99, 1.45, 1.2]].forEach(n => horn(n[0], H + n[1], n[2]));
+        horn(523.25, H + 1.45, 1.2);
+        [[523.25, 0, 0.16], [659.25, 0.18, 0.16], [783.99, 0.36, 0.16], [1046.5, 0.54, 1.4]].forEach(n => horn(n[0], C + n[1], n[2]));
+        horn(659.25, C + 0.54, 1.4); horn(783.99, C + 0.54, 1.4);
+        [2093, 2637, 3136, 4186].forEach((f, i) => tone(f, s.title + i * 0.09, 0.35, 'sine', 0.03, bus));
+        s.glints.forEach(g => [3136, 4186].forEach((f, i) => tone(f, g + i * 0.07, 0.3, 'sine', 0.02, bus)));
+        s.bursts.forEach(d => {
+            const o = tone(170, d, 0.28, 'sine', s.thump, bus);
             o.frequency.exponentialRampToValueAtTime(48, t0 + d + 0.25);
         });
         return bus;
     }
 
-    // Plays the scene, then calls onDone (once, under the last flash, or at once on a skip).
+    const reducedMotion = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+    // Plays the film (or the drawn scene), then calls onDone (once, under the last flash, or at
+    // once on a skip).
     function play(onDone) {
         if (document.getElementById('intro')) return;
-        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) { onDone(); return; }
+        if (reducedMotion()) { onDone(); return; }
+        if (film === 'loading') film = 'late';
+        if (film === 'ready') {
+            const box = document.createElement('div');
+            box.id = 'intro'; box.className = 'in3d';
+            box.setAttribute('aria-label', 'פְּתִיחָה: שַׁעֲרֵי הַמַּמְלָכָה נִפְתָּחִים');
+            const TL = GaiaIntro3D.timeline;
+            box.innerHTML = '<div class="in3d-stage"></div>' + titleHTML(TL.title) +
+                '<div class="in-flash"></div><button class="in-skip" type="button">דִּלּוּג ⏭</button>';
+            document.body.appendChild(box);
+            try {
+                const show = GaiaIntro3D.play(box.querySelector('.in3d-stage'));
+                film = 'played';   // it is let go at the end, to free the memory for the games
+                run(box, onDone, TL.handoff * 1000, TL.length * 1000,
+                    { horns: TL.gates - 0.05, chord: TL.cheer - 0.36, title: TL.title + 0.1, glints: [1.35, 1.75], bursts: TL.bursts, thump: 0.08 },
+                    () => { show.stop(); GaiaIntro3D.dispose(); });
+                return;
+            } catch (e) {
+                console.warn('[intro3d] could not play', e);
+                film = 'no';
+                box.remove();
+            }
+        }
         const box = build();
         document.body.appendChild(box);
-        const sound = fanfare();
-        let handed = false;
+        run(box, onDone, HANDOFF, LENGTH, SCHEDULE_2D, () => {});
+    }
+
+    // The timers, the fanfare and the skip, shared by both: hand over at handoff (ms), remove at length.
+    function run(box, onDone, handoffAt, length, schedule, release) {
+        const sound = fanfare(schedule);
+        let handed = false, ended = false;
         const handoff = () => { if (!handed) { handed = true; onDone(); } };
-        const end = () => { box.remove(); document.removeEventListener('keydown', onKey); };
-        const timers = [setTimeout(handoff, HANDOFF), setTimeout(end, LENGTH)];
+        const end = () => {
+            if (ended) return;
+            ended = true;
+            box.remove(); document.removeEventListener('keydown', onKey);
+            try { release(); } catch (e) { console.warn('[intro]', e); }
+        };
+        const timers = [setTimeout(handoff, handoffAt), setTimeout(end, length)];
         const skip = () => {
             timers.forEach(clearTimeout);
             box.classList.add('in-skipping');
@@ -3747,9 +3803,66 @@ const GaiaPlayer = (function () {
         const onKey = e => { if (e.key === 'Escape') skip(); };
         box.querySelector('.in-skip').addEventListener('click', skip);
         document.addEventListener('keydown', onKey);
+        // if the graphics card drops the film, go straight on to the map
+        const canvas = box.querySelector('canvas');
+        if (canvas) canvas.addEventListener('webglcontextlost', skip, { once: true });
     }
 
-    window.GaiaIntro = { play };
+    // ----- the 3D film -----
+    // Fetched once the welcome screen is up; it builds its scene and checks this device can play
+    // it smoothly while the child is still on the welcome screen. Not under reduced motion, data
+    // saving or very little memory.
+    let film = null;   // null, 'loading', 'ready', 'played', 'late' (not ready in time) or 'no'
+    function introFaces() {   // the sisters' faces, drawn by the game's own girlFace
+        const out = {};
+        for (const who of ['yoovy', 'googy']) {
+            const yoovy = who === 'yoovy', look = GIRL_LOOKS[who];
+            const cx = 60, cy = yoovy ? 70 : 98, rx = yoovy ? 27.5 : 28.5, ry = yoovy ? 30.5 : 29, big = !yoovy;
+            const face = girlFace(cx, cy, look, big, 'full');
+            const ex = big ? 13 : 12, ey = cy + 4, erx = big ? 6.2 : 5.4, ery = big ? 7.2 : 6.4, P = look.pupil;
+            const svg = (hide, extra = '') => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${cx - rx} ${cy - ry} ${2 * rx} ${2 * ry}" width="512" height="512">` +
+                `<style>${hide}{display:none}</style>${face}${extra}</svg>`;
+            // shut eyes for blinking: a curve and a lash for each
+            const shut = [cx - ex, cx + ex].map((x, i) => {
+                const side = i ? 1 : -1;
+                return `<path d="M${x - erx} ${ey + 0.5} Q${x} ${ey + ery * 0.75} ${x + erx} ${ey + 0.5}" stroke="${P}" stroke-width="2.4" fill="none" stroke-linecap="round"/>` +
+                    `<path d="M${x + side * erx} ${ey + 0.5} l${side * 3} -1.6" stroke="${P}" stroke-width="1.5" stroke-linecap="round"/>`;
+            }).join('');
+            out[who] = {
+                open: svg('.g-mouth-grin,.g-mouth-sad,.g-mouth-o,.g-eyes-happy,.g-brows-up,.g-brows-sad,.g-drop'),
+                blink: svg('.g-mouth-grin,.g-mouth-sad,.g-mouth-o,.g-eyes-happy,.g-eyes-open,.g-brows-up,.g-brows-sad,.g-drop', shut),
+                laugh: svg('.g-mouth-happy,.g-mouth-sad,.g-mouth-o,.g-eyes-open,.g-brows-up,.g-brows-sad,.g-drop')
+            };
+        }
+        return out;
+    }
+    function preloadFilm() {
+        if (film) return;
+        const net = navigator.connection;
+        if (reducedMotion() || (net && net.saveData) || (navigator.deviceMemory && navigator.deviceMemory < 2)) { film = 'no'; return; }
+        film = 'loading';
+        const script = document.createElement('script');
+        script.src = 'intro3d.js?v=20261015';
+        script.async = true;
+        script.onerror = () => { film = 'no'; };
+        script.onload = () => {
+            const G = window.GaiaIntro3D;
+            if (!G || !G.supported()) { film = 'no'; return; }
+            G.prepare({ faces: introFaces(), width: innerWidth, height: innerHeight })
+                .then(() => window.__force3D || G.fits())
+                .then(ok => {
+                    if (film === 'loading' && ok) { film = 'ready'; return; }
+                    if (film === 'loading') film = 'no';
+                    G.dispose();   // too slow here, or the drawn intro has already played
+                })
+                .catch(e => { console.warn('[intro3d]', e); film = 'no'; try { G.dispose(); } catch (_) { /* nothing to free */ } });
+        };
+        document.head.appendChild(script);
+    }
+    if (document.readyState === 'complete') setTimeout(preloadFilm, 600);
+    else window.addEventListener('load', () => setTimeout(preloadFilm, 600));
+
+    window.GaiaIntro = { play, get film() { return film; } };
 })();
 </script>
 <script>

@@ -1,0 +1,12 @@
+{
+  "name": "gaia-intro3d",
+  "private": true,
+  "description": "The 3D royal intro of Yoovy & Googy (three.js), bundled into ../intro3d.js",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.12",
+    "three": "0.186.1"
+  }
+}
