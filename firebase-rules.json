@@ -3,7 +3,7 @@
     "boards": {
       ".read": true,
       "$land": {
-        ".validate": "$land.matches(/^(math|hebrew|reading|english|geography|biology|memory|puzzle)$/)",
+        ".validate": "$land.matches(/^(math|hebrew|reading|english|geography|biology|memory|puzzle|chess)$/)",
         "$game": {
           ".indexOn": ["k"],
           ".validate": "$game.matches(/^[a-z0-9_]{1,20}$/)",
