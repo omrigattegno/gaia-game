@@ -8,10 +8,10 @@ import { scaleUV, M } from './geo.js';
 import { CASTLE } from './castle.js';
 import * as T from './textures.js';
 
-export const LAMPS = Array.from({ length: 10 }, (_, i) => -5 - 6 * i);   // z of each pair
-export const LAMP_X = 2.3;
+const LAMPS = Array.from({ length: 10 }, (_, i) => -5 - 6 * i);   // z of each pair
+const LAMP_X = 2.3;
 
-export function groundHeight(x, z) {
+function groundHeight(x, z) {
     const out = Math.max(0, Math.abs(x) - 24) + Math.max(0, -96 - z) * 0.9 + Math.max(0, z - 34) * 0.6;
     const hills = 7 + 5 * Math.sin(x * 0.031 + z * 0.017) * Math.cos(z * 0.043 - x * 0.012) + 3 * Math.sin(x * 0.09 + 1.3) * Math.sin(z * 0.07);
     return (1 - Math.exp(-out / 26)) * hills;

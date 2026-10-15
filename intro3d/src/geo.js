@@ -124,13 +124,6 @@ export function scaleUV(g, su, sv = su) {
     return g;
 }
 
-// Planar uv from x,y (in units of `size`), for extruded pieces.
-export function planarUV(g, size = 1, ox = 0, oy = 0) {
-    const p = g.attributes.position, uv = new Float32Array(p.count * 2);
-    for (let i = 0; i < p.count; i++) { uv[i * 2] = (p.getX(i) - ox) / size; uv[i * 2 + 1] = (p.getY(i) - oy) / size; }
-    g.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
-    return g;
-}
 
 export const M = {};
 export function makeMaterials() {

@@ -1,13 +1,12 @@
 // Small helpers shared by the scene modules. Every animation in the intro is a pure function
 // of the time t (seconds from the start), so a frame can be drawn at any moment.
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
 export const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 export const lerp = (a, b, k) => a + (b - a) * k;
 export const smooth = (a, b, x) => { const k = clamp((x - a) / (b - a)); return k * k * (3 - 2 * k); };
 export const easeInOut = k => (k = clamp(k), k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
-export const easeOut = k => 1 - Math.pow(1 - clamp(k), 3);
-export const easeIn = k => Math.pow(clamp(k), 3);
 // rises from 0 at a to 1 at b, then back to 0 from c to d
 export const window4 = (x, a, b, c, d) => smooth(a, b, x) * (1 - smooth(c, d, x));
 
@@ -61,7 +60,6 @@ export const v3 = (x, y, z) => new THREE.Vector3(x, y, z);
 export const col = hex => new THREE.Color(hex);
 
 // Merges geometries that share one material into one mesh (fewer draw calls).
-import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 export function merged(geos, material, opts = {}) {
     const prepared = geos.map(g => {
         let geo = g.index ? g.toNonIndexed() : g;
