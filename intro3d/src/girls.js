@@ -6,7 +6,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { lock, slabShape, heartShape, starShape, M } from './geo.js';
-import { smooth, clamp, lerp } from './util.js';
+import { smooth, lerp } from './util.js';
 import * as T from './textures.js';
 
 const LOOKS = {
@@ -411,8 +411,6 @@ export function buildGirl(who, faceTex, mats) {
     blob.rotation.x = -Math.PI / 2; blob.position.y = 0.012;
     root.add(blob);
 
-    root.traverse(o => { if (o.isMesh && o !== blob && o !== face) o.receiveShadow = o.receiveShadow || false; });
-
     // --- poses ---
     const qa = new THREE.Quaternion(), qb = new THREE.Quaternion(), qc = new THREE.Quaternion(), e = new THREE.Euler();
     const dir = new THREE.Vector3(), tmp = new THREE.Vector3();
@@ -421,8 +419,6 @@ export function buildGirl(who, faceTex, mats) {
     const setFace = f => { if (f !== faceNow && faceTex[f]) { faceNow = f; faceMat.map = faceMat.emissiveMap = faceTex[f]; } };
     return {
         root, head, D, who,
-        // where her hand is when it holds her sister's (in her own space)
-        handFor(side) { return new THREE.Vector3(side * (D.shoulder[0] + 0.03), D.shoulder[1] - D.arm - 0.04, 0.03); },
         // st: { x, z, walk (0..1), dist, hold (0..1), holdTarget (local Vector3), holdSide, cheer (0..1), wave (0..1), jump, face, look }
         update(t, st) {
             root.position.set(st.x, 0, st.z);
@@ -438,9 +434,8 @@ export function buildGirl(who, faceTex, mats) {
             head.rotation.x = -0.04 + (st.nod || 0);
             head.rotation.y = st.look || 0;
             // legs swing as she walks
-            const lift = (st.cheer || 0) * 0;
-            legs[0].rotation.x = -Math.sin(ph) * 0.48 * w + lift;
-            legs[1].rotation.x = Math.sin(ph) * 0.48 * w - lift;
+            legs[0].rotation.x = -Math.sin(ph) * 0.48 * w;
+            legs[1].rotation.x = Math.sin(ph) * 0.48 * w;
             // arms: swinging, holding hands, cheering, waving
             for (let k = 0; k < 2; k++) {
                 const side = k ? 1 : -1, pivot = arms[k];
@@ -487,7 +482,6 @@ export function girlMaterials() {
         pinkDark: cloth('#E0407F', '#ffd0e4', 0.5),
         yellow: cloth('#FFD54F', '#fff3c0', 0.5),
         brooch: new THREE.MeshStandardMaterial({ color: '#FFD54F', metalness: 0.5, roughness: 0.45, emissive: '#7a5200', emissiveIntensity: 0.15 }),
-        lining: new THREE.MeshStandardMaterial({ color: '#f3cf7a', metalness: 0.55, roughness: 0.38, side: THREE.BackSide }),
         ermine: new THREE.MeshPhysicalMaterial({ color: '#ffffff', roughness: 1, sheen: 1, sheenColor: '#ffffff', sheenRoughness: 0.9, emissive: '#ffffff', emissiveIntensity: 0.08 }),
         ermineTail: new THREE.MeshStandardMaterial({ color: '#1d1a26', roughness: 0.9 }),
         blob: new THREE.MeshBasicMaterial({ map: blobTexture(), transparent: true, depthWrite: false, opacity: 0.55 }),

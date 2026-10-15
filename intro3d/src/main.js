@@ -14,7 +14,7 @@ import { buildCastle } from './castle.js';
 import { buildGrounds } from './grounds.js';
 import { buildGirl, girlMaterials } from './girls.js';
 import { buildFireworks, buildMotes, buildShower, BURSTS } from './fx.js';
-import { CAM, AIM, FOV, girlState, LENGTH, HANDOFF, CHEER, TITLE, GIRL_X } from './timeline.js';
+import { CAM, AIM, FOV, girlState, LENGTH, HANDOFF, CHEER, TITLE } from './timeline.js';
 
 let S = null;   // the stage, once prepared
 

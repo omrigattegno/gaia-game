@@ -43,7 +43,7 @@ const walked = t => {
     return SPEED * (a + u - u * u / (2 * L));
 };
 const TOTAL = walked(99);
-export const GIRLS_Z0 = Z_STOP - TOTAL;
+const GIRLS_Z0 = Z_STOP - TOTAL;
 export const GIRL_X = { yoovy: -0.27, googy: 0.27 };
 
 const blink = (t, at) => at.some(b => t > b && t < b + 0.13);

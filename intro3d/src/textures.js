@@ -292,33 +292,7 @@ export function petal() {
     return tex(c, { srgb: false });
 }
 
-// A soft vertical beam of light (for the rays through the open gates).
-export function beam() {
-    const W = 64, H = 256;
-    const [c, x] = canvas(W, H);
-    const img = x.createImageData(W, H), d = img.data;
-    for (let j = 0; j < H; j++) for (let i = 0; i < W; i++) {
-        const u = Math.abs(i / (W - 1) - 0.5) * 2, v = j / (H - 1);
-        const a = Math.pow(1 - u, 2.2) * Math.pow(1 - v, 1.4) * Math.min(1, v * 8);
-        const k = (j * W + i) * 4;
-        d[k] = d[k + 1] = d[k + 2] = 255; d[k + 3] = a * 255;
-    }
-    x.putImageData(img, 0, 0);
-    return tex(c, { srgb: false });
-}
 
-// Ermine: white fur with soft streaks.
-export function fur() {
-    const S = 128, R = rng(31);
-    const [c, x] = canvas(S);
-    x.fillStyle = '#f4f1ff'; x.fillRect(0, 0, S, S);
-    for (let i = 0; i < 900; i++) {
-        x.strokeStyle = R() < 0.5 ? 'rgba(255,255,255,0.8)' : 'rgba(190,185,215,0.5)';
-        const px = R() * S, py = R() * S;
-        x.lineWidth = 1; x.beginPath(); x.moveTo(px, py); x.lineTo(px + (R() - 0.5) * 4, py + 4 + R() * 5); x.stroke();
-    }
-    return tex(c, { repeat: true });
-}
 
 // An SVG drawing (a face) turned into a texture; resolves when drawn.
 export function fromSVG(svg, size = 512) {

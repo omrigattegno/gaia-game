@@ -2,11 +2,11 @@
 // scrolled in gold with a crest on each ("Y" and "G"), lanterns, banners, and the light
 // waiting behind the doors.
 import * as THREE from 'three';
-import { merged, placed, col, smooth, clamp, easeInOut, window4 } from './util.js';
+import { merged, placed, col, smooth, easeInOut, window4 } from './util.js';
 import { tube, arc, spiral, slab, slabShape, heartShape, crownShape, M, scaleUV } from './geo.js';
 import * as T from './textures.js';
 
-export const G = { halfW: 3.1, spring: 4.6, top: 9.5, depth: 2.4, towerX: 7.0 };
+const G = { halfW: 3.1, spring: 4.6, top: 9.5, depth: 2.4, towerX: 7.0 };
 export const GATE_OPEN = [2.5, 4.3];   // seconds: the doors swing from closed to open
 
 export function buildGate(mats) {
