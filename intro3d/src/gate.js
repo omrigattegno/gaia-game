@@ -128,7 +128,7 @@ export function buildGate(mats) {
 
     // --- the cobbled square in front ---
     const sq = new THREE.PlaneGeometry(90, 46, 1, 1);
-    scaleUV(sq, 14, 7);   // big, soft stones: small sharp ones shimmered as the camera moved in
+    scaleUV(sq, 30, 15);
     const square = new THREE.Mesh(sq, mats.cobbles);
     square.rotation.x = -Math.PI / 2; square.position.set(0, 0.02, 23 - 1.3);
     square.receiveShadow = true;

@@ -44,8 +44,8 @@ function sceneMaterials() {
     return {
         stone: stoneMat(), castleStone,
         roofPink: roof('#e2559a'), roofPurple: roof('#7a4ae0'),
-        cobbles: new THREE.MeshStandardMaterial({ map: cob.map, normalMap: cob.normalMap, normalScale: new THREE.Vector2(0.6, 0.6), roughness: 0.8, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -2 }),
-        grass: new THREE.MeshStandardMaterial({ map: grass.map, normalMap: grass.normalMap, roughness: 0.95, color: '#eaffdc' }),
+        cobbles: new THREE.MeshStandardMaterial({ map: cob.map, normalMap: cob.normalMap, roughness: 0.72, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -2 }),
+        grass: new THREE.MeshStandardMaterial({ map: grass.map, normalMap: grass.normalMap, roughness: 0.95, color: '#c8dcc0' }),
         carpet: new THREE.MeshPhysicalMaterial({ map: T.carpet(), roughness: 0.9, sheen: 0.7, sheenColor: '#c8204f', sheenRoughness: 0.5 }),
         window: new THREE.MeshBasicMaterial({ map: win, transparent: true, color: new THREE.Color(2.3, 1.85, 1.3) }),
         windowLit: new THREE.MeshBasicMaterial({ map: win, transparent: true, vertexColors: true, color: new THREE.Color(2.3, 1.85, 1.3) }),
@@ -56,10 +56,10 @@ function sceneMaterials() {
         iron: new THREE.MeshStandardMaterial({ color: '#2c2840', metalness: 0.7, roughness: 0.42 }),
         pot: new THREE.MeshStandardMaterial({ color: '#f4eefc', roughness: 0.45 }),
         trunk: new THREE.MeshStandardMaterial({ color: '#5a3d2b', roughness: 0.9 }),
-        leaf: new THREE.MeshStandardMaterial({ color: '#3f9052', roughness: 0.8, normalMap: grass.normalMap, normalScale: new THREE.Vector2(1.4, 1.4) }),
-        hedge: new THREE.MeshStandardMaterial({ color: '#3a8148', roughness: 0.85, normalMap: grass.normalMap, normalScale: new THREE.Vector2(1.6, 1.6) }),
-        tree: new THREE.MeshStandardMaterial({ color: '#3a765a', roughness: 0.9 }),
-        pine: new THREE.MeshStandardMaterial({ color: '#2d6553', roughness: 0.9 }),
+        leaf: new THREE.MeshStandardMaterial({ color: '#2f7040', roughness: 0.8, normalMap: grass.normalMap, normalScale: new THREE.Vector2(1.4, 1.4) }),
+        hedge: new THREE.MeshStandardMaterial({ color: '#2a6338', roughness: 0.85, normalMap: grass.normalMap, normalScale: new THREE.Vector2(1.6, 1.6) }),
+        tree: new THREE.MeshStandardMaterial({ color: '#2a5546', roughness: 0.9 }),
+        pine: new THREE.MeshStandardMaterial({ color: '#1f463e', roughness: 0.9 }),
         flower: new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.6, emissive: '#ffffff', emissiveIntensity: 0.08 }),
         pool: new THREE.MeshBasicMaterial({ map: T.glow(1.5), color: '#ffb35c', transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, vertexColors: true, opacity: 0.38 }),
         ...girlMaterials()
@@ -100,7 +100,7 @@ function vignette() {
         transparent: true, depthTest: false, depthWrite: false,
         vertexShader: 'varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
         fragmentShader: `varying vec2 vUv; void main() { vec2 q = vUv - 0.5; float v = clamp(1.0 - dot(q, q) * 1.25, 0.0, 1.0);
-            gl_FragColor = vec4(0.0, 0.0, 0.0, 0.42 * (1.0 - v)); }`
+            gl_FragColor = vec4(0.0, 0.0, 0.0, 0.65 * (1.0 - v)); }`
     }));
     m.frustumCulled = false;
     m.renderOrder = 999;
@@ -120,12 +120,12 @@ async function prepare(opts = {}) {
     canvas.className = 'in3d-canvas';
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, stencil: false, powerPreference: 'high-performance' });
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.2;
+    renderer.toneMappingExposure = 1.0;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFShadowMap;
     T.setAnisotropy(Math.min(8, renderer.capabilities.getMaxAnisotropy()));
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(col('#5e4c9e'), 0.0034);
+    scene.fog = new THREE.FogExp2(col('#2b1c52'), 0.0042);
     const camera = new THREE.PerspectiveCamera(40, 16 / 9, 0.25, 2500);
 
     makeMaterials();
@@ -133,7 +133,7 @@ async function prepare(opts = {}) {
     const mats = sceneMaterials();
     const env = buildEnvironment(renderer);
     scene.environment = env.texture;
-    scene.environmentIntensity = 0.65;
+    scene.environmentIntensity = 0.42;
 
     const sky = buildSky(); scene.add(sky.group);
     const gate = buildGate(mats); scene.add(gate.group);
@@ -149,8 +149,8 @@ async function prepare(opts = {}) {
 
     // lights: the moon, the night sky, a warm key on the sisters from the open gates, a warm rim
     // from the castle, a glow inside the gates as they open
-    const hemi = new THREE.HemisphereLight(col('#aebcff'), col('#5c4272'), 0.9);
-    const moon = new THREE.DirectionalLight(col('#cdd5ff'), 1.9);
+    const hemi = new THREE.HemisphereLight(col('#5a6cc0'), col('#2a1838'), 0.35);
+    const moon = new THREE.DirectionalLight(col('#b9c6ff'), 1.25);
     moon.castShadow = true;
     moon.shadow.mapSize.set(2048, 2048);
     moon.shadow.camera.left = -11; moon.shadow.camera.right = 11; moon.shadow.camera.top = 11; moon.shadow.camera.bottom = -11;
@@ -220,11 +220,11 @@ async function prepare(opts = {}) {
         // lights through the film
         const open = smooth(GATE_OPEN[0], GATE_OPEN[0] + 0.8, t);
         const flood = window4(t, GATE_OPEN[0], GATE_OPEN[0] + 0.45, GATE_OPEN[0] + 0.7, GATE_OPEN[0] + 1.3);
-        inner.intensity = flood * 28 + open * 6;
+        inner.intensity = flood * 40 + open * 6;
         key.intensity = open * 30;
         rim.intensity = open * 2.2;
-        hemi.intensity = 0.9 + fl.flash * 0.25;
-        renderer.toneMappingExposure = 1.2 + flood * 0.04;
+        hemi.intensity = 0.35 + fl.flash * 0.25;
+        renderer.toneMappingExposure = 1.0 + flood * 0.12;
         // the moon's shadows follow the action: the gate, then the sisters; they glide across
         // and move in whole shadow-map texels, so the edges don't crawl as the sisters walk
         F.copy(yoovy.root.position).x += 0.27;
@@ -234,7 +234,7 @@ async function prepare(opts = {}) {
         const focus = F.set(0, 0, 0).addScaledVector(LX, lx).addScaledVector(LY, ly).addScaledVector(MOON_DIR, lz);
         moon.target.position.copy(focus);
         moon.position.copy(focus).addScaledVector(MOON_DIR, 70);
-        bloom.strength = 0.6 + flood * 0.15;
+        bloom.strength = 0.6 + flood * 0.25;
         composer.render();
     };
 

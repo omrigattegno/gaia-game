@@ -3987,7 +3987,7 @@ const GaiaPlayer = (function () {
         if (reducedMotion() || (net && net.saveData) || (navigator.deviceMemory && navigator.deviceMemory < 2)) { film = 'no'; return; }
         film = 'loading';
         const script = document.createElement('script');
-        script.src = 'intro3d.js?v=20261016';
+        script.src = 'intro3d.js?v=20261016b';
         script.async = true;
         script.onerror = () => { film = 'no'; };
         script.onload = () => {
