@@ -1,5 +1,5 @@
 // The film: when things happen, where the camera goes, and what the sisters do.
-//   0.0  the golden gates at night, lanterns flickering, gold dust in the air
+//   0.0  the golden gates at twilight, lanterns glowing, gold dust in the air
 //   1.4  a glint runs over the crests
 //   2.5  the gates open: light floods out, the lamps light up along the carpet
 //   4.0  through the gates: the castle, fireworks, the sisters walking hand in hand

@@ -44,6 +44,7 @@
             --land-biology:   oklch(0.62 0.13 180);
             --land-memory:    oklch(0.66 0.15 210);
             --land-puzzle:    oklch(0.72 0.17 70);
+            --land-chess:     oklch(0.58 0.11 52);
 
             /* The land being played (body[data-land]): its colour, a deep shade for the 3D edges,
                a soft tint for the question area and a light line colour. Default: the kingdom's purple. */
@@ -114,8 +115,9 @@
         body[data-land="biology"]   { --lt: oklch(0.55 0.11 192); --lt-deep: oklch(0.42 0.09 195); --lt-soft: oklch(0.97 0.02 190);  --lt-line: oklch(0.88 0.05 190); }
         body[data-land="memory"]    { --lt: oklch(0.55 0.17 285); --lt-deep: oklch(0.42 0.15 285); --lt-soft: oklch(0.97 0.025 285); --lt-line: oklch(0.88 0.06 285); }
         body[data-land="puzzle"]    { --lt: oklch(0.64 0.16 70);  --lt-deep: oklch(0.50 0.14 60);  --lt-soft: oklch(0.97 0.035 85);  --lt-line: oklch(0.89 0.08 80); }
+        body[data-land="chess"]     { --lt: oklch(0.55 0.10 52);  --lt-deep: oklch(0.42 0.09 45);  --lt-soft: oklch(0.97 0.02 75);   --lt-line: oklch(0.88 0.05 65); }
         #land-scene { position: absolute; inset: 0; display: none; }
-        #land-scene svg { display: block; width: 100%; height: 100%; }
+        #land-scene > svg { display: block; width: 100%; height: 100%; }
         body[data-land] #land-scene { display: block; }
         body[data-land] #kg-castle, body[data-land] .kg-star, body[data-land] .kg-sparkle { display: none; }
         body[data-land="biology"] .kg-cloud { display: none; }   /* inside the cave */
@@ -456,6 +458,7 @@
             font-family: 'Fredoka', 'Courier New', monospace; margin: 22px 0;
             direction: ltr; unicode-bidi: bidi-override; white-space: nowrap;
         }
+        .math-display.wide { font-size: clamp(2rem, 10.5vw, 3.4rem); }
 
         .options-container { display: flex; justify-content: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
 
@@ -791,6 +794,15 @@
             line-height: 1.9; color: var(--ink); unicode-bidi: embed;
             margin: 8px 0; padding: 0 4px;
         }
+        /* the longer third-grade stories: paragraphs in a book-sized font */
+        .reading-para {
+            direction: rtl; text-align: right; font-size: 1.15rem; line-height: 1.8;
+            color: var(--ink); margin: 0 0 12px; padding: 0 4px; text-indent: 1em;
+        }
+        .reading-story-box:has(.reading-para) { max-height: min(56dvh, 460px); }
+        .reading-peek { direction: rtl; text-align: right; margin: 0 0 6px; }
+        .reading-peek summary { cursor: pointer; font-weight: bold; color: var(--lt-deep); font-size: 1.05rem; padding: 4px 0; }
+        .reading-peek .reading-story-box { max-height: 34dvh; margin-top: 6px; }
         /* the story is printed on a book page, with a ribbon for a bookmark */
         .reading-story-box {
             position: relative; background: linear-gradient(180deg, oklch(0.995 0.015 90), oklch(0.975 0.03 85));
@@ -1331,6 +1343,96 @@
         .in3d .in-sub2 { animation-delay: 12.1s; }
         .in3d .in-flash { bottom: 42vh; animation-delay: 12.75s; }
 
+        /* =========================================================
+           THE CHESS GARDEN: the board, its pieces, the lessons
+           ========================================================= */
+        #chess-screen.screen { width: 98%; max-width: 620px; }
+        #chess-screen .game-container { padding: 64px 10px 12px; justify-content: flex-start; min-height: 0; }
+        #chess-mode { flex-shrink: 1; }
+        #chess-status { flex-shrink: 0; color: var(--lt-deep); }
+        .chess-stage { position: relative; width: min(100%, calc(100dvh - 300px)); min-width: 248px; margin: 0 auto; }
+        #chess-screen.chess-learning .chess-stage { width: min(100%, calc(100dvh - 380px)); }
+        .chess-board {
+            position: relative; width: 100%; aspect-ratio: 1; display: grid;
+            grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr);
+            border-radius: 10px; overflow: hidden; touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+            box-shadow: 0 0 0 5px var(--lt-deep), 0 0 0 8px var(--lt-line), 0 10px 24px oklch(0.3 0.06 60 / 0.35);
+        }
+        .chess-sq { position: relative; cursor: pointer; }
+        .chess-sq.light { background: oklch(0.95 0.035 95); }
+        .chess-sq.dark { background: oklch(0.66 0.10 145); }
+        .chess-sq .crd { position: absolute; font: 700 clamp(8px, 2.3vw, 12px)/1 'Fredoka', sans-serif; pointer-events: none; z-index: 1; }
+        .chess-sq .crd-f { right: 3px; bottom: 2px; }
+        .chess-sq .crd-r { left: 3px; top: 2px; }
+        .chess-sq.light .crd { color: oklch(0.55 0.10 145); }
+        .chess-sq.dark .crd { color: oklch(0.96 0.03 95); }
+        /* the last move, the chosen piece, a king in check, a hint */
+        .chess-sq.last::before, .chess-sq.sel::before, .chess-sq.check::before, .chess-sq.hint::before { content: ''; position: absolute; inset: 0; }
+        .chess-sq.last::before { background: oklch(0.90 0.14 100 / 0.55); }
+        .chess-sq.sel::before { background: oklch(0.86 0.17 92 / 0.85); }
+        .chess-sq.check::before { background: radial-gradient(circle, oklch(0.62 0.24 25) 0%, oklch(0.65 0.22 25 / 0.75) 38%, oklch(0.7 0.2 25 / 0) 72%); }
+        .chess-sq.hint::before { box-shadow: inset 0 0 0 4px oklch(0.80 0.17 85); animation: chess-hint 0.8s ease-in-out infinite alternate; }
+        @keyframes chess-hint { from { opacity: 0.45; } to { opacity: 1; } }
+        /* where the chosen piece can go: a dot, or a ring around a piece it can take */
+        .chess-sq.dot::after, .chess-sq.cap::after { content: ''; position: absolute; z-index: 3; pointer-events: none; border-radius: 50%; }
+        .chess-sq.dot::after { left: 50%; top: 50%; width: 30%; height: 30%; transform: translate(-50%, -50%); background: oklch(0.42 0.12 150 / 0.5); }
+        .chess-sq.cap::after { inset: 4%; border: 4px solid oklch(0.58 0.20 25 / 0.7); }
+        .chess-layer { position: absolute; inset: 0; pointer-events: none; }
+        .chess-pc { position: absolute; left: 0; top: 0; width: 12.5%; height: 12.5%; z-index: 2; transition: transform 0.24s cubic-bezier(.3, .8, .4, 1); }
+        .chess-pc svg { display: block; width: 100%; height: 100%; filter: drop-shadow(0 2px 1px oklch(0.25 0.05 300 / 0.35)); }
+        .chess-pc.moving { z-index: 4; }
+        .chess-pc.gone { animation: chess-gone 0.28s ease-in forwards; }
+        @keyframes chess-gone { to { opacity: 0; filter: blur(2px); } }
+        /* lesson stars, and the pop when one is collected */
+        .chess-star { position: absolute; inset: 0; display: grid; place-items: center; font-size: clamp(18px, 6vw, 34px); z-index: 1; pointer-events: none; animation: chess-star 1.4s ease-in-out infinite; }
+        .chess-star.got { animation: chess-got 0.4s ease-in forwards; }
+        @keyframes chess-star { 50% { transform: scale(1.15) rotate(8deg); } }
+        @keyframes chess-got { to { transform: scale(2) rotate(40deg); opacity: 0; } }
+        /* the pieces each side has taken */
+        .chess-tray { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 1px; min-height: 28px; margin: 4px auto; }
+        .chess-tray .tp { width: 24px; height: 24px; }
+        .chess-tray .tp svg { width: 100%; height: 100%; display: block; }
+        .chess-tray .adv { margin-inline-start: 6px; font: 700 0.95rem 'Fredoka', sans-serif; color: var(--lt-deep); }
+        .chess-actions { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+        .chess-act {
+            border: 2px solid var(--lt-line); border-radius: 999px; padding: 8px 15px; cursor: pointer;
+            font: inherit; font-size: 1.02rem; font-weight: bold; color: var(--lt-deep); background: var(--surface);
+            box-shadow: 0 3px 0 var(--lt-line); transition: transform var(--t-ui) var(--ease-out-quart);
+        }
+        .chess-act:active { transform: translateY(2px); }
+        .chess-act:disabled { opacity: 0.4; cursor: default; }
+        .chess-lesson { margin: 2px 0 8px; }
+        .chess-lesson .land-guide-bubble { font-size: 0.98rem; }
+        /* over the board: choosing the new piece; over the whole card: the end of a game or a lesson */
+        .chess-promo, .chess-end {
+            position: absolute; inset: 0; z-index: 6; display: grid; place-items: center;
+            background: oklch(0.2 0.04 150 / 0.45); border-radius: 10px;
+        }
+        .chess-end { z-index: 20; border-radius: 0; padding: 12px; }
+        .chess-promo[hidden], .chess-end[hidden] { display: none; }
+        .chess-promo-box, .chess-end-box {
+            background: var(--surface); border-radius: 22px; padding: 14px 16px; text-align: center;
+            box-shadow: 0 10px 30px oklch(0.2 0.05 300 / 0.35); animation: popIn 0.35s var(--ease-out-quart);
+            width: min(94%, 360px); max-height: 100%; overflow-y: auto;
+        }
+        .chess-promo-box p { margin: 0 0 8px; font-weight: bold; color: var(--lt-deep); }
+        .chess-promo-row { display: flex; justify-content: center; gap: 6px; }
+        .chess-promo-row button { width: 62px; height: 62px; padding: 4px; border-radius: 14px; border: 2px solid var(--lt-line); background: oklch(0.95 0.035 95); cursor: pointer; }
+        .chess-promo-row svg { width: 100%; height: 100%; display: block; }
+        .chess-end-icon { font-size: 3rem; line-height: 1.1; }
+        .chess-end-box h2 { margin: 4px 0; font-size: 1.5rem; color: var(--lt-deep); }
+        .chess-end-line { margin: 0 0 4px; color: var(--ink-soft); line-height: 1.4; }
+        .chess-end-box .stars-earned { font-size: 2.1rem; margin: 2px 0 4px; }
+        .chess-end-actions { display: flex; gap: 8px; justify-content: center; }
+        .chess-end-actions .big-btn, .chess-lesson-done .big-btn { margin: 8px 0 0; padding: 12px 16px; font-size: 1.1rem; }
+        .btn-chess { background: linear-gradient(135deg, oklch(0.62 0.11 55), oklch(0.48 0.10 45)); }
+        /* the sisters stand in the corner only where they leave the board free */
+        @media (max-width: 900px) { body:has(#chess-screen.active) #gaia-char { display: none; } }
+        @media (prefers-reduced-motion: reduce) {
+            .chess-pc { transition: none; }
+            .chess-star, .chess-sq.hint::before, .chess-pc.gone { animation: none; }
+        }
+
         /* --- reduced motion: collapse map/parallax/character motion to instant --- */
         @media (prefers-reduced-motion: reduce) {
             #gaia-char .girl, .kg-cloud, .kg-sparkle, .kg-star, .map-cloud,
@@ -1575,6 +1677,30 @@
             </div>
             <div id="googy-end"></div>
             <button class="home-btn" onclick="goHome()">🏠</button>
+        </div>
+    </div>
+
+    <!-- ===== THE CHESS GARDEN ===== -->
+    <div id="chess-screen" class="screen">
+        <div class="game-container">
+            <div class="hud-container">
+                <div id="chess-mode"></div>
+                <div id="chess-status" aria-live="polite"></div>
+            </div>
+            <div id="chess-lesson" class="land-guide chess-lesson" hidden></div>
+            <div class="chess-tray" id="chess-tray-top"></div>
+            <div class="chess-stage">
+                <div id="chess-board" class="chess-board" dir="ltr" aria-label="לוּחַ הַשַּׁחְמָט"></div>
+                <div id="chess-promo" class="chess-promo" hidden></div>
+            </div>
+            <div class="chess-tray" id="chess-tray-bottom"></div>
+            <div class="chess-actions">
+                <button class="chess-act" id="chess-undo" type="button">↩️ אָחוֹרָה</button>
+                <button class="chess-act" id="chess-hint" type="button">💡 רֶמֶז</button>
+                <button class="chess-act" id="chess-restart" type="button">🔄 מֵחָדָשׁ</button>
+            </div>
+            <button class="home-btn" onclick="goHome()" aria-label="חֲזָרָה לַמַּפָּה">🏠</button>
+            <div id="chess-end" class="chess-end" hidden></div>
         </div>
     </div>
 
@@ -2376,6 +2502,7 @@ const GaiaPlayer = (function () {
             if (currentGameType === 'biology') return 30;
             if (currentGameType === 'english' && currentLevel === 4) return 25;
             if (currentGameType === 'english' && currentLevel === 0) return 20;
+            if (currentGameType === 'math' && currentLevel === 100) return 25;
             return 15;
         }
         let timeLeft = 15;
@@ -3195,7 +3322,18 @@ const GaiaPlayer = (function () {
             document.getElementById('options').className = "options-container";
             const isAddition = Math.random() > 0.5;
             let n1, n2;
-            if (isAddition) {
+            if (currentLevel === 100) {
+                // up to 100: two-digit numbers, so the sums and differences cross the tens
+                if (isAddition) {
+                    n1 = 10 + Math.floor(Math.random() * 81);                // 10..90
+                    n2 = 1 + Math.floor(Math.random() * (100 - n1));         // 1..100-n1 → sum ≤ 100
+                } else {
+                    n1 = 11 + Math.floor(Math.random() * 90);                // 11..100
+                    n2 = 1 + Math.floor(Math.random() * (n1 - 1));           // 1..n1-1
+                }
+                currentAnswer = isAddition ? n1 + n2 : n1 - n2;
+                container.innerHTML = `<div class="math-display wide">${n1} ${isAddition ? '+' : '-'} ${n2} = ?</div>`;
+            } else if (isAddition) {
                 n1 = Math.floor(Math.random() * (currentLevel - 1)) + 1;   // 1..N-1
                 n2 = Math.floor(Math.random() * (currentLevel - n1 + 1));  // 0..N-n1 → sum ≤ N
                 currentAnswer = n1 + n2;
@@ -3470,6 +3608,13 @@ const GaiaPlayer = (function () {
                 while (options.length < 3) {
                     let rand = allLetters[Math.floor(Math.random() * allLetters.length)];
                     if (!options.includes(rand)) options.push(rand);
+                }
+            } else if (type === 'math' && currentLevel === 100) {
+                // the slips a child makes with big numbers: a ten off, or one or two off
+                const offsets = shuffle([-10, 10, -10, 10, -1, 1, -2, 2, -11, 11, -9, 9]);
+                for (const off of offsets) {
+                    const rand = correct + off;
+                    if (options.length < 3 && rand >= 0 && rand <= 110 && !options.includes(rand)) options.push(rand);
                 }
             } else {
                 while (options.length < 3) {
@@ -3842,7 +3987,7 @@ const GaiaPlayer = (function () {
         if (reducedMotion() || (net && net.saveData) || (navigator.deviceMemory && navigator.deviceMemory < 2)) { film = 'no'; return; }
         film = 'loading';
         const script = document.createElement('script');
-        script.src = 'intro3d.js?v=20261015';
+        script.src = 'intro3d.js?v=20261016';
         script.async = true;
         script.onerror = () => { film = 'no'; };
         script.onload = () => {
@@ -4198,6 +4343,105 @@ const readingData = [
         ]
       }
     ]
+  },
+  {
+    // third grade: longer stories in paragraphs, without nikkud, and four questions each
+    category: "grade3",
+    label: "סִפּוּרִים לְכִתָּה ג׳",
+    doneLine: "כָּל הַסִּפּוּרִים לְכִתָּה ג׳ נִקְרְאוּ!",
+    plain: true,
+    stories: [
+      {
+        title: "המפה הישנה 🗺️",
+        paragraphs: [
+          "ביום שישי בבוקר עלתה נועה עם אחיה הקטן, איתי, לעליית הגג של סבתא. הם חיפשו את קופסת המשחקים הישנה, אבל מצאו משהו אחר לגמרי: נייר מקופל וצהוב, מכוסה באבק.",
+          "כשפתחו את הנייר, ראו שזו מפה. במרכז הייתה מצוירת החצר של סבתא, ולידה עץ הלימון הגדול. מהעץ יצא קו מקווקו אל איקס אדום ליד הגדר. מתחת לאיקס היה כתוב: \"האוצר שלי\".",
+          "הילדים לקחו כף חפירה ורצו לחצר. הם ספרו עשרה צעדים מהעץ, בדיוק כמו במפה, והתחילו לחפור. אחרי זמן קצר הכף נגעה במשהו קשה. זו הייתה קופסת פח קטנה וחלודה.",
+          "בתוך הקופסה מצאו גולות צבעוניות, משרוקית ותמונה של ילדה עם צמות. \"זאת אני, כשהייתי בת תשע!\" צחקה סבתא. \"ציירתי את המפה הזאת לפני שישים שנה, ושכחתי ממנה לגמרי.\" באותו ערב שיחקו שלושתם בגולות, וסבתא סיפרה להם איך נראתה השכונה כשהייתה ילדה."
+        ],
+        questions: [
+          { q: "מה חיפשו הילדים בעליית הגג?", options: ["מפה ישנה", "קופסת משחקים", "כף חפירה"], a: 1 },
+          { q: "איפה סומן האוצר במפה?", options: ["ליד הגדר", "בתוך עץ הלימון", "בעליית הגג"], a: 0 },
+          { q: "מי הייתה הילדה שבתמונה?", options: ["נועה", "אמא של נועה", "סבתא"], a: 2 },
+          { q: "למה סבתא צחקה?", options: ["כי איתי נפל לבור", "כי מצאו מפה שהיא עצמה ציירה ושכחה", "כי הגולות היו מצחיקות"], a: 1 }
+        ]
+      },
+      {
+        title: "למה צריך דבורים? 🐝",
+        paragraphs: [
+          "רוב האנשים מכירים את הדבורה בגלל הדבש המתוק, או בגלל העקיצה הכואבת. אבל לדבורים יש תפקיד חשוב הרבה יותר: הן עוזרות לצמחים ליצור פירות.",
+          "כשדבורה נוחתת על פרח כדי לשתות צוף, אבקה צהובה ודקה נדבקת לשערות שעל גופה. כשהיא עפה לפרח הבא, חלק מהאבקה נופל עליו. המעבר הזה של אבקה מפרח לפרח נקרא האבקה, ובזכותו הפרח יכול להפוך לפרי.",
+          "תפוחים, אבטיחים, שקדים ומלפפונים הם רק חלק מהמאכלים שצריכים את עזרת הדבורים. בלי דבורים היו על המדפים בסופר הרבה פחות פירות וירקות.",
+          "היום יש בעולם פחות דבורים מבעבר. גם ילדים יכולים לעזור להן: לשתול פרחים במרפסת או בחצר, ולא לפגוע בדבורה שנוחתת לידם. דבורה שעסוקה באיסוף צוף לא תעקוץ, אם לא מפריעים לה."
+        ],
+        questions: [
+          { q: "מה התפקיד החשוב של הדבורים, לפי הטקסט?", options: ["לעקוץ אנשים", "לעזור לצמחים ליצור פירות", "לקשט את הגינה"], a: 1 },
+          { q: "מה נדבק לשערות של הדבורה?", options: ["אבקה", "דבש", "טיפות מים"], a: 0 },
+          { q: "מה פירוש המילה \"האבקה\" בטקסט?", options: ["עקיצה של דבורה", "הכנת דבש בכוורת", "מעבר של אבקה מפרח לפרח"], a: 2 },
+          { q: "מה כדאי לעשות כשדבורה נוחתת לידנו?", options: ["לברוח מהר", "לא להפריע לה", "לנסות לתפוס אותה"], a: 1 }
+        ]
+      },
+      {
+        title: "הפתעה לסבא 🎁",
+        paragraphs: [
+          "בעוד שבוע יחגוג סבא אברהם יום הולדת שבעים. התאומים עומר ומאיה רצו לתת לו מתנה מיוחדת, אבל בקופה שלהם היו רק עשרים שקלים.",
+          "\"אפשר לקנות לו עט,\" הציע עומר. \"עטים יש לו כבר עשרה,\" ענתה מאיה. \"בוא נכין משהו בעצמנו.\" הם ישבו וחשבו, עד שמאיה נזכרה שסבא תמיד מספר סיפורים מהילדות שלו, ותמיד אומר: \"חבל שאף אחד לא כותב את זה.\"",
+          "כל יום אחרי בית הספר התקשרו התאומים לסבתא, ושאלו אותה על סבא: איפה גדל, באילו משחקים שיחק, ומה עשה כשהיה בגילם. עומר כתב את הסיפורים, ומאיה ציירה ציור לכל סיפור. בעשרים השקלים קנו כריכה יפה, וחיברו את כל הדפים לספר.",
+          "ביום ההולדת פתח סבא את המתנה ושתק רגע ארוך. אחר כך הרכיב את המשקפיים והתחיל לקרוא בקול. כשהגיע לסיפור על הכלב שהיה לו בילדות, ראו כולם שהעיניים שלו נוצצות. \"זאת המתנה הכי יפה שקיבלתי אי פעם,\" אמר, וחיבק את שניהם."
+        ],
+        questions: [
+          { q: "למה התאומים לא קנו לסבא עט?", options: ["כי לא היה להם כסף בכלל", "כי יש לו כבר הרבה עטים", "כי סבא לא אוהב לכתוב"], a: 1 },
+          { q: "מה עשתה מאיה בספר?", options: ["כתבה את הסיפורים", "ציירה ציורים", "קנתה את הדפים"], a: 1 },
+          { q: "ממי שמעו התאומים את הסיפורים על סבא?", options: ["מסבתא", "מהספרנית", "מהמורה"], a: 0 },
+          { q: "למה העיניים של סבא נצצו?", options: ["כי הוא היה עייף", "כי האור בחדר היה חזק", "כי הוא התרגש מהמתנה"], a: 2 }
+        ]
+      },
+      {
+        title: "שמשון הלך לאיבוד 🐕",
+        paragraphs: [
+          "שמשון הוא כלב קטן וחום, עם אוזן אחת עומדת ואוזן אחת מקופלת. הוא גר עם משפחת לוי, ואוהב שלושה דברים: לרדוף אחרי יונים, לישון על הספה ולאכול נקניקיות.",
+          "ביום ראשון בערב שכח מישהו לסגור את השער. כשאריאל, הבן של המשפחה, יצא לחצר לקרוא לשמשון לארוחת הערב, הכלב לא הגיע. אריאל חיפש מתחת לעץ, מאחורי המחסן ובכל הרחוב, אבל שמשון נעלם.",
+          "המשפחה הדפיסה מודעות עם תמונה של שמשון, ותלתה אותן בכל השכונה. בלילה אריאל לא הצליח להירדם. הוא דמיין את שמשון לבד בחושך, קר ורעב.",
+          "למחרת בבוקר צלצל הטלפון. \"שלום, אני מהמאפייה שבסוף הרחוב,\" אמרה אישה. \"יש פה כלב קטן עם אוזן מקופלת, שיושב ליד הדלת כבר שעה ומסתכל על הנקניקיות בחלון.\" אריאל רץ למאפייה, ושמשון קפץ עליו וליקק לו את הפנים. מאז אריאל בודק בכל ערב שהשער סגור."
+        ],
+        questions: [
+          { q: "איך אפשר לזהות את שמשון?", options: ["יש לו זנב ארוך ולבן", "יש לו אוזן אחת מקופלת", "יש לו קולר אדום"], a: 1 },
+          { q: "איך יצא שמשון מהחצר?", options: ["השער נשאר פתוח", "הוא קפץ מעל הגדר", "הוא חפר בור"], a: 0 },
+          { q: "למה, לדעתכם, חיכה שמשון דווקא ליד המאפייה?", options: ["כי הוא היה עייף", "כי הוא אוהב נקניקיות", "כי אריאל חיכה לו שם"], a: 1 },
+          { q: "מה למד אריאל מהמקרה?", options: ["לבדוק שהשער סגור", "לא לגדל כלבים", "לקנות נקניקיות במאפייה"], a: 0 }
+        ]
+      },
+      {
+        title: "מזחל לפרפר 🦋",
+        paragraphs: [
+          "האם ידעתם שכל פרפר היה פעם זחל? החיים של פרפר מתחילים בביצה קטנטנה, שאמו מטילה על עלה. אחרי כמה ימים בוקע מהביצה זחל רעב מאוד.",
+          "הזחל עושה כמעט כל היום דבר אחד: אוכל. הוא אוכל עלים ועוד עלים, וגדל מהר מאוד. העור שלו לא גדל יחד איתו, ולכן הזחל מחליף את העור כמה פעמים, כמו ילד שמקבל בגדים חדשים כשהישנים קטנים עליו.",
+          "כשהזחל מסיים לגדול, הוא נתלה על ענף ויוצר סביבו מעטפת קשה שנקראת גולם. מבחוץ נראה שהגולם ישן ושלא קורה בו כלום, אבל בפנים מתרחש שינוי מדהים: הגוף של הזחל משתנה לגמרי.",
+          "אחרי כשבועיים הגולם נפתח, ויוצא ממנו פרפר עם כנפיים רטובות ומקומטות. הפרפר מחכה בסבלנות שהכנפיים יתייבשו ויתיישרו, ורק אז הוא עף לחפש פרחים. השינוי הגדול הזה, מביצה לזחל, לגולם ולפרפר, נקרא גלגול."
+        ],
+        questions: [
+          { q: "איפה מטילה אמא פרפר את הביצה?", options: ["על עלה", "בתוך פרח", "באדמה"], a: 0 },
+          { q: "למה הזחל מחליף את העור שלו?", options: ["כי העור מתלכלך", "כי העור לא גדל יחד איתו", "כי קר לו"], a: 1 },
+          { q: "מה הסדר הנכון בחיים של פרפר?", options: ["זחל, ביצה, פרפר, גולם", "ביצה, גולם, זחל, פרפר", "ביצה, זחל, גולם, פרפר"], a: 2 },
+          { q: "למה הפרפר לא עף מיד כשהוא יוצא מהגולם?", options: ["כי הכנפיים שלו עוד רטובות", "כי הוא רעב", "כי הוא מפחד"], a: 0 }
+        ]
+      },
+      {
+        title: "הכדור של כולם ⚽",
+        paragraphs: [
+          "בהפסקה הגדולה יצאו ילדי כיתה ג' לחצר. בארגז הספורט נשאר רק כדור אחד, ודניאל ורוני תפסו אותו באותו רגע בדיוק. \"אנחנו צריכים אותו לכדורגל!\" צעק דניאל. \"ואנחנו צריכים אותו לכדורסל!\" צעקה רוני.",
+          "שניהם משכו את הכדור, כל אחד לכיוון שלו, והוויכוח הלך וגדל. ילדים נוספים התאספו מסביב, וכל אחד צעק משהו אחר. חצי מההפסקה כבר עבר, ואף אחד עוד לא שיחק.",
+          "אז ניגשה אליהם ליה, ילדה שקטה שבדרך כלל רק מסתכלת מהצד. \"אולי נחלק את ההפסקה?\" הציעה. \"עשר דקות כדורגל ועשר דקות כדורסל. ואם כולנו נשחק ביחד, יהיו לנו קבוצות גדולות יותר.\"",
+          "דניאל ורוני הסתכלו זה על זו, והתחילו לצחוק. הם הטילו מטבע כדי להחליט במה מתחילים. מאותו יום שיחקו כל ילדי הכיתה ביחד, והמשחקים היו הרבה יותר שמחים. וליה? היא כבר לא הסתכלה מהצד. היא הייתה השחקנית הכי מהירה במגרש."
+        ],
+        questions: [
+          { q: "מה הייתה הבעיה בהפסקה?", options: ["הכדור היה קרוע", "היה רק כדור אחד לשני משחקים", "ירד גשם"], a: 1 },
+          { q: "מה הציעה ליה?", options: ["לחלק את ההפסקה בין שני המשחקים", "לקנות עוד כדור", "לשאול את המורה"], a: 0 },
+          { q: "איך החליטו במה מתחילים?", options: ["לפי מי שצעק חזק יותר", "המורה החליטה", "הטילו מטבע"], a: 2 },
+          { q: "מה הרעיון החשוב בסיפור?", options: ["שכדורגל עדיף על כדורסל", "שאפשר לפתור ריב בהסכמה ובשיתוף", "שצריך להביא כדור מהבית"], a: 1 }
+        ]
+      }
+    ]
   }
 ];
 
@@ -4205,8 +4449,16 @@ let currentReadingCategoryIdx = 0;
 let currentReadingStoryIdx = 0;
 let currentReadingQuestionIdx = 0;
 let readingScore = 0;
-// { catIdx: [bestStoryScore0, bestStoryScore1, bestStoryScore2] }  -1 = not done
+// { catIdx: [bestStoryScore0, bestStoryScore1, ...] }  -1 = not done
 let readingProgress = GaiaProgress.getReadingProgress();
+
+// a category's progress, one slot per story (older saves may hold fewer slots)
+function readingProgressFor(catIdx) {
+    const n = readingData[catIdx].stories.length;
+    const prog = readingProgress[catIdx] || [];
+    while (prog.length < n) prog.push(-1);
+    return prog;
+}
 
 // back to the map, with the reading land's category panel open
 function goToReadingMenu() {
@@ -4219,18 +4471,19 @@ function startReadingCategory(catIdx) {
     GaiaHooks.emit('game_start', { subject: 'reading', level: 'cat_' + catIdx });
     currentReadingCategoryIdx = catIdx;
     currentReadingQuestionIdx = 0;
-    if (!readingProgress[catIdx]) readingProgress[catIdx] = [-1, -1, -1];
+    readingProgress[catIdx] = readingProgressFor(catIdx);
     showScreen('reading-screen');
     renderStorySelection();
 }
 
 function renderStorySelection() {
     const cat = readingData[currentReadingCategoryIdx];
-    const prog = readingProgress[currentReadingCategoryIdx] || [-1, -1, -1];
+    const prog = readingProgressFor(currentReadingCategoryIdx);
     const doneCount = prog.filter(v => v >= 0).length;
+    const allDone = doneCount === cat.stories.length;
 
     document.getElementById('reading-cat-label').textContent = cat.label;
-    document.getElementById('reading-story-progress').textContent = doneCount + '/3 הֻשְׁלְמוּ';
+    document.getElementById('reading-story-progress').textContent = doneCount + '/' + cat.stories.length + ' הֻשְׁלְמוּ';
     document.getElementById('reading-q-progress').textContent = '';
 
     const content = document.getElementById('reading-content');
@@ -4245,10 +4498,10 @@ function renderStorySelection() {
             <button class="reading-story-pick-btn ${done ? 'done' : ''}" onclick="startReadingStory(${i})">
                 <span class="story-pick-icon">${done ? '✅' : '📖'}</span>
                 <span class="story-pick-title">${story.title}</span>
-                ${done ? `<span class="story-pick-score">⭐ ${score}/3</span>` : ''}
+                ${done ? `<span class="story-pick-score">⭐ ${score}/${story.questions.length}</span>` : ''}
             </button>`;
         }).join('')}
-        ${doneCount === 3 ? `
+        ${allDone ? `
         <button class="big-btn btn-reading reading-btn" onclick="showReadingCategoryComplete()">
             🏆 סִיכּוּם הַקָּטֶגוֹרְיָה
         </button>` : ''}
@@ -4258,7 +4511,7 @@ function renderStorySelection() {
 
 function startReadingStory(storyIdx) {
     currentReadingStoryIdx = storyIdx;
-    GaiaBoards.startClock();   // the board times each story: reading it and its 3 questions
+    GaiaBoards.startClock();   // the board times each story: reading it and its questions
     renderReadingStory();
 }
 
@@ -4268,7 +4521,7 @@ function renderReadingStory() {
 
     document.getElementById('reading-cat-label').textContent = cat.label;
     document.getElementById('reading-story-progress').textContent =
-        'סִיפּוּר ' + (currentReadingStoryIdx + 1) + '/3';
+        'סִיפּוּר ' + (currentReadingStoryIdx + 1) + '/' + cat.stories.length;
     document.getElementById('reading-q-progress').textContent = '';
 
     const content = document.getElementById('reading-content');
@@ -4277,14 +4530,19 @@ function renderReadingStory() {
             ← חֲזָרָה לִבְחִירַת סִיפּוּר
         </button>
         <div class="reading-title">${story.title}</div>
-        <div class="reading-story-box">
-            ${story.sentences.map(s => `<div class="reading-text">${s}</div>`).join('')}
-        </div>
+        <div class="reading-story-box">${readingStoryText(story)}</div>
         <button class="big-btn btn-reading reading-btn" onclick="startReadingQuiz()">
             סִיַּמְתִּי לִקְרֹא ✅
         </button>
     `;
     setGaiaState('idle');
+}
+
+// the story itself: short lines for the nikkud stories, paragraphs for the longer ones
+function readingStoryText(story) {
+    return story.paragraphs
+        ? story.paragraphs.map(p => `<p class="reading-para">${p}</p>`).join('')
+        : story.sentences.map(s => `<div class="reading-text">${s}</div>`).join('');
 }
 
 function startReadingQuiz() {
@@ -4299,11 +4557,17 @@ function renderReadingQuestion() {
     const q = story.questions[currentReadingQuestionIdx];
 
     document.getElementById('reading-q-progress').textContent =
-        'שְׁאֵלָה ' + (currentReadingQuestionIdx + 1) + '/3';
+        'שְׁאֵלָה ' + (currentReadingQuestionIdx + 1) + '/' + story.questions.length;
 
+    // a long story may be looked at again while answering, as in a reading test
+    const peek = story.paragraphs ? `
+        <details class="reading-peek">
+            <summary>📖 לְהָצִיץ בַּסִּפּוּר</summary>
+            <div class="reading-story-box">${readingStoryText(story)}</div>
+        </details>` : '';
     const content = document.getElementById('reading-content');
     content.innerHTML = `
-        <div class="reading-title reading-quiz-title">${story.title}</div>
+        <div class="reading-title reading-quiz-title">${story.title}</div>${peek}
         <div class="reading-question">❓ ${q.q}</div>
         <div id="reading-opts">
             ${q.options.map((opt, i) =>
@@ -4338,20 +4602,25 @@ function answerReading(chosen) {
 
     later(() => {
         currentReadingQuestionIdx++;
-        if (currentReadingQuestionIdx < 3) {
+        if (currentReadingQuestionIdx < story.questions.length) {
             renderReadingQuestion();
         } else {
-            if (!readingProgress[currentReadingCategoryIdx]) readingProgress[currentReadingCategoryIdx] = [-1, -1, -1];
-            const prog = readingProgress[currentReadingCategoryIdx];
+            const prog = readingProgress[currentReadingCategoryIdx] = readingProgressFor(currentReadingCategoryIdx);
             // the story keeps its best result; a weaker re-read doesn't lower it
             prog[currentReadingStoryIdx] = Math.max(prog[currentReadingStoryIdx], readingScore);
             // --- Progress persistence: each read-through earns its 0-3 stars (like any game) ---
             try {
-                GaiaProgress.recordReadingStory(readingProgress, currentReadingCategoryIdx, readingScore);
+                GaiaProgress.recordReadingStory(readingProgress, currentReadingCategoryIdx, readingStars());
             } catch (e) { console.warn('[progress] reading hook', e); }
             renderStoryDone();
         }
     }, 1200);
+}
+
+// a read-through's 0-3 stars: the share of its questions answered right
+function readingStars() {
+    const n = readingData[currentReadingCategoryIdx].stories[currentReadingStoryIdx].questions.length;
+    return Math.round(3 * readingScore / n);
 }
 
 // A story is done: its stars, and its place on the reading land's board.
@@ -4368,17 +4637,19 @@ function renderStoryDone() {
             <button class="big-btn btn-reading reading-btn" onclick="renderStorySelection()">חֲזָרָה לַסִּיפּוּרִים 📚</button>
         </div>
     `;
-    renderStarsEarned(document.getElementById('reading-story-stars'), readingScore);
-    const result = GaiaBoards.finish('reading', 'cat_' + currentReadingCategoryIdx, GaiaBoards.grade(readingScore, 3));
+    const total = story.questions.length;
+    renderStarsEarned(document.getElementById('reading-story-stars'), readingStars());
+    const result = GaiaBoards.finish('reading', 'cat_' + currentReadingCategoryIdx, GaiaBoards.grade(readingScore, total));
     if (result) document.getElementById('reading-board').appendChild(GaiaBoards.resultCard(result));
-    setGaiaState(readingScore === 3 ? 'dance' : 'idle');
+    setGaiaState(readingScore === total ? 'dance' : 'idle');
 }
 
 function showReadingCategoryComplete() {
     GaiaHooks.emit('game_end');
     const cat = readingData[currentReadingCategoryIdx];
-    const prog = readingProgress[currentReadingCategoryIdx] || [0, 0, 0];
+    const prog = readingProgressFor(currentReadingCategoryIdx);
     const totalScore = prog.reduce((s, v) => s + (v > 0 ? v : 0), 0);
+    const maxScore = cat.stories.reduce((s, st) => s + st.questions.length, 0);
     const content = document.getElementById('reading-content');
     document.getElementById('reading-q-progress').textContent = '';
     document.getElementById('reading-story-progress').textContent = 'הֻשְׁלַם! 🎉';
@@ -4388,13 +4659,13 @@ function showReadingCategoryComplete() {
             <div class="trophy-pop">🏆</div>
             <div class="reading-title">כָּל הַכָּבוֹד!</div>
             <div class="reading-sub">
-                כָּל הַסִּיפּוּרִים בְּ${cat.label} נִקְרְאוּ!
+                ${cat.doneLine || `כָּל הַסִּיפּוּרִים בְּ${cat.label} נִקְרְאוּ!`}
             </div>
             <div class="reading-total">
-                ⭐ ${totalScore} / 9 נְקֻדּוֹת
+                ⭐ ${totalScore} / ${maxScore} נְקֻדּוֹת
             </div>
             <button class="big-btn btn-reading reading-btn" onclick="goToReadingMenu()">
-                חֲזָרָה לִבְחִירַת נִקּוּד 📖
+                ${cat.plain ? 'חֲזָרָה לְעֵמֶק הַסִּפּוּרִים 📖' : 'חֲזָרָה לִבְחִירַת נִקּוּד 📖'}
             </button>
         </div>
     `;
@@ -5598,6 +5869,931 @@ document.getElementById('repeat-listen').addEventListener('click', () => repeatS
 document.getElementById('repeat-slow').addEventListener('click', () => repeatSay(true));
 </script>
 <script>
+// ===== CHESS: THE RULES AND THE COMPUTER PLAYER =====
+// The whole game of chess for the chess garden: every legal move (castling, en passant,
+// promotion), check, checkmate, stalemate and the draws (three times the same position, fifty
+// moves with no capture or pawn move, too few pieces to mate), and a computer player that looks
+// a few moves ahead (alpha-beta search) at three strengths. No DOM here (see THE CHESS GARDEN).
+// Squares are 0..63: a1 = 0, h1 = 7, a8 = 56. A piece is its colour (8 white, 16 black) plus
+// its type (1 pawn, 2 knight, 3 bishop, 4 rook, 5 queen, 6 king).
+(function () {
+    const PAWN = 1, KNIGHT = 2, BISHOP = 3, ROOK = 4, QUEEN = 5, KING = 6, WHITE = 8, BLACK = 16;
+    const START = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+    const LETTERS = ' pnbrqk';
+    // move flags (a move is one number: from | to << 6 | promotion << 12 | flags << 15)
+    const CAP = 1, DOUBLE = 2, EP = 4, CASTLE_K = 8, CASTLE_Q = 16;
+
+    // where each piece can go from each square: knight and king jumps, and the 8 rays
+    // (0-3 straight for rooks, 4-7 diagonal for bishops)
+    const DIRS = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]];
+    const JUMPS = { [KNIGHT]: [], [KING]: [] }, RAYS = [];
+    for (let s = 0; s < 64; s++) {
+        const f = s & 7, r = s >> 3;
+        const inside = (x, y) => x >= 0 && x < 8 && y >= 0 && y < 8;
+        JUMPS[KNIGHT][s] = [[1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2]]
+            .filter(([x, y]) => inside(f + x, r + y)).map(([x, y]) => (r + y) * 8 + f + x);
+        JUMPS[KING][s] = DIRS.filter(([x, y]) => inside(f + x, r + y)).map(([x, y]) => (r + y) * 8 + f + x);
+        RAYS[s] = DIRS.map(([x, y]) => {
+            const ray = [];
+            for (let i = 1; inside(f + x * i, r + y * i); i++) ray.push((r + y * i) * 8 + f + x * i);
+            return ray;
+        });
+    }
+    // castling rights kept when a move touches a square: K=1 Q=2 k=4 q=8
+    const KEEP = new Array(64).fill(15);
+    KEEP[4] = 15 & ~3; KEEP[7] = 15 & ~1; KEEP[0] = 15 & ~2;
+    KEEP[60] = 15 & ~12; KEEP[63] = 15 & ~4; KEEP[56] = 15 & ~8;
+
+    // --- what the pieces are worth, and where they like to stand (white's view, rank 8 first) ---
+    const VALUE = [0, 100, 320, 330, 500, 900, 0];
+    const PLACE = {
+        [PAWN]: [0, 0, 0, 0, 0, 0, 0, 0, 50, 50, 50, 50, 50, 50, 50, 50, 10, 10, 20, 30, 30, 20, 10, 10, 5, 5, 10, 25, 25, 10, 5, 5,
+            0, 0, 0, 20, 20, 0, 0, 0, 5, -5, -10, 0, 0, -10, -5, 5, 5, 10, 10, -20, -20, 10, 10, 5, 0, 0, 0, 0, 0, 0, 0, 0],
+        [KNIGHT]: [-50, -40, -30, -30, -30, -30, -40, -50, -40, -20, 0, 0, 0, 0, -20, -40, -30, 0, 10, 15, 15, 10, 0, -30, -30, 5, 15, 20, 20, 15, 5, -30,
+            -30, 0, 15, 20, 20, 15, 0, -30, -30, 5, 10, 15, 15, 10, 5, -30, -40, -20, 0, 5, 5, 0, -20, -40, -50, -40, -30, -30, -30, -30, -40, -50],
+        [BISHOP]: [-20, -10, -10, -10, -10, -10, -10, -20, -10, 0, 0, 0, 0, 0, 0, -10, -10, 0, 5, 10, 10, 5, 0, -10, -10, 5, 5, 10, 10, 5, 5, -10,
+            -10, 0, 10, 10, 10, 10, 0, -10, -10, 10, 10, 10, 10, 10, 10, -10, -10, 5, 0, 0, 0, 0, 5, -10, -20, -10, -10, -10, -10, -10, -10, -20],
+        [ROOK]: [0, 0, 0, 0, 0, 0, 0, 0, 5, 10, 10, 10, 10, 10, 10, 5, -5, 0, 0, 0, 0, 0, 0, -5, -5, 0, 0, 0, 0, 0, 0, -5,
+            -5, 0, 0, 0, 0, 0, 0, -5, -5, 0, 0, 0, 0, 0, 0, -5, -5, 0, 0, 0, 0, 0, 0, -5, 0, 0, 0, 5, 5, 0, 0, 0],
+        [QUEEN]: [-20, -10, -10, -5, -5, -10, -10, -20, -10, 0, 0, 0, 0, 0, 0, -10, -10, 0, 5, 5, 5, 5, 0, -10, -5, 0, 5, 5, 5, 5, 0, -5,
+            0, 0, 5, 5, 5, 5, 0, -5, -10, 5, 5, 5, 5, 5, 0, -10, -10, 0, 5, 0, 0, 0, 0, -10, -20, -10, -10, -5, -5, -10, -10, -20],
+        [KING]: [-30, -40, -40, -50, -50, -40, -40, -30, -30, -40, -40, -50, -50, -40, -40, -30, -30, -40, -40, -50, -50, -40, -40, -30,
+            -30, -40, -40, -50, -50, -40, -40, -30, -20, -30, -30, -40, -40, -30, -30, -20, -10, -20, -20, -20, -20, -20, -20, -10,
+            20, 20, 0, 0, 0, 0, 20, 20, 20, 30, 10, 0, 0, 10, 30, 20]
+    };
+    const KING_END = [-50, -40, -30, -20, -20, -30, -40, -50, -30, -20, -10, 0, 0, -10, -20, -30, -30, -10, 20, 30, 30, 20, -10, -30,
+        -30, -10, 30, 40, 40, 30, -10, -30, -30, -10, 30, 40, 40, 30, -10, -30, -30, -10, 20, 30, 30, 20, -10, -30,
+        -30, -30, 0, 0, 0, 0, -30, -30, -50, -30, -30, -30, -30, -30, -30, -50];
+    const MATE = 100000;
+
+    class Chess {
+        constructor(fen) { this.load(fen || START); }
+
+        load(fen) {
+            const [placement, turn, castling, ep, half, full] = fen.trim().split(/\s+/);
+            this.board = new Array(64).fill(0);
+            this.kings = { [WHITE]: -1, [BLACK]: -1 };
+            placement.split('/').forEach((row, i) => {
+                let f = 0;
+                for (const ch of row) {
+                    if (/\d/.test(ch)) { f += +ch; continue; }
+                    const s = (7 - i) * 8 + f++;
+                    const type = LETTERS.indexOf(ch.toLowerCase());
+                    this.board[s] = type | (ch === ch.toUpperCase() ? WHITE : BLACK);
+                    if (type === KING) this.kings[this.board[s] & 24] = s;
+                }
+            });
+            this.turn = turn === 'b' ? BLACK : WHITE;
+            this.castling = (castling.includes('K') ? 1 : 0) | (castling.includes('Q') ? 2 : 0) | (castling.includes('k') ? 4 : 0) | (castling.includes('q') ? 8 : 0);
+            this.ep = ep && ep !== '-' ? (ep.charCodeAt(0) - 97) + (+ep[1] - 1) * 8 : -1;
+            this.half = +half || 0;
+            this.full = +full || 1;
+            this.stack = [];     // what each move changed, to take it back
+            this.played = [];    // the moves of the game (for the screen), with the position keys
+            this.keys = [this.key()];
+        }
+
+        fen() {
+            let out = '';
+            for (let r = 7; r >= 0; r--) {
+                let empty = 0;
+                for (let f = 0; f < 8; f++) {
+                    const p = this.board[r * 8 + f];
+                    if (!p) { empty++; continue; }
+                    if (empty) { out += empty; empty = 0; }
+                    const ch = LETTERS[p & 7];
+                    out += p & WHITE ? ch.toUpperCase() : ch;
+                }
+                if (empty) out += empty;
+                if (r) out += '/';
+            }
+            const c = (this.castling & 1 ? 'K' : '') + (this.castling & 2 ? 'Q' : '') + (this.castling & 4 ? 'k' : '') + (this.castling & 8 ? 'q' : '');
+            const ep = this.ep < 0 ? '-' : String.fromCharCode(97 + (this.ep & 7)) + ((this.ep >> 3) + 1);
+            return `${out} ${this.turn === WHITE ? 'w' : 'b'} ${c || '-'} ${ep} ${this.half} ${this.full}`;
+        }
+
+        // the position, for spotting repetitions (en passant counts only when it can be taken)
+        key() { return this.board.join(',') + this.turn + '|' + this.castling + '|' + this.ep; }
+
+        attacked(s, by) {
+            const b = this.board, f = s & 7;
+            if (by === WHITE) {
+                if (f < 7 && s >= 7 && b[s - 7] === (WHITE | PAWN)) return true;
+                if (f > 0 && s >= 9 && b[s - 9] === (WHITE | PAWN)) return true;
+            } else {
+                if (f > 0 && s + 7 < 64 && b[s + 7] === (BLACK | PAWN)) return true;
+                if (f < 7 && s + 9 < 64 && b[s + 9] === (BLACK | PAWN)) return true;
+            }
+            for (const t of JUMPS[KNIGHT][s]) if (b[t] === (by | KNIGHT)) return true;
+            for (const t of JUMPS[KING][s]) if (b[t] === (by | KING)) return true;
+            const rays = RAYS[s];
+            for (let d = 0; d < 8; d++) {
+                const slider = d < 4 ? ROOK : BISHOP;
+                for (const t of rays[d]) {
+                    const p = b[t];
+                    if (!p) continue;
+                    if (p === (by | slider) || p === (by | QUEEN)) return true;
+                    break;
+                }
+            }
+            return false;
+        }
+
+        inCheck(color = this.turn) { return this.attacked(this.kings[color], color ^ 24); }
+
+        // Every move by the side to play, before checking that its own king is safe after it.
+        // capturesOnly: captures and promotions (for the search's quiet ending).
+        pseudo(capturesOnly) {
+            const b = this.board, us = this.turn, them = us ^ 24, out = [];
+            const add = (from, to, flags, promo) => out.push(from | to << 6 | (promo || 0) << 12 | flags << 15);
+            for (let s = 0; s < 64; s++) {
+                const p = b[s];
+                if (!p || (p & 24) !== us) continue;
+                const type = p & 7;
+                if (type === PAWN) {
+                    const dir = us === WHITE ? 8 : -8, last = us === WHITE ? 7 : 0, first = us === WHITE ? 1 : 6;
+                    const one = s + dir, f = s & 7;
+                    const pawnTo = (to, flags) => {
+                        if (to >> 3 === last) for (const promo of [QUEEN, KNIGHT, ROOK, BISHOP]) add(s, to, flags, promo);
+                        else if (!capturesOnly || flags & (CAP | EP)) add(s, to, flags);
+                    };
+                    if (!b[one]) {
+                        if (!capturesOnly || one >> 3 === last) pawnTo(one, 0);
+                        if (!capturesOnly && s >> 3 === first && !b[one + dir]) add(s, one + dir, DOUBLE);
+                    }
+                    for (const df of [-1, 1]) {
+                        if (f + df < 0 || f + df > 7) continue;
+                        const to = one + df;
+                        if (b[to] && (b[to] & 24) === them) pawnTo(to, CAP);
+                        else if (to === this.ep) pawnTo(to, EP);
+                    }
+                } else if (type === KNIGHT || type === KING) {
+                    for (const to of JUMPS[type][s]) {
+                        if (!b[to]) { if (!capturesOnly) add(s, to, 0); }
+                        else if ((b[to] & 24) === them) add(s, to, CAP);
+                    }
+                    if (type === KING && !capturesOnly) this.castles(s, add);
+                } else {
+                    const d0 = type === BISHOP ? 4 : 0, d1 = type === ROOK ? 4 : 8;
+                    for (let d = d0; d < d1; d++) {
+                        for (const to of RAYS[s][d]) {
+                            if (!b[to]) { if (!capturesOnly) add(s, to, 0); continue; }
+                            if ((b[to] & 24) === them) add(s, to, CAP);
+                            break;
+                        }
+                    }
+                }
+            }
+            return out;
+        }
+
+        castles(s, add) {
+            const b = this.board, us = this.turn, them = us ^ 24, home = us === WHITE ? 4 : 60;
+            if (s !== home || this.attacked(home, them)) return;
+            const k = us === WHITE ? 1 : 4, q = us === WHITE ? 2 : 8;
+            if (this.castling & k && !b[home + 1] && !b[home + 2] && b[home + 3] === (us | ROOK) &&
+                !this.attacked(home + 1, them) && !this.attacked(home + 2, them)) add(home, home + 2, CASTLE_K);
+            if (this.castling & q && !b[home - 1] && !b[home - 2] && !b[home - 3] && b[home - 4] === (us | ROOK) &&
+                !this.attacked(home - 1, them) && !this.attacked(home - 2, them)) add(home, home - 2, CASTLE_Q);
+        }
+
+        make(m) {
+            const b = this.board, us = this.turn, them = us ^ 24;
+            const from = m & 63, to = m >> 6 & 63, promo = m >> 12 & 7, flags = m >> 15;
+            const piece = b[from];
+            let captured = b[to];
+            if (flags & EP) { const cs = to + (us === WHITE ? -8 : 8); captured = b[cs]; b[cs] = 0; }
+            this.stack.push([m, captured, this.castling, this.ep, this.half]);
+            b[to] = promo ? us | promo : piece;
+            b[from] = 0;
+            if (flags & CASTLE_K) { b[to - 1] = b[to + 1]; b[to + 1] = 0; }
+            if (flags & CASTLE_Q) { b[to + 1] = b[to - 2]; b[to - 2] = 0; }
+            if ((piece & 7) === KING) this.kings[us] = to;
+            this.castling &= KEEP[from] & KEEP[to];
+            this.ep = flags & DOUBLE ? (from + to) >> 1 : -1;
+            this.half = (piece & 7) === PAWN || captured ? 0 : this.half + 1;
+            if (us === BLACK) this.full++;
+            this.turn = them;
+        }
+
+        unmake() {
+            const [m, captured, castling, ep, half] = this.stack.pop();
+            const b = this.board, them = this.turn, us = them ^ 24;
+            const from = m & 63, to = m >> 6 & 63, promo = m >> 12 & 7, flags = m >> 15;
+            const piece = promo ? us | PAWN : b[to];
+            b[from] = piece;
+            b[to] = 0;
+            if (flags & EP) b[to + (us === WHITE ? -8 : 8)] = captured;
+            else b[to] = captured;
+            if (flags & CASTLE_K) { b[to + 1] = b[to - 1]; b[to - 1] = 0; }
+            if (flags & CASTLE_Q) { b[to - 2] = b[to + 1]; b[to + 1] = 0; }
+            if ((piece & 7) === KING) this.kings[us] = from;
+            this.castling = castling; this.ep = ep; this.half = half;
+            if (us === BLACK) this.full--;
+            this.turn = us;
+        }
+
+        // the moves that do not leave one's own king in check
+        legal(capturesOnly) {
+            const us = this.turn, out = [];
+            for (const m of this.pseudo(capturesOnly)) {
+                this.make(m);
+                if (!this.attacked(this.kings[us], us ^ 24)) out.push(m);
+                this.unmake();
+            }
+            return out;
+        }
+
+        // ---- for the screen ----
+        describe(m) {
+            const from = m & 63, to = m >> 6 & 63, promo = m >> 12 & 7, flags = m >> 15;
+            const d = { from, to, piece: this.board[from], captured: this.board[to] || 0, capturedAt: to, promo: promo ? (this.turn | promo) : 0, code: m };
+            if (flags & EP) { d.capturedAt = to + (this.turn === WHITE ? -8 : 8); d.captured = this.board[d.capturedAt]; }
+            if (flags & CASTLE_K) d.rook = [to + 1, to - 1];
+            if (flags & CASTLE_Q) d.rook = [to - 2, to + 1];
+            return d;
+        }
+        moves(from) {
+            return this.legal().filter(m => from === undefined || (m & 63) === from).map(m => this.describe(m));
+        }
+        // Plays a move from the list of legal ones (promotion: the piece type, queen if not said).
+        play(from, to, promo) {
+            const options = this.legal().filter(m => (m & 63) === from && (m >> 6 & 63) === to);
+            if (!options.length) return null;
+            const m = options.find(x => (x >> 12 & 7) === (promo || QUEEN)) || options[0];
+            const d = this.describe(m);
+            this.make(m);
+            d.check = this.inCheck();
+            this.played.push(d);
+            this.keys.push(this.key());
+            return d;
+        }
+        undo() {
+            if (!this.played.length) return null;
+            this.unmake();
+            this.keys.pop();
+            return this.played.pop();
+        }
+        get(s) { return this.board[s]; }
+        whiteToPlay() { return this.turn === WHITE; }
+
+        insufficient() {
+            const minors = [];
+            for (let s = 0; s < 64; s++) {
+                const t = this.board[s] & 7;
+                if (t === PAWN || t === ROOK || t === QUEEN) return false;
+                if (t === KNIGHT || t === BISHOP) minors.push([t, s]);
+            }
+            if (minors.length <= 1) return true;
+            // only bishops, all on squares of one colour
+            return minors.every(([t]) => t === BISHOP) && new Set(minors.map(([, s]) => ((s >> 3) + (s & 7)) & 1)).size === 1;
+        }
+
+        // Is the game over? { over, result: 'mate'|'stalemate'|'repetition'|'fifty'|'material', winner: 'w'|'b'|null, check }
+        status() {
+            const check = this.inCheck();
+            const any = this.legal().length > 0;
+            const done = (result, winner) => ({ over: true, result, winner, check });
+            if (!any) return check ? done('mate', this.turn === WHITE ? 'b' : 'w') : done('stalemate', null);
+            if (this.insufficient()) return done('material', null);
+            if (this.half >= 100) return done('fifty', null);
+            const now = this.keys[this.keys.length - 1];
+            if (this.keys.filter(k => k === now).length >= 3) return done('repetition', null);
+            return { over: false, result: null, winner: null, check };
+        }
+
+        // ---- the computer player ----
+        // A score for the side to play (centipawns): material, where the pieces stand, and in a
+        // won ending, a push of the lone king to the edge so the stronger side can mate it.
+        evaluate() {
+            const b = this.board;
+            let nonPawn = 0, white = 0, black = 0;
+            for (let s = 0; s < 64; s++) {
+                const p = b[s];
+                if (!p) continue;
+                const t = p & 7;
+                if (t !== PAWN && t !== KING) nonPawn += VALUE[t];
+                if (t !== KING) { if (p & WHITE) white++; else black++; }
+            }
+            const end = nonPawn <= 1300;
+            let score = 0;
+            for (let s = 0; s < 64; s++) {
+                const p = b[s];
+                if (!p) continue;
+                const t = p & 7, r = s >> 3, f = s & 7;
+                const i = p & WHITE ? (7 - r) * 8 + f : r * 8 + f;
+                const v = VALUE[t] + (t === KING && end ? KING_END[i] : PLACE[t][i]);
+                score += p & WHITE ? v : -v;
+            }
+            // mop-up: one side has only its king left
+            if ((white === 0) !== (black === 0) && Math.abs(score) > 300) {
+                const strong = white ? WHITE : BLACK, lone = this.kings[strong ^ 24], ours = this.kings[strong];
+                const lf = lone & 7, lr = lone >> 3;
+                const edge = Math.max(3 - lf, lf - 4) + Math.max(3 - lr, lr - 4);
+                const near = 14 - (Math.abs(lf - (ours & 7)) + Math.abs(lr - (ours >> 3)));
+                const bonus = 10 * edge + 4 * near;
+                score += strong === WHITE ? bonus : -bonus;
+            }
+            return this.turn === WHITE ? score : -score;
+        }
+
+        // Searches the best move. level: { depth, ms, spread, blunder } (spread: take any move
+        // within this many centipawns of the best; blunder: the chance of a random move).
+        // random: a function returning 0..1 (seedable in tests).
+        think(level, random = Math.random) {
+            const root = this.legal();
+            if (!root.length) return null;
+            if (level.blunder && random() < level.blunder) return this.describe(root[Math.floor(random() * root.length)]);
+            const deadline = Date.now() + (level.ms || 1e9);
+            let nodes = 0, outOfTime = false;
+            const order = (moves) => {
+                const b = this.board;
+                return moves.map(m => {
+                    const to = m >> 6 & 63, promo = m >> 12 & 7, flags = m >> 15;
+                    let k = 0;
+                    if (flags & (CAP | EP)) k = 10 * VALUE[(b[to] & 7) || PAWN] - VALUE[b[m & 63] & 7] + 10000;
+                    if (promo) k += 9000 + VALUE[promo];
+                    return [k, m];
+                }).sort((a, b2) => b2[0] - a[0]).map(x => x[1]);
+            };
+            const quiet = (alpha, beta, depth) => {
+                const stand = this.evaluate();
+                if (stand >= beta) return stand;
+                if (stand > alpha) alpha = stand;
+                if (depth >= 6) return stand;
+                const us = this.turn;
+                for (const m of order(this.pseudo(true))) {
+                    this.make(m);
+                    if (this.attacked(this.kings[us], us ^ 24)) { this.unmake(); continue; }
+                    const score = -quiet(-beta, -alpha, depth + 1);
+                    this.unmake();
+                    if (score >= beta) return score;
+                    if (score > alpha) alpha = score;
+                }
+                return alpha;
+            };
+            const search = (depth, alpha, beta, ply) => {
+                if ((++nodes & 1023) === 0 && Date.now() > deadline) outOfTime = true;
+                if (outOfTime) return 0;
+                if (depth <= 0) return level.quiet ? quiet(alpha, beta, 0) : this.evaluate();
+                const us = this.turn;
+                let legal = 0, best = -Infinity;
+                for (const m of order(this.pseudo(false))) {
+                    this.make(m);
+                    if (this.attacked(this.kings[us], us ^ 24)) { this.unmake(); continue; }
+                    legal++;
+                    const score = -search(depth - 1, -beta, -alpha, ply + 1);
+                    this.unmake();
+                    if (score > best) best = score;
+                    if (score > alpha) alpha = score;
+                    if (alpha >= beta) break;
+                }
+                if (!legal) return this.inCheck() ? -MATE + ply : 0;
+                if (this.half >= 100) return 0;
+                return best;
+            };
+            // deeper and deeper while there is time; each round starts with the last round's best
+            let ranked = order(root).map(m => [0, m]), done = null;
+            for (let depth = 1; depth <= level.depth; depth++) {
+                const scores = [];
+                let alpha = -Infinity;
+                for (const [, m] of ranked) {
+                    this.make(m);
+                    const window = level.spread ? -Infinity : alpha;   // exact scores when choosing among close moves
+                    // a position this game has already seen counts as a draw (no going round in circles)
+                    const score = this.keys.includes(this.key()) ? 0 : -search(depth - 1, -Infinity, -window, 1);
+                    this.unmake();
+                    if (outOfTime) break;
+                    scores.push([score, m]);
+                    if (score > alpha) alpha = score;
+                }
+                if (outOfTime) break;
+                ranked = scores.sort((a, b) => b[0] - a[0]);
+                done = ranked;
+                if (ranked[0][0] >= MATE - 100) break;   // a mate found: no need to look further
+            }
+            if (!done) done = ranked;
+            const best = done[0][0];
+            const close = level.spread ? done.filter(([s]) => s >= best - level.spread) : [done[0]];
+            return this.describe(close[Math.floor(random() * close.length)][1]);
+        }
+
+        // counts the positions after depth moves (to check the rules against known numbers)
+        perft(depth) {
+            if (depth === 0) return 1;
+            let n = 0;
+            for (const m of this.legal()) { this.make(m); n += this.perft(depth - 1); this.unmake(); }
+            return n;
+        }
+    }
+
+    // the strengths of the computer player
+    const LEVELS = {
+        easy: { depth: 1, ms: 300, spread: 180, blunder: 0.3, quiet: false },
+        medium: { depth: 2, ms: 600, spread: 35, blunder: 0.04, quiet: true },
+        hard: { depth: 4, ms: 900, spread: 0, blunder: 0, quiet: true },
+        hint: { depth: 2, ms: 500, spread: 0, blunder: 0, quiet: true }
+    };
+
+    window.GaiaChess = { Chess, START, LEVELS, PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING, WHITE, BLACK };
+})();
+</script>
+<script>
+// The chess pieces, drawn for the game (viewBox 100×100): round, friendly shapes with a bold
+// outline, white in cream and black in deep plum. type: 1 pawn … 6 king (as in GaiaChess).
+function chessPieceSVG(type, white, attrs) {
+    const fill = white ? '#FFFBF0' : '#45325E', line = white ? '#3B2E4E' : '#1D1330', detail = white ? '#3B2E4E' : '#E9DDFF';
+    const shine = white ? '#FFFFFF' : '#8E78B0';
+    const base = '<path d="M20 86 Q20 78 29 78 H71 Q80 78 80 86 V88 Q80 93 75 93 H25 Q20 93 20 88 Z"/>';
+    const body = {
+        // a ball on a little dress
+        1: '<path d="M33 79 C34 64 40 53 45 47 H55 C60 53 66 64 67 79 Z"/><ellipse cx="50" cy="46" rx="14" ry="5"/><circle cx="50" cy="30" r="13"/>',
+        // a horse's head, looking left
+        2: '<path d="M70 79 H31 C30 68 35 60 44 54 C47 52 48 49 46 47 C40 49 33 51 27 50 C20 49 18 43 21 39 C26 32 34 24 40 19 L39 9 L47 15 C50 13 53 12 57 12 C70 13 79 27 79 45 C79 60 73 69 70 79 Z"/>',
+        // a mitre with a slit, a ball on top
+        3: '<path d="M38 79 C39 70 41 64 42 58 H58 C59 64 61 70 62 79 Z"/><rect x="35" y="52" width="30" height="8" rx="4"/>' +
+           '<path d="M50 14 C63 23 67 37 61 52 H39 C33 37 37 23 50 14 Z"/><circle cx="50" cy="10" r="5.5"/>',
+        // a tower with battlements
+        4: '<path d="M33 79 L36 46 H64 L67 79 Z"/><path d="M27 20 H38 V29 H45 V20 H55 V29 H62 V20 H73 V40 Q73 46 67 46 H33 Q27 46 27 40 Z"/>',
+        // a crown with five points and pearls
+        5: '<path d="M33 79 C35 72 33 67 30 62 H70 C67 67 65 72 67 79 Z"/>' +
+           '<path d="M30 63 L22 30 L33 45 L37 25 L45 43 L50 20 L55 43 L63 25 L67 45 L78 30 L70 63 Z"/>' +
+           '<circle cx="22" cy="27" r="4.5"/><circle cx="37" cy="22" r="4.5"/><circle cx="50" cy="17" r="4.5"/><circle cx="63" cy="22" r="4.5"/><circle cx="78" cy="27" r="4.5"/>',
+        // a dome with a cross
+        6: '<path d="M34 79 C36 72 34 67 31 61 H69 C66 67 64 72 66 79 Z"/>' +
+           '<path d="M30 62 C24 46 36 33 50 36 C64 33 76 46 70 62 Z"/><path d="M46 8 H54 V15 H61 V23 H54 V34 H46 V23 H39 V15 H46 Z"/>'
+    }[type];
+    // little details in the other colour: the horse's eye and mane, the bishop's slit, bands
+    const marks = {
+        1: '',
+        2: '<circle cx="47" cy="27" r="3.2" fill="' + detail + '" stroke="none"/><circle cx="25" cy="42" r="1.8" fill="' + detail + '" stroke="none"/>' +
+           '<path d="M60 17 C69 24 74 36 73 52" stroke="' + detail + '" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.7"/>',
+        3: '<path d="M56 25 L46 38" stroke="' + detail + '" stroke-width="3.5" fill="none" stroke-linecap="round"/>',
+        4: '<path d="M38 56 H62 M36 67 H64" stroke="' + detail + '" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.6"/>',
+        5: '<path d="M32 63 H68" stroke="' + detail + '" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.8"/><circle cx="50" cy="52" r="3.5" fill="' + detail + '" stroke="none"/>',
+        6: '<path d="M32 62 H68" stroke="' + detail + '" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.8"/>'
+    }[type];
+    const glint = {
+        1: '<ellipse cx="45" cy="25" rx="4" ry="3" fill="' + shine + '" opacity="0.55" stroke="none"/>',
+        2: '<path d="M57 17 C64 21 69 28 71 36" stroke="' + shine + '" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.4"/>',
+        3: '<ellipse cx="44" cy="30" rx="3" ry="6" fill="' + shine + '" opacity="0.45" stroke="none"/>',
+        4: '<path d="M40 50 L38 74" stroke="' + shine + '" stroke-width="3" stroke-linecap="round" opacity="0.4"/>',
+        5: '<path d="M38 66 L36 76" stroke="' + shine + '" stroke-width="3" stroke-linecap="round" opacity="0.4"/>',
+        6: '<ellipse cx="41" cy="46" rx="4" ry="6" fill="' + shine + '" opacity="0.4" stroke="none"/>'
+    }[type];
+    return '<svg viewBox="0 0 100 100" ' + (attrs || '') + ' aria-hidden="true"><g fill="' + fill + '" stroke="' + line + '" stroke-width="3.6" stroke-linejoin="round">' +
+        base + body + '</g>' + glint + marks + '</svg>';
+}
+
+// ===== THE CHESS GARDEN =====
+// The chess land: lessons on how each piece moves (move it to collect the stars), a game
+// against the computer at three strengths, and a game for two on one device. Tap a piece to see
+// where it can go, tap a square to move. "אָחוֹרָה" takes a move back, "רֶמֶז" shows a good one.
+// The rules and the computer player are in GaiaChess (see CHESS: THE RULES).
+(function () {
+    const { Chess, LEVELS, WHITE } = window.GaiaChess;
+    const $ = id => document.getElementById(id);
+    const sqOf = n => (n.charCodeAt(0) - 97) + (+n[1] - 1) * 8;
+    const NAMES = { 1: 'הָרַגְלִי', 2: 'הַפָּרָשׁ', 3: 'הָרָץ', 4: 'הַצְּרִיחַ', 5: 'הַמַּלְכָּה', 6: 'הַמֶּלֶךְ' };
+    const MODES = { easy: '🤖 נֶגֶד הַמַּחְשֵׁב · קַל', medium: '🤖 נֶגֶד הַמַּחְשֵׁב · בֵּינוֹנִי', hard: '🤖 נֶגֶד הַמַּחְשֵׁב · קָשֶׁה', two: '👫 שְׁנֵי שַׂחְקָנִים' };
+
+    // Lessons: one piece (and friends or something to take), stars to collect.
+    const LESSONS = [
+        { at: 'd4', piece: 'R', stars: ['d7', 'g7', 'g2'], who: 'yoovy',
+          text: 'הַצְּרִיחַ הוֹלֵךְ יָשָׁר: קָדִימָה, אָחוֹרָה וְלַצְּדָדִים, כַּמָּה מִשְׁבָּצוֹת שֶׁרוֹצִים. אִסְפוּ אֶת כָּל הַכּוֹכָבִים!' },
+        { at: 'c1', piece: 'B', stars: ['e3', 'h6', 'f8'], who: 'googy',
+          text: 'הָרָץ הוֹלֵךְ בַּאֲלַכְסוֹן, וְתָמִיד נִשְׁאָר עַל מִשְׁבָּצוֹת בְּאוֹתוֹ הַצֶּבַע.' },
+        { at: 'd1', piece: 'Q', stars: ['d5', 'a8', 'h8', 'h1'], who: 'yoovy',
+          text: 'הַמַּלְכָּה הִיא הַכְּלִי הֲכִי חָזָק: הִיא הוֹלֶכֶת גַּם יָשָׁר וְגַם בַּאֲלַכְסוֹן!' },
+        { at: 'e1', piece: 'K', stars: ['e2', 'f3', 'g3', 'h4'], who: 'googy',
+          text: 'הַמֶּלֶךְ הוֹלֵךְ רַק צַעַד אֶחָד, לְכָל כִּוּוּן. אֶת הַמֶּלֶךְ צְרִיכִים לִשְׁמֹר הֲכִי טוֹב!' },
+        { at: 'b1', piece: 'N', stars: ['c3', 'e4', 'f6'], friends: ['a2', 'b2', 'c2', 'd2'], who: 'yoovy',
+          text: 'הַפָּרָשׁ קוֹפֵץ כְּמוֹ הָאוֹת L: שְׁתַּיִם יָשָׁר וְעוֹד אַחַת הַצִּדָּה. רַק הוּא יָכוֹל לִקְפֹּץ מֵעַל כֵּלִים!' },
+        { at: 'e2', piece: 'P', stars: ['e4', 'd5', 'd6'], foes: ['d5'], who: 'googy',
+          text: 'הָרַגְלִי צוֹעֵד קָדִימָה מִשְׁבֶּצֶת אַחַת (בַּצַּעַד הָרִאשׁוֹן — אֲפִלּוּ שְׁתַּיִם), וְאוֹכֵל בַּאֲלַכְסוֹן.' }
+    ];
+
+    let game = null, mode = null;
+    let selected = -1, targets = [], hint = null;
+    let busy = false, over = false, turnToken = 0, helps = 0;
+    let lesson = null;   // { i, at, stars: Set, moves, optimal, total }
+    let learnMoves = 0, learnOptimal = 0;
+    const els = new Array(64).fill(null);   // the piece on each square
+
+    // ---- the board ----
+    let built = false;
+    function build() {
+        if (built) return;
+        built = true;
+        const board = $('chess-board');
+        for (let r = 7; r >= 0; r--) {
+            for (let f = 0; f < 8; f++) {
+                const s = r * 8 + f, sq = document.createElement('div');
+                sq.className = 'chess-sq ' + ((r + f) % 2 ? 'light' : 'dark');
+                sq.dataset.sq = s;
+                if (r === 0) sq.insertAdjacentHTML('beforeend', '<span class="crd crd-f">' + 'abcdefgh'[f] + '</span>');
+                if (f === 0) sq.insertAdjacentHTML('beforeend', '<span class="crd crd-r">' + (r + 1) + '</span>');
+                board.appendChild(sq);
+            }
+        }
+        const layer = document.createElement('div');
+        layer.className = 'chess-layer';
+        layer.id = 'chess-layer';
+        board.appendChild(layer);
+        board.addEventListener('click', e => {
+            const sq = e.target.closest('.chess-sq');
+            if (sq) tap(+sq.dataset.sq);
+        });
+        $('chess-undo').addEventListener('click', undo);
+        $('chess-hint').addEventListener('click', showHint);
+        $('chess-restart').addEventListener('click', () => {
+            if (!lesson) startChess(mode);
+            else if (!busy) startLesson(lesson.i);   // the same lesson again
+        });
+    }
+    const place = (el, s) => { el.style.transform = 'translate(' + (s & 7) * 100 + '%, ' + (7 - (s >> 3)) * 100 + '%)'; };
+    function pieceEl(p, s) {
+        const el = document.createElement('div');
+        el.className = 'chess-pc';
+        el.innerHTML = chessPieceSVG(p & 7, !!(p & WHITE));
+        place(el, s);
+        $('chess-layer').appendChild(el);
+        return el;
+    }
+    // every piece where the game has it (after a take-back or a new game)
+    function placeAll() {
+        $('chess-layer').textContent = '';
+        for (let s = 0; s < 64; s++) els[s] = game.get(s) ? pieceEl(game.get(s), s) : null;
+    }
+    // a move slides its piece (and the rook, when castling); a taken piece fades away
+    function slide(d) {
+        const el = els[d.from];
+        if (d.captured && els[d.capturedAt]) {
+            const gone = els[d.capturedAt];
+            gone.classList.add('gone');
+            setTimeout(() => gone.remove(), 300);
+            els[d.capturedAt] = null;
+        }
+        els[d.from] = null;
+        els[d.to] = el;
+        if (!el) return;
+        el.classList.add('moving');
+        place(el, d.to);
+        setTimeout(() => el.classList.remove('moving'), 300);
+        if (d.rook) {
+            const rook = els[d.rook[0]];
+            els[d.rook[0]] = null;
+            els[d.rook[1]] = rook;
+            if (rook) place(rook, d.rook[1]);
+        }
+        if (d.promo) setTimeout(() => { el.innerHTML = chessPieceSVG(d.promo & 7, !!(d.promo & WHITE)); }, 200);
+    }
+
+    // the marks on the squares: the last move, the chosen piece and where it can go, check, a hint, stars
+    function paint() {
+        const last = game.played[game.played.length - 1];
+        const king = !lesson && game.inCheck() ? game.kings[game.turn] : -1;
+        document.querySelectorAll('#chess-board .chess-sq').forEach(sq => {
+            const s = +sq.dataset.sq;
+            sq.classList.toggle('last', !!last && (s === last.from || s === last.to));
+            sq.classList.toggle('sel', s === selected);
+            const t = targets.find(m => m.to === s);
+            sq.classList.toggle('dot', !!t && !t.captured);
+            sq.classList.toggle('cap', !!t && !!t.captured);
+            sq.classList.toggle('check', s === king);
+            sq.classList.toggle('hint', !!hint && (s === hint.from || s === hint.to));
+            const star = !!lesson && lesson.stars.has(s);
+            const had = sq.querySelector('.chess-star');
+            if (star && !had) sq.insertAdjacentHTML('beforeend', '<span class="chess-star" aria-hidden="true">⭐</span>');
+            if (!star && had) had.remove();
+        });
+    }
+
+    // the pieces each side has taken, and who is ahead
+    function trays() {
+        const taken = { w: [], b: [] };
+        game.played.forEach(d => { if (d.captured) taken[d.captured & WHITE ? 'b' : 'w'].push(d.captured); });
+        const worth = [0, 1, 3, 3, 5, 9, 0];
+        const score = side => taken[side].reduce((n, p) => n + worth[p & 7], 0);
+        const fill = (el, list, lead) => {
+            el.innerHTML = list.sort((a, b) => (b & 7) - (a & 7)).map(p => '<span class="tp">' + chessPieceSVG(p & 7, !!(p & WHITE)) + '</span>').join('') +
+                (lead > 0 ? '<span class="adv">+' + lead + '</span>' : '');
+        };
+        const w = score('w'), b = score('b');
+        fill($('chess-tray-bottom'), taken.w, w - b);
+        fill($('chess-tray-top'), taken.b, b - w);
+    }
+
+    const vsComputer = () => mode === 'easy' || mode === 'medium' || mode === 'hard';
+    const myTurn = () => !lesson && (mode === 'two' || game.whiteToPlay());
+    function status(text) { $('chess-status').textContent = text; }
+    function turnText() {
+        const check = game.inCheck();
+        if (mode === 'two') return (game.whiteToPlay() ? 'תּוֹר הַלְּבָנִים ⚪' : 'תּוֹר הַשְּׁחֹרִים ⚫') + (check ? ' · שַׁח!' : '');
+        return check ? 'שַׁח! שִׁמְרוּ עַל הַמֶּלֶךְ 👑' : 'תּוֹרְכֶם ⚪';
+    }
+    function buttons() {
+        $('chess-undo').disabled = busy || over || !!lesson || !game.played.length;
+        $('chess-hint').disabled = busy || over || !!lesson;
+    }
+
+    // ---- moves ----
+    function select(s) {
+        selected = s;
+        targets = lesson ? lessonTargets(s) : game.moves(s);
+        hint = null;
+        paint();
+    }
+    function deselect() { selected = -1; targets = []; paint(); }
+
+    function tap(s) {
+        if (busy || over) return;
+        if (lesson) return lessonTap(s);
+        if (!myTurn()) return;
+        if (selected >= 0 && targets.some(m => m.to === s)) {
+            const promos = targets.filter(m => m.to === s && m.promo);
+            if (promos.length) return choosePromotion(selected, s);
+            return move(selected, s);
+        }
+        const p = game.get(s);
+        if (p && ((p & WHITE) ? game.whiteToPlay() : !game.whiteToPlay()) && s !== selected) return select(s);
+        deselect();
+    }
+
+    function move(from, to, promo) {
+        const d = game.play(from, to, promo);
+        if (!d) return;
+        selected = -1; targets = []; hint = null;
+        slide(d);
+        sound(d);
+        if (d.captured) setGaiaState(vsComputer() && !(d.piece & WHITE) ? 'surprised' : 'happy');
+        afterMove();
+    }
+
+    function afterMove() {
+        paint(); trays();
+        const st = game.status();
+        if (st.over) {
+            busy = true;
+            buttons();
+            status(st.result === 'mate' ? 'שַׁח־מָט! ♚' : 'תֵּיקוּ 🤝');
+            later(() => finish(st), 900);
+            return;
+        }
+        if (vsComputer() && !game.whiteToPlay()) {
+            busy = true;
+            buttons();
+            status('הַמַּחְשֵׁב חוֹשֵׁב… 🤔');
+            const token = ++turnToken;
+            // let the slide finish (and the words show) before the computer thinks
+            later(() => {
+                if (token !== turnToken || over) return;
+                const m = game.think(LEVELS[mode]);
+                busy = false;
+                if (m) move(m.from, m.to, m.promo & 7);
+            }, 450);
+            return;
+        }
+        busy = false;
+        status(turnText());
+        buttons();
+    }
+
+    // which piece the pawn becomes on the last row
+    function choosePromotion(from, to) {
+        const box = $('chess-promo'), white = !!(game.get(from) & WHITE);
+        box.innerHTML = '<div class="chess-promo-box"><p>לְאֵיזֶה כְּלִי הָרַגְלִי יַהֲפֹךְ?</p><div class="chess-promo-row">' +
+            [5, 4, 3, 2].map(t => '<button type="button" data-t="' + t + '" aria-label="' + NAMES[t] + '">' + chessPieceSVG(t, white) + '</button>').join('') + '</div></div>';
+        box.hidden = false;
+        box.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+            box.hidden = true;
+            move(from, to, +b.dataset.t);
+        }));
+    }
+
+    function undo() {
+        if (busy || over || lesson || !game.played.length) return;
+        // against the computer: back to the child's last turn (its move and the computer's answer)
+        game.undo();
+        if (vsComputer() && !game.whiteToPlay() && game.played.length) game.undo();
+        helps++;
+        turnToken++;
+        selected = -1; targets = []; hint = null;
+        placeAll(); paint(); trays();
+        status(turnText()); buttons();
+    }
+
+    function showHint() {
+        if (busy || over || lesson || !myTurn()) return;
+        const m = game.think(LEVELS.hint);
+        if (!m) return;
+        helps++;
+        select(m.from);
+        hint = m;
+        paint();
+        status('💡 נַסּוּ אֶת הַמַּהֲלָךְ הַמְּסֻמָּן');
+    }
+
+    // ---- sounds ----
+    function sound(d) {
+        if (!audioCtx) return;
+        const now = audioCtx.currentTime;
+        if (d.check) { playNote(880, now, 0.12, 'triangle', 0.25); playNote(660, now + 0.12, 0.16, 'triangle', 0.22); }
+        else if (d.captured) { playNote(392, now, 0.08, 'square', 0.12); playNote(587.33, now + 0.08, 0.12, 'sine', 0.3); }
+        else playNote(d.piece & WHITE ? 523.25 : 440, now, 0.07, 'triangle', 0.22);
+    }
+
+    // ---- the end ----
+    function finish(st) {
+        over = true; busy = false;
+        buttons();
+        GaiaHooks.emit('game_end');
+        let icon, title, line, stars = null, result = null;
+        if (mode === 'two') {
+            icon = st.winner ? '🏆' : '🤝';
+            title = st.winner === 'w' ? 'הַלְּבָנִים נִצְּחוּ!' : st.winner === 'b' ? 'הַשְּׁחֹרִים נִצְּחוּ!' : 'תֵּיקוּ!';
+            line = endReason(st);
+            setGaiaState(st.winner ? 'dance' : 'happy');
+            playSound('victory');
+        } else {
+            const won = st.winner === 'w', lost = st.winner === 'b';
+            stars = won ? 3 : !st.winner ? 2 : game.played.length >= 20 ? 1 : 0;
+            icon = won ? '🏆' : lost ? '🤖' : '🤝';
+            title = won ? 'שַׁח־מָט! נִצַּחְתֶּם!' : lost ? 'הַפַּעַם הַמַּחְשֵׁב נִצַּח' : 'תֵּיקוּ!';
+            line = lost ? 'כָּל מִשְׂחָק מְלַמֵּד מַשֶּׁהוּ חָדָשׁ. נְנַסֶּה שׁוּב?' : endReason(st);
+            try { GaiaProgress.recordGame('chess', mode, stars); } catch (e) { console.warn('[progress] chess', e); }
+            result = GaiaBoards.finish('chess', mode, won ? Math.max(60, 100 - 5 * helps) : !st.winner ? 50 : 0);
+            setGaiaState(won ? 'dance' : lost ? 'sad' : 'happy');
+            if (won) playSound('victory'); else if (lost) playSound('timeout'); else playSound('correct');
+        }
+        showEnd(icon, title, line, stars, result, () => startChess(mode));
+    }
+    function endReason(st) {
+        return { mate: 'שַׁח־מָט: לַמֶּלֶךְ אֵין לְאָן לִבְרֹחַ.', stalemate: 'פָּט: אֵין מַהֲלָךְ חֻקִּי, וְהַמֶּלֶךְ לֹא בְּשַׁח.',
+            repetition: 'אוֹתוֹ מַצָּב חָזַר שָׁלֹשׁ פְּעָמִים.', fifty: 'חֲמִשִּׁים מַהֲלָכִים בְּלִי לֶאֱכֹל וּבְלִי לְהָזִיז רַגְלִי.',
+            material: 'לֹא נִשְׁאֲרוּ מַסְפִּיק כֵּלִים כְּדֵי לְנַצֵּחַ.' }[st.result] || '';
+    }
+    function showEnd(icon, title, line, stars, result, again) {
+        const box = $('chess-end');
+        box.innerHTML = '<div class="chess-end-box"><div class="chess-end-icon">' + icon + '</div><h2></h2><p class="chess-end-line"></p>' +
+            '<div class="stars-earned"></div><div class="chess-end-board"></div>' +
+            '<div class="chess-end-actions"><button class="big-btn btn-chess" type="button" data-act="again">שׁוּב 🔁</button>' +
+            '<button class="big-btn btn-soft" type="button" data-act="home">לַמַּפָּה 🗺️</button></div></div>';
+        box.querySelector('h2').textContent = title;
+        box.querySelector('.chess-end-line').textContent = line;
+        if (stars === null) box.querySelector('.stars-earned').remove();
+        else renderStarsEarned(box.querySelector('.stars-earned'), stars);
+        if (result) box.querySelector('.chess-end-board').appendChild(GaiaBoards.resultCard(result));
+        box.querySelector('[data-act="again"]').addEventListener('click', again);
+        box.querySelector('[data-act="home"]').addEventListener('click', goHome);
+        box.hidden = false;
+        if (stars === 3 || (stars === null && icon === '🏆')) {
+            for (let i = 0; i < 5; i++) later(() => spawnStars({ clientX: Math.random() * innerWidth, clientY: Math.random() * innerHeight * 0.6 }), i * 200);
+        }
+    }
+
+    // ---- lessons ----
+    function lessonFen(L, at, stars) {
+        const board = {};
+        board[at] = L.piece;
+        (L.friends || []).forEach(s => { board[s] = 'P'; });
+        (L.foes || []).filter(s => stars.has(sqOf(s))).forEach(s => { board[s] = 'p'; });
+        let fen = '';
+        for (let r = 8; r >= 1; r--) {
+            let empty = 0;
+            for (const f of 'abcdefgh') {
+                const p = board[f + r];
+                if (!p) { empty++; continue; }
+                if (empty) { fen += empty; empty = 0; }
+                fen += p;
+            }
+            if (empty) fen += empty;
+            if (r > 1) fen += '/';
+        }
+        return fen + ' w - - 0 1';
+    }
+    // the squares the lesson's piece can reach (only white moves; there are no kings to guard)
+    function reach(g, s) {
+        g.turn = WHITE; g.ep = -1;
+        return g.pseudo(false).filter(m => (m & 63) === s).map(m => g.describe(m));
+    }
+    function lessonTargets(s) { return s === lesson.at ? reach(game, s) : []; }
+    // the fewest moves that collect every star (a search over where the piece is and what is left)
+    function fewestMoves(L) {
+        const all = L.stars.map(sqOf), full = (1 << all.length) - 1;
+        const startKey = sqOf(L.at) + ':0';
+        const seen = new Set([startKey]);
+        let frontier = [[sqOf(L.at), 0]];
+        for (let depth = 1; depth <= 12; depth++) {
+            const next = [];
+            for (const [at, got] of frontier) {
+                const left = new Set(all.filter((s, i) => !(got >> i & 1)));
+                const g = new Chess(lessonFen(L, 'abcdefgh'[at & 7] + ((at >> 3) + 1), left));
+                for (const d of reach(g, at)) {
+                    const i = all.indexOf(d.to);
+                    const now = i >= 0 ? got | 1 << i : got;
+                    if (now === full) return depth;
+                    const key = d.to + ':' + now;
+                    if (!seen.has(key)) { seen.add(key); next.push([d.to, now]); }
+                }
+            }
+            frontier = next;
+        }
+        return L.stars.length * 3;
+    }
+    function startLesson(i) {
+        const L = LESSONS[i];
+        lesson = { i, at: sqOf(L.at), stars: new Set(L.stars.map(sqOf)), moves: 0, optimal: fewestMoves(L) };
+        game = new Chess(lessonFen(L, L.at, lesson.stars));
+        over = false; busy = false; selected = -1; targets = []; hint = null;
+        $('chess-end').hidden = true;
+        $('chess-mode').textContent = '🎓 שִׁעוּר ' + (i + 1) + '/' + LESSONS.length;
+        const guide = $('chess-lesson');
+        guide.hidden = false;
+        guide.innerHTML = girlSVG(L.who, { mode: 'head', size: 54 }) + '<div class="land-guide-bubble"></div>';
+        guide.querySelector('.land-guide-bubble').textContent = L.text;
+        status('הָזִיזוּ אֶת ' + NAMES[game.get(lesson.at) & 7] + ' ⭐');
+        placeAll(); trays(); buttons();
+        select(lesson.at);
+    }
+    function lessonTap(s) {
+        const t = targets.find(m => m.to === s);
+        if (!t) { if (s === lesson.at) select(s); return; }
+        game.make(t.code);
+        game.turn = WHITE;
+        lesson.moves++;
+        slide(t);
+        lesson.at = t.to;
+        if (lesson.stars.delete(t.to)) {
+            if (audioCtx) { const now = audioCtx.currentTime; playNote(784, now, 0.1, 'sine', 0.3); playNote(1046.5, now + 0.1, 0.14, 'sine', 0.3); }
+            const sq = document.querySelector('#chess-board .chess-sq[data-sq="' + t.to + '"] .chess-star');
+            if (sq) sq.classList.add('got');
+        } else if (audioCtx) playNote(523.25, audioCtx.currentTime, 0.07, 'triangle', 0.2);
+        selected = -1; targets = [];
+        if (lesson.stars.size) { later(() => { paint(); select(lesson.at); }, 260); return; }
+        // the lesson is done
+        busy = true;
+        learnMoves += lesson.moves; learnOptimal += lesson.optimal;
+        setGaiaState('happy');
+        later(() => {
+            paint();
+            if (lesson.i + 1 < LESSONS.length) {
+                const next = lesson.i + 1;
+                showLessonDone(lesson.moves <= lesson.optimal ? 'מֻשְׁלָם! ⭐' : 'כׇּל הַכָּבוֹד! ⭐', () => startLesson(next));
+            } else finishLearning();
+        }, 500);
+    }
+    function showLessonDone(title, next) {
+        const box = $('chess-end');
+        box.innerHTML = '<div class="chess-end-box chess-lesson-done"><div class="chess-end-icon">🌟</div><h2></h2>' +
+            '<button class="big-btn btn-chess" type="button">לַשִּׁעוּר הַבָּא ◀️</button></div>';
+        box.querySelector('h2').textContent = title;
+        box.querySelector('button').addEventListener('click', next);
+        box.hidden = false;
+        playSound('correct');
+    }
+    function finishLearning() {
+        over = true; busy = false;
+        GaiaHooks.emit('game_end');
+        const stars = GaiaProgress.starsFor(learnOptimal, learnMoves);
+        try { GaiaProgress.recordGame('chess', 'learn', stars); } catch (e) { console.warn('[progress] chess', e); }
+        const result = GaiaBoards.finish('chess', 'learn', GaiaBoards.grade(learnOptimal, learnMoves));
+        setGaiaState('dance');
+        playSound('victory');
+        showEnd('🎓', 'לְמַדְתֶּם אֵיךְ כָּל הַכֵּלִים זָזִים!', 'עַכְשָׁו אֶפְשָׁר לְשַׂחֵק נֶגֶד הַמַּחְשֵׁב.', stars, result, () => startChess('learn'));
+    }
+
+    // ---- start ----
+    window.startChess = function (m) {
+        stopAllGames();
+        build();
+        mode = m;
+        helps = 0; over = false; busy = false; turnToken++;
+        selected = -1; targets = []; hint = null; lesson = null;
+        $('chess-end').hidden = true;
+        $('chess-promo').hidden = true;
+        $('chess-screen').classList.toggle('chess-learning', m === 'learn');
+        showScreen('chess-screen');
+        GaiaHooks.emit('game_start', { subject: 'chess', level: m });
+        if (m === 'learn') {
+            learnMoves = 0; learnOptimal = 0;
+            startLesson(0);
+            return;
+        }
+        $('chess-lesson').hidden = true;
+        $('chess-mode').textContent = MODES[m];
+        game = new Chess();
+        placeAll(); paint(); trays();
+        status(turnText()); buttons();
+    };
+    // for the tests
+    window.GaiaChessGarden = {
+        get game() { return game; }, get busy() { return busy; }, get over() { return over; }, get lesson() { return lesson; }, LESSONS, fewestMoves,
+        setup(fen) { game.load(fen); selected = -1; targets = []; hint = null; placeAll(); paint(); trays(); status(turnText()); buttons(); }
+    };
+})();
+</script>
+<script>
 // ===== LEADERBOARDS MODULE =====
 // Every land has a board for each of its games: the highest grade (0-100) first, and
 // between equal grades the fastest time. One row per player, and only a better result
@@ -5609,7 +6805,7 @@ const BOARD_MAX_MS = 99999999;   // the sort key k = grade * 10^8 + (BOARD_MAX_M
 
 // The games of every land, in the order of the land's buttons: [game key, chip label].
 const BOARD_GAMES = {
-    math: [['10', '➕ עַד 10'], ['20', '➕ עַד 20'], ['mult_all', '✖️ כָּל הַלּוּחוֹת']]
+    math: [['10', '➕ עַד 10'], ['20', '➕ עַד 20'], ['100', '➕ עַד 100'], ['mult_all', '✖️ כָּל הַלּוּחוֹת']]
         .concat([2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => ['mult_' + n, '✖️ ' + n])),
     hebrew: [['1', 'אוֹת רִאשׁוֹנָה'], ['2', 'אוֹת אַחֲרוֹנָה'], ['3', 'אוֹת חֲסֵרָה']],
     reading: readingData.map((cat, i) => ['cat_' + i, cat.label]),
@@ -5618,7 +6814,8 @@ const BOARD_GAMES = {
     geography: [['1', 'מְדִינוֹת מֻכָּרוֹת'], ['2', 'כָּל הַמְּדִינוֹת']],
     biology: [['1', 'אֵיבָרִים עִקָּרִיִּים'], ['2', 'כָּל הָאֵיבָרִים']],
     memory: [['words_easy', 'מִלִּים – קַל'], ['words_hard', 'מִלִּים – קָשֶׁה'], ['flags_easy', 'דְּגָלִים – קַל'], ['flags_hard', 'דְּגָלִים – קָשֶׁה']],
-    puzzle: [['2x2', '2×2'], ['3x3', '3×3'], ['3x4', '3×4']]
+    puzzle: [['2x2', '2×2'], ['3x3', '3×3'], ['3x4', '3×4']],
+    chess: [['learn', '🎓 לוֹמְדִים'], ['easy', '🤖 קַל'], ['medium', '🤖 בֵּינוֹנִי'], ['hard', '🤖 קָשֶׁה']]
 };
 
 const GaiaBoards = (function () {
@@ -5956,7 +7153,7 @@ const GaiaBoards = (function () {
     'use strict';
 
     const SVG_NS = 'http://www.w3.org/2000/svg';
-    const VIEW_W = 800, VIEW_H = 1500;
+    const VIEW_W = 800, VIEW_H = 1660;
     const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     // Land definitions (top -> bottom). x,y are on the winding path (RTL feel).
@@ -5969,7 +7166,8 @@ const GaiaBoards = (function () {
         { key: 'geography', name: 'מִדְבַּר הַדְּגָלִים', x: 600, y: 870 },
         { key: 'biology',   name: 'מְעָרַת הַגּוּף',   x: 240, y: 1020 },
         { key: 'memory',    name: 'אִי הַזִּכָּרוֹן',   x: 570, y: 1170 },
-        { key: 'puzzle',    name: 'גֶּשֶׁר הַפָּאזֶל',  x: 250, y: 1330 }
+        { key: 'puzzle',    name: 'גֶּשֶׁר הַפָּאזֶל',  x: 250, y: 1330 },
+        { key: 'chess',     name: 'גַּן הַשַּׁחְמָט',   x: 560, y: 1490 }
     ];
 
     // Level buttons per land — same start* functions used today.
@@ -5979,6 +7177,7 @@ const GaiaBoards = (function () {
             buttons: [
                 { cls: 'btn-level-1', label: 'חִבּוּר וְחִסּוּר עַד 10', fn: () => startMathGame(10), levelKey: '10' },
                 { cls: 'btn-level-2', label: 'חִבּוּר וְחִסּוּר עַד 20', fn: () => startMathGame(20), levelKey: '20' },
+                { cls: 'btn-level-3', label: 'חִבּוּר וְחִסּוּר עַד 100', fn: () => startMathGame(100), levelKey: '100' },
                 { cls: 'btn-math',    label: 'לוּחַ הַכֶּפֶל ✖️',        fn: () => goToMultMenu() }
             ]
         },
@@ -5997,7 +7196,8 @@ const GaiaBoards = (function () {
                 { cls: 'btn-reading', label: 'סֶגּוֹל וְצֵירֵי (ֶ ֵ)',    fn: () => startReadingCategory(1) },
                 { cls: 'btn-reading', label: 'חִירִיק (ִ)',              fn: () => startReadingCategory(2) },
                 { cls: 'btn-reading', label: 'חוֹלָם (וֹ ֹ)',            fn: () => startReadingCategory(3) },
-                { cls: 'btn-reading', label: 'שׁוּרוּק וְקֻבּוּץ (וּ ֻ)', fn: () => startReadingCategory(4) }
+                { cls: 'btn-reading', label: 'שׁוּרוּק וְקֻבּוּץ (וּ ֻ)', fn: () => startReadingCategory(4) },
+                { cls: 'btn-level-3', label: 'סִפּוּרִים לְכִתָּה ג׳ 📚', fn: () => startReadingCategory(5) }
             ]
         },
         english: {
@@ -6045,6 +7245,16 @@ const GaiaBoards = (function () {
                 { cls: 'btn-puzzle', label: 'קָשֶׁה — 3×4',    fn: () => startPuzzle(3, 4, 'numbers'), levelKey: '3x4' },
                 { cls: 'btn-level-3', label: 'פָּאזֶל תְּמוּנָה 🖼️', fn: () => goToPuzzleMenu('image') }
             ]
+        },
+        chess: {
+            title: '♞ גַּן הַשַּׁחְמָט', hue: '--land-chess',
+            buttons: [
+                { cls: 'btn-chess',   label: 'לוֹמְדִים אֵיךְ הַכֵּלִים זָזִים 🎓', fn: () => startChess('learn'), levelKey: 'learn' },
+                { cls: 'btn-level-1', label: 'נֶגֶד הַמַּחְשֵׁב — קַל 🤖',      fn: () => startChess('easy'), levelKey: 'easy' },
+                { cls: 'btn-level-2', label: 'נֶגֶד הַמַּחְשֵׁב — בֵּינוֹנִי 🤖', fn: () => startChess('medium'), levelKey: 'medium' },
+                { cls: 'btn-level-3', label: 'נֶגֶד הַמַּחְשֵׁב — קָשֶׁה 🤖',     fn: () => startChess('hard'), levelKey: 'hard' },
+                { cls: 'btn-soft',    label: 'שְׁנֵי שַׂחְקָנִים עַל מַכְשִׁיר אֶחָד 👫', fn: () => startChess('two') }
+            ]
         }
     };
 
@@ -6057,7 +7267,8 @@ const GaiaBoards = (function () {
         geography: ['yoovy', 'כָּל דֶּגֶל שַׁיָּךְ לִמְדִינָה אַחֶרֶת. כַּמָּה מֵהֶם אַתֶּם מַכִּירִים? 🌍'],
         biology:   ['googy', 'מָה יֵשׁ לָנוּ בְּתוֹךְ הַגּוּף? בּוֹאוּ נְגַלֶּה! 🫀'],
         memory:    ['yoovy', 'בּוֹאוּ נִבְדֹּק אֶת הַזִּכָּרוֹן! 🃏'],
-        puzzle:    ['googy', 'עַל הַגֶּשֶׁר הַזֶּה הַחֲתִיכוֹת הִתְבַּלְבְּלוּ. נְסַדֵּר אוֹתָן? 🧩']
+        puzzle:    ['googy', 'עַל הַגֶּשֶׁר הַזֶּה הַחֲתִיכוֹת הִתְבַּלְבְּלוּ. נְסַדֵּר אוֹתָן? 🧩'],
+        chess:     ['yoovy', 'בְּגַן הַשַּׁחְמָט כָּל כְּלִי זָז אַחֶרֶת. בּוֹאוּ נִלְמַד — וְאָז נְנַסֶּה לְנַצֵּחַ אֶת הַמַּחְשֵׁב! ♞']
     };
 
     // castle land key maps to nothing playable
@@ -6146,7 +7357,9 @@ const GaiaBoards = (function () {
          [520, 950, 'dec-rock', 1], [360, 870, 'dec-bush', 1.1], [320, 905, 'dec-flowers', 1.1], [80, 990, 'dec-rock', 1.4],
          [120, 1062, 'dec-rock', 1], [400, 1010, 'dec-rock', 1.2], [745, 1005, 'dec-bush', 1], [380, 1170, 'dec-tree', 1.1],
          [430, 1200, 'dec-flowers', 1.2], [60, 1150, 'dec-tree', 1.2], [95, 1230, 'dec-pine', 1.2], [40, 1290, 'dec-bush', 1.1],
-         [520, 1420, 'dec-flowers', 1.2], [640, 1440, 'dec-bush', 1.1], [720, 1400, 'dec-tree', 1.1], [440, 1460, 'dec-rock', 1]
+         [740, 1410, 'dec-tree', 1.1], [400, 1430, 'dec-flowers', 1.2], [380, 1540, 'dec-rock', 1], [740, 1560, 'dec-bush', 1.1],
+         [90, 1470, 'dec-tree', 1.2], [160, 1540, 'dec-pine', 1.2], [60, 1610, 'dec-bush', 1.1], [250, 1610, 'dec-flowers', 1.3],
+         [430, 1630, 'dec-tree', 1], [700, 1640, 'dec-flowers', 1.2]
         ].forEach(function (d) { t += use(d[2], d[0], d[1], d[3]); });
         // birds over the castle
         t += '<g class="map-birds">' + use('dec-bird', 170, 95, 1.2) + use('dec-bird', 200, 115, 1) + use('dec-bird', 650, 60, 1.1) + '</g>';
@@ -6155,6 +7368,19 @@ const GaiaBoards = (function () {
 
     // One landmark per land, drawn around (0,0); its base stands at y≈+40, the name plaque is below.
     const LAND_ART = {
+        chess: function () {
+            let tiles = '';
+            for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) {
+                tiles += '<rect x="' + (i * 16 - 32) + '" y="' + (j * 16 - 32) + '" width="16" height="16" fill="' +
+                    ((i + j) % 2 ? 'oklch(0.66 0.10 145)' : 'oklch(0.95 0.035 95)') + '"/>';
+            }
+            return '' +
+                '<ellipse cx="0" cy="40" rx="80" ry="14" fill="oklch(0.74 0.12 140)" opacity="0.7"/>' +
+                '<g transform="translate(0 20) scale(1 0.5) rotate(45)"><rect x="-37" y="-37" width="74" height="74" rx="6" fill="oklch(0.48 0.09 50)"/>' + tiles + '</g>' +
+                use('dec-bush', -70, 34, 0.9) + use('dec-bush', 72, 36, 0.8) +
+                chessPieceSVG(6, true, 'x="-44" y="-36" width="58" height="58"') +
+                chessPieceSVG(2, false, 'x="-4" y="-22" width="50" height="50"');
+        },
         castle: function () {
             return '' +
                 '<ellipse cx="0" cy="42" rx="92" ry="14" fill="oklch(0.80 0.12 140)"/>' +
@@ -6360,6 +7586,30 @@ const GaiaBoards = (function () {
     }
 
     const LAND_SCENES = {
+        chess: function () {
+            let t = '<circle cx="985" cy="95" r="80" fill="url(#sc-sunglow)"/><circle cx="985" cy="95" r="36" fill="#FFD54F"/>';
+            t += cloud(190, 115, 1.3) + cloud(620, 75, 1) + cloud(420, 205, 0.8, 0.7) + cloud(830, 215, 0.75, 0.7);
+            // hedges and trees round the garden
+            t += '<path d="M0 470 Q150 432 300 456 T600 450 T900 452 T1200 444 L1200 530 L0 530 Z" fill="oklch(0.58 0.12 150)"/>';
+            t += use('dec-tree', 80, 480, 2.4) + use('dec-pine', 215, 478, 2.1) + use('dec-pine', 985, 476, 2.2) + use('dec-tree', 1125, 474, 2.5);
+            t += '<rect x="0" y="505" width="1200" height="295" fill="url(#sc-meadow)"/>';
+            // a giant chessboard on the lawn, seen from in front (tiles shrink toward the hedges)
+            const at = (x, z) => (600 + x * 330 / z).toFixed(1) + ' ' + (380 + 1260 / z).toFixed(1);
+            t += '<path d="M' + at(-5.3, 2.85) + ' L' + at(5.3, 2.85) + ' L' + at(5.3, 9.15) + ' L' + at(-5.3, 9.15) + ' Z" fill="oklch(0.48 0.09 50)"/>';
+            for (let k = 0; k < 6; k++) for (let i = -5; i < 5; i++) {
+                const z0 = 3 + k, z1 = 4 + k;
+                t += '<path d="M' + at(i, z0) + ' L' + at(i + 1, z0) + ' L' + at(i + 1, z1) + ' L' + at(i, z1) + ' Z" fill="' +
+                    ((i + k) % 2 ? 'oklch(0.66 0.10 145)' : 'oklch(0.95 0.035 95)') + '"/>';
+            }
+            // big pieces standing on it, the far ones first
+            [[3.6, 8.4, 4, false], [-3.8, 7.6, 2, true], [4.1, 5.6, 5, false], [-4.3, 5.0, 6, true], [3.2, 3.7, 1, false], [-3.3, 3.5, 4, true]]
+                .forEach(function (p) {
+                    const size = 2.2 * 330 / p[1], x = 600 + p[0] * 330 / p[1], y = 380 + 1260 / p[1];
+                    t += chessPieceSVG(p[2], p[3], 'x="' + (x - size / 2).toFixed(1) + '" y="' + (y - size * 0.95).toFixed(1) + '" width="' + size.toFixed(1) + '" height="' + size.toFixed(1) + '"');
+                });
+            t += use('dec-flowers', 120, 770, 1.8) + use('dec-flowers', 1080, 760, 1.7) + use('dec-bush', 40, 790, 2) + use('dec-bush', 1170, 795, 2);
+            return t;
+        },
         math: function () {
             let t = cloud(170, 110, 1.4) + cloud(1040, 80, 1.1) + cloud(330, 230, 0.8, 0.7) + cloud(900, 250, 0.9, 0.7);
             // the far range, then a big mountain on each side and the tall summit in the middle
@@ -6859,10 +8109,10 @@ const GaiaBoards = (function () {
     // body[data-land] follows the game that starts (game_start) and the screen shown (nav);
     // the map and the welcome screen have none. CSS colours the cards from it.
     const SUBJECT_LAND = { math: 'math', multiplication: 'math', hebrew: 'hebrew', reading: 'reading', english: 'english', repeat: 'english',
-        googy: 'english', geography: 'geography', biology: 'biology', memory: 'memory', puzzle: 'puzzle' };
+        googy: 'english', geography: 'geography', biology: 'biology', memory: 'memory', puzzle: 'puzzle', chess: 'chess' };
     const SCREEN_LAND = { 'welcome-screen': '', 'main-menu': '', 'mult-menu': 'math', 'mult-screen': 'math', 'puzzle-menu': 'puzzle',
         'puzzle-screen': 'puzzle', 'reading-screen': 'reading', 'memory-screen': 'memory',
-        'googy-topics': 'english', 'googy-screen': 'english', 'repeat-screen': 'english' };
+        'googy-topics': 'english', 'googy-screen': 'english', 'repeat-screen': 'english', 'chess-screen': 'chess' };
     function setLand(land) {
         const body = document.body;
         if ((body.dataset.land || '') === land) return;

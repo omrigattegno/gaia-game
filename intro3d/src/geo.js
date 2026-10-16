@@ -127,7 +127,7 @@ export function scaleUV(g, su, sv = su) {
 
 export const M = {};
 export function makeMaterials() {
-    M.gold = new THREE.MeshStandardMaterial({ color: '#ffcf6a', metalness: 1, roughness: 0.24 });
+    M.gold = new THREE.MeshStandardMaterial({ color: '#ffcf6a', metalness: 1, roughness: 0.3 });
     M.goldDeep = new THREE.MeshStandardMaterial({ color: '#f0b445', metalness: 1, roughness: 0.32 });
     M.ruby = gem('#ff2d55');
     M.sapphire = gem('#3d8bff');

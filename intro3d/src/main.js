@@ -44,8 +44,8 @@ function sceneMaterials() {
     return {
         stone: stoneMat(), castleStone,
         roofPink: roof('#e2559a'), roofPurple: roof('#7a4ae0'),
-        cobbles: new THREE.MeshStandardMaterial({ map: cob.map, normalMap: cob.normalMap, roughness: 0.72 }),
-        grass: new THREE.MeshStandardMaterial({ map: grass.map, normalMap: grass.normalMap, roughness: 0.95, color: '#c8dcc0' }),
+        cobbles: new THREE.MeshStandardMaterial({ map: cob.map, normalMap: cob.normalMap, normalScale: new THREE.Vector2(0.6, 0.6), roughness: 0.8, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -2 }),
+        grass: new THREE.MeshStandardMaterial({ map: grass.map, normalMap: grass.normalMap, roughness: 0.95, color: '#eaffdc' }),
         carpet: new THREE.MeshPhysicalMaterial({ map: T.carpet(), roughness: 0.9, sheen: 0.7, sheenColor: '#c8204f', sheenRoughness: 0.5 }),
         window: new THREE.MeshBasicMaterial({ map: win, transparent: true, color: new THREE.Color(2.3, 1.85, 1.3) }),
         windowLit: new THREE.MeshBasicMaterial({ map: win, transparent: true, vertexColors: true, color: new THREE.Color(2.3, 1.85, 1.3) }),
@@ -56,10 +56,10 @@ function sceneMaterials() {
         iron: new THREE.MeshStandardMaterial({ color: '#2c2840', metalness: 0.7, roughness: 0.42 }),
         pot: new THREE.MeshStandardMaterial({ color: '#f4eefc', roughness: 0.45 }),
         trunk: new THREE.MeshStandardMaterial({ color: '#5a3d2b', roughness: 0.9 }),
-        leaf: new THREE.MeshStandardMaterial({ color: '#2f7040', roughness: 0.8, normalMap: grass.normalMap, normalScale: new THREE.Vector2(1.4, 1.4) }),
-        hedge: new THREE.MeshStandardMaterial({ color: '#2a6338', roughness: 0.85, normalMap: grass.normalMap, normalScale: new THREE.Vector2(1.6, 1.6) }),
-        tree: new THREE.MeshStandardMaterial({ color: '#2a5546', roughness: 0.9 }),
-        pine: new THREE.MeshStandardMaterial({ color: '#1f463e', roughness: 0.9 }),
+        leaf: new THREE.MeshStandardMaterial({ color: '#3f9052', roughness: 0.8, normalMap: grass.normalMap, normalScale: new THREE.Vector2(1.4, 1.4) }),
+        hedge: new THREE.MeshStandardMaterial({ color: '#3a8148', roughness: 0.85, normalMap: grass.normalMap, normalScale: new THREE.Vector2(1.6, 1.6) }),
+        tree: new THREE.MeshStandardMaterial({ color: '#3a765a', roughness: 0.9 }),
+        pine: new THREE.MeshStandardMaterial({ color: '#2d6553', roughness: 0.9 }),
         flower: new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.6, emissive: '#ffffff', emissiveIntensity: 0.08 }),
         pool: new THREE.MeshBasicMaterial({ map: T.glow(1.5), color: '#ffb35c', transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, vertexColors: true, opacity: 0.38 }),
         ...girlMaterials()
@@ -100,7 +100,7 @@ function vignette() {
         transparent: true, depthTest: false, depthWrite: false,
         vertexShader: 'varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
         fragmentShader: `varying vec2 vUv; void main() { vec2 q = vUv - 0.5; float v = clamp(1.0 - dot(q, q) * 1.25, 0.0, 1.0);
-            gl_FragColor = vec4(0.0, 0.0, 0.0, 0.65 * (1.0 - v)); }`
+            gl_FragColor = vec4(0.0, 0.0, 0.0, 0.42 * (1.0 - v)); }`
     }));
     m.frustumCulled = false;
     m.renderOrder = 999;
@@ -109,8 +109,8 @@ function vignette() {
 
 // tiers: pixel ratio cap, MSAA samples, shadow map size (0 = none), bloom
 const TIERS = [
-    { pr: 1, msaa: 0, shadow: 0, bloom: true },
-    { pr: 1.5, msaa: 0, shadow: 1024, bloom: true },
+    { pr: 1, msaa: 2, shadow: 0, bloom: true },
+    { pr: 1.5, msaa: 4, shadow: 1024, bloom: true },
     { pr: 2, msaa: 4, shadow: 2048, bloom: true }
 ];
 
@@ -120,20 +120,20 @@ async function prepare(opts = {}) {
     canvas.className = 'in3d-canvas';
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, stencil: false, powerPreference: 'high-performance' });
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.0;
+    renderer.toneMappingExposure = 1.2;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFShadowMap;
     T.setAnisotropy(Math.min(8, renderer.capabilities.getMaxAnisotropy()));
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(col('#2b1c52'), 0.0042);
-    const camera = new THREE.PerspectiveCamera(40, 16 / 9, 0.1, 2500);
+    scene.fog = new THREE.FogExp2(col('#5e4c9e'), 0.0034);
+    const camera = new THREE.PerspectiveCamera(40, 16 / 9, 0.25, 2500);
 
     makeMaterials();
     M.goldDouble = M.gold.clone(); M.goldDouble.side = THREE.DoubleSide;
     const mats = sceneMaterials();
     const env = buildEnvironment(renderer);
     scene.environment = env.texture;
-    scene.environmentIntensity = 0.42;
+    scene.environmentIntensity = 0.65;
 
     const sky = buildSky(); scene.add(sky.group);
     const gate = buildGate(mats); scene.add(gate.group);
@@ -149,8 +149,8 @@ async function prepare(opts = {}) {
 
     // lights: the moon, the night sky, a warm key on the sisters from the open gates, a warm rim
     // from the castle, a glow inside the gates as they open
-    const hemi = new THREE.HemisphereLight(col('#5a6cc0'), col('#2a1838'), 0.35);
-    const moon = new THREE.DirectionalLight(col('#b9c6ff'), 1.25);
+    const hemi = new THREE.HemisphereLight(col('#aebcff'), col('#5c4272'), 0.9);
+    const moon = new THREE.DirectionalLight(col('#cdd5ff'), 1.9);
     moon.castShadow = true;
     moon.shadow.mapSize.set(2048, 2048);
     moon.shadow.camera.left = -11; moon.shadow.camera.right = 11; moon.shadow.camera.top = 11; moon.shadow.camera.bottom = -11;
@@ -170,7 +170,8 @@ async function prepare(opts = {}) {
     composer.addPass(bloom);
     composer.addPass(new OutputPass());
 
-    const V = new THREE.Vector3(), A = new THREE.Vector3();
+    const V = new THREE.Vector3(), A = new THREE.Vector3(), F = new THREE.Vector3();
+    const LX = new THREE.Vector3(0, 1, 0).cross(MOON_DIR).normalize(), LY = MOON_DIR.clone().cross(LX);
     let px = 1, tier = 2, W = 0, H = 0;
     const setTier = (n) => {
         tier = n;
@@ -219,16 +220,21 @@ async function prepare(opts = {}) {
         // lights through the film
         const open = smooth(GATE_OPEN[0], GATE_OPEN[0] + 0.8, t);
         const flood = window4(t, GATE_OPEN[0], GATE_OPEN[0] + 0.45, GATE_OPEN[0] + 0.7, GATE_OPEN[0] + 1.3);
-        inner.intensity = flood * 40 + open * 6;
+        inner.intensity = flood * 28 + open * 6;
         key.intensity = open * 30;
         rim.intensity = open * 2.2;
-        hemi.intensity = 0.35 + fl.flash * 0.25;
-        renderer.toneMappingExposure = 1.0 + flood * 0.12;
-        // the moon's shadows follow the action: the gate, then the sisters
-        const focus = t < 4 ? new THREE.Vector3(0, 0, 0) : yoovy.root.position.clone().add(new THREE.Vector3(0.27, 0, 0));
+        hemi.intensity = 0.9 + fl.flash * 0.25;
+        renderer.toneMappingExposure = 1.2 + flood * 0.04;
+        // the moon's shadows follow the action: the gate, then the sisters; they glide across
+        // and move in whole shadow-map texels, so the edges don't crawl as the sisters walk
+        F.copy(yoovy.root.position).x += 0.27;
+        F.multiplyScalar(smooth(3.4, 4.6, t));
+        const step = 22 / moon.shadow.mapSize.x;
+        const lx = Math.round(F.dot(LX) / step) * step, ly = Math.round(F.dot(LY) / step) * step, lz = F.dot(MOON_DIR);
+        const focus = F.set(0, 0, 0).addScaledVector(LX, lx).addScaledVector(LY, ly).addScaledVector(MOON_DIR, lz);
         moon.target.position.copy(focus);
         moon.position.copy(focus).addScaledVector(MOON_DIR, 70);
-        bloom.strength = 0.6 + flood * 0.25;
+        bloom.strength = 0.6 + flood * 0.15;
         composer.render();
     };
 
@@ -247,20 +253,34 @@ async function prepare(opts = {}) {
 function play(container, { onTime } = {}) {
     if (!S) throw new Error('GaiaIntro3D: prepare() first');
     container.appendChild(S.canvas);
-    const fit = () => S.resize(container.clientWidth || innerWidth, container.clientHeight || innerHeight);
+    let raf = 0, stopped = false, t0 = 0, slow = 0, frames = 0, last = 0, shown = 0;
+    // a canvas is emptied whenever it is resized, so it is only resized when the size really
+    // changes, and the frame is drawn again straight away (else a blank frame flashes)
+    const fit = () => {
+        const w = container.clientWidth || innerWidth, h = container.clientHeight || innerHeight;
+        if (S.canvas.width === Math.floor(w * S.renderer.getPixelRatio()) && S.canvas.height === Math.floor(h * S.renderer.getPixelRatio())) return;
+        S.resize(w, h);
+        S.draw(shown);
+    };
     fit();
+    S.draw(0);   // the opening frame is up before the first animation frame comes
     window.addEventListener('resize', fit);
-    let raf = 0, stopped = false, t0 = 0, slow = 0, frames = 0, last = 0;
     const frame = (now) => {
         if (stopped) return;
         if (!t0) t0 = now;
         const t = (now - t0) / 1000;
-        S.draw(Math.min(t, LENGTH));
+        shown = Math.min(t, LENGTH);
+        S.draw(shown);
         if (onTime) onTime(t);
-        // too slow for this device? draw fewer pixels
-        if (last) { frames++; if (now - last > 45) slow++; }
+        // too slow for this device? draw fewer pixels. Judged only after the start-up hiccups
+        // and over a good stretch, and the frame is drawn again at once: resizing the canvas
+        // empties it, and an empty frame on screen is a flash.
+        if (last && t > 0.8) { frames++; if (now - last > 45) slow++; }
         last = now;
-        if (frames === 24) { if (slow > 12 && S.tier > 0) S.setTier(S.tier - 1); frames = slow = 0; }
+        if (frames === 30) {
+            if (slow > 20 && S.tier > 0) { S.setTier(S.tier - 1); S.draw(shown); }
+            frames = slow = 0;
+        }
         raf = requestAnimationFrame(frame);
     };
     raf = requestAnimationFrame(frame);

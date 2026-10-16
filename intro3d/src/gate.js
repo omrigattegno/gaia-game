@@ -128,9 +128,9 @@ export function buildGate(mats) {
 
     // --- the cobbled square in front ---
     const sq = new THREE.PlaneGeometry(90, 46, 1, 1);
-    scaleUV(sq, 30, 15);
+    scaleUV(sq, 14, 7);   // big, soft stones: small sharp ones shimmered as the camera moved in
     const square = new THREE.Mesh(sq, mats.cobbles);
-    square.rotation.x = -Math.PI / 2; square.position.set(0, 0, 23 - 1.3);
+    square.rotation.x = -Math.PI / 2; square.position.set(0, 0.02, 23 - 1.3);
     square.receiveShadow = true;
     group.add(square);
 
@@ -157,9 +157,9 @@ export function buildGate(mats) {
             raysMat.opacity = flood * 0.45;
             raysMesh.rotation.z = t * 0.12;
             raysMesh.visible = flood > 0.001;
-            // lanterns flicker
+            // lanterns breathe softly (a fast flicker read as the picture flickering)
             for (const L of lanterns) {
-                const f = 0.82 + 0.1 * Math.sin(t * 13 + L.phase) + 0.06 * Math.sin(t * 29.7 + L.phase * 2) + 0.04 * Math.sin(t * 53.1);
+                const f = 0.9 + 0.06 * Math.sin(t * 2.6 + L.phase) + 0.04 * Math.sin(t * 4.3 + L.phase * 2);
                 L.light.intensity = 9 * f;
                 L.flame.scale.set(1, 0.9 + 0.2 * f, 1);
                 L.glowMat.opacity = 0.55 * f;
