@@ -161,7 +161,7 @@ export function buildGrounds(mats) {
         g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals();
         return new THREE.Mesh(g, new THREE.MeshLambertMaterial({ color, side: THREE.DoubleSide }));
     };
-    group.add(ridge(230, 18, 52, 3, '#2a2350'), ridge(330, 40, 90, 8, '#231c45'));
+    group.add(ridge(230, 18, 52, 3, '#4c4290'), ridge(330, 40, 90, 8, '#3e357e'));
 
     return {
         group,
@@ -171,7 +171,7 @@ export function buildGrounds(mats) {
             const c = new THREE.Color();
             for (let j = 0; j < n; j++) {
                 const i = j >> 1, on = smooth(2.85 + i * 0.16, 3.25 + i * 0.16, t);
-                const k = 0.12 + 0.88 * on * (0.94 + 0.06 * Math.sin(t * 9 + j * 1.7));
+                const k = 0.12 + 0.88 * on * (0.96 + 0.04 * Math.sin(t * 2.4 + j * 1.7));
                 b.setX(j, k);
                 orbs.setColorAt(j, c.setScalar(0.25 + 0.75 * k));
                 for (let v = 0; v < 6; v++) poolCol.set([k, k, k], (j * 6 + v) * 3);

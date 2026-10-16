@@ -1,6 +1,6 @@
 # The 3D royal intro
 
-The film that opens the kingdom when "יוֹצְאִים לַדֶּרֶךְ" is tapped: the golden gates at night swing
+The film that opens the kingdom when "יוֹצְאִים לַדֶּרֶךְ" is tapped: the golden gates at twilight swing
 open, fireworks go up over the castle, and Yoovy and Googy walk out hand in hand in crowns and capes.
 It is drawn live with [three.js](https://threejs.org) (WebGL 2), from code only: every model, texture
 and effect is made in `src/` (no image or model files), and the sisters' faces are the game's own

@@ -458,6 +458,7 @@
             font-family: 'Fredoka', 'Courier New', monospace; margin: 22px 0;
             direction: ltr; unicode-bidi: bidi-override; white-space: nowrap;
         }
+        .math-display.wide { font-size: clamp(2rem, 10.5vw, 3.4rem); }
 
         .options-container { display: flex; justify-content: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
 
@@ -793,6 +794,15 @@
             line-height: 1.9; color: var(--ink); unicode-bidi: embed;
             margin: 8px 0; padding: 0 4px;
         }
+        /* the longer third-grade stories: paragraphs in a book-sized font */
+        .reading-para {
+            direction: rtl; text-align: right; font-size: 1.15rem; line-height: 1.8;
+            color: var(--ink); margin: 0 0 12px; padding: 0 4px; text-indent: 1em;
+        }
+        .reading-story-box:has(.reading-para) { max-height: min(56dvh, 460px); }
+        .reading-peek { direction: rtl; text-align: right; margin: 0 0 6px; }
+        .reading-peek summary { cursor: pointer; font-weight: bold; color: var(--lt-deep); font-size: 1.05rem; padding: 4px 0; }
+        .reading-peek .reading-story-box { max-height: 34dvh; margin-top: 6px; }
         /* the story is printed on a book page, with a ribbon for a bookmark */
         .reading-story-box {
             position: relative; background: linear-gradient(180deg, oklch(0.995 0.015 90), oklch(0.975 0.03 85));
@@ -2492,6 +2502,7 @@ const GaiaPlayer = (function () {
             if (currentGameType === 'biology') return 30;
             if (currentGameType === 'english' && currentLevel === 4) return 25;
             if (currentGameType === 'english' && currentLevel === 0) return 20;
+            if (currentGameType === 'math' && currentLevel === 100) return 25;
             return 15;
         }
         let timeLeft = 15;
@@ -3311,7 +3322,18 @@ const GaiaPlayer = (function () {
             document.getElementById('options').className = "options-container";
             const isAddition = Math.random() > 0.5;
             let n1, n2;
-            if (isAddition) {
+            if (currentLevel === 100) {
+                // up to 100: two-digit numbers, so the sums and differences cross the tens
+                if (isAddition) {
+                    n1 = 10 + Math.floor(Math.random() * 81);                // 10..90
+                    n2 = 1 + Math.floor(Math.random() * (100 - n1));         // 1..100-n1 → sum ≤ 100
+                } else {
+                    n1 = 11 + Math.floor(Math.random() * 90);                // 11..100
+                    n2 = 1 + Math.floor(Math.random() * (n1 - 1));           // 1..n1-1
+                }
+                currentAnswer = isAddition ? n1 + n2 : n1 - n2;
+                container.innerHTML = `<div class="math-display wide">${n1} ${isAddition ? '+' : '-'} ${n2} = ?</div>`;
+            } else if (isAddition) {
                 n1 = Math.floor(Math.random() * (currentLevel - 1)) + 1;   // 1..N-1
                 n2 = Math.floor(Math.random() * (currentLevel - n1 + 1));  // 0..N-n1 → sum ≤ N
                 currentAnswer = n1 + n2;
@@ -3586,6 +3608,13 @@ const GaiaPlayer = (function () {
                 while (options.length < 3) {
                     let rand = allLetters[Math.floor(Math.random() * allLetters.length)];
                     if (!options.includes(rand)) options.push(rand);
+                }
+            } else if (type === 'math' && currentLevel === 100) {
+                // the slips a child makes with big numbers: a ten off, or one or two off
+                const offsets = shuffle([-10, 10, -10, 10, -1, 1, -2, 2, -11, 11, -9, 9]);
+                for (const off of offsets) {
+                    const rand = correct + off;
+                    if (options.length < 3 && rand >= 0 && rand <= 110 && !options.includes(rand)) options.push(rand);
                 }
             } else {
                 while (options.length < 3) {
@@ -3958,7 +3987,7 @@ const GaiaPlayer = (function () {
         if (reducedMotion() || (net && net.saveData) || (navigator.deviceMemory && navigator.deviceMemory < 2)) { film = 'no'; return; }
         film = 'loading';
         const script = document.createElement('script');
-        script.src = 'intro3d.js?v=20261015';
+        script.src = 'intro3d.js?v=20261016';
         script.async = true;
         script.onerror = () => { film = 'no'; };
         script.onload = () => {
@@ -4314,6 +4343,105 @@ const readingData = [
         ]
       }
     ]
+  },
+  {
+    // third grade: longer stories in paragraphs, without nikkud, and four questions each
+    category: "grade3",
+    label: "סִפּוּרִים לְכִתָּה ג׳",
+    doneLine: "כָּל הַסִּפּוּרִים לְכִתָּה ג׳ נִקְרְאוּ!",
+    plain: true,
+    stories: [
+      {
+        title: "המפה הישנה 🗺️",
+        paragraphs: [
+          "ביום שישי בבוקר עלתה נועה עם אחיה הקטן, איתי, לעליית הגג של סבתא. הם חיפשו את קופסת המשחקים הישנה, אבל מצאו משהו אחר לגמרי: נייר מקופל וצהוב, מכוסה באבק.",
+          "כשפתחו את הנייר, ראו שזו מפה. במרכז הייתה מצוירת החצר של סבתא, ולידה עץ הלימון הגדול. מהעץ יצא קו מקווקו אל איקס אדום ליד הגדר. מתחת לאיקס היה כתוב: \"האוצר שלי\".",
+          "הילדים לקחו כף חפירה ורצו לחצר. הם ספרו עשרה צעדים מהעץ, בדיוק כמו במפה, והתחילו לחפור. אחרי זמן קצר הכף נגעה במשהו קשה. זו הייתה קופסת פח קטנה וחלודה.",
+          "בתוך הקופסה מצאו גולות צבעוניות, משרוקית ותמונה של ילדה עם צמות. \"זאת אני, כשהייתי בת תשע!\" צחקה סבתא. \"ציירתי את המפה הזאת לפני שישים שנה, ושכחתי ממנה לגמרי.\" באותו ערב שיחקו שלושתם בגולות, וסבתא סיפרה להם איך נראתה השכונה כשהייתה ילדה."
+        ],
+        questions: [
+          { q: "מה חיפשו הילדים בעליית הגג?", options: ["מפה ישנה", "קופסת משחקים", "כף חפירה"], a: 1 },
+          { q: "איפה סומן האוצר במפה?", options: ["ליד הגדר", "בתוך עץ הלימון", "בעליית הגג"], a: 0 },
+          { q: "מי הייתה הילדה שבתמונה?", options: ["נועה", "אמא של נועה", "סבתא"], a: 2 },
+          { q: "למה סבתא צחקה?", options: ["כי איתי נפל לבור", "כי מצאו מפה שהיא עצמה ציירה ושכחה", "כי הגולות היו מצחיקות"], a: 1 }
+        ]
+      },
+      {
+        title: "למה צריך דבורים? 🐝",
+        paragraphs: [
+          "רוב האנשים מכירים את הדבורה בגלל הדבש המתוק, או בגלל העקיצה הכואבת. אבל לדבורים יש תפקיד חשוב הרבה יותר: הן עוזרות לצמחים ליצור פירות.",
+          "כשדבורה נוחתת על פרח כדי לשתות צוף, אבקה צהובה ודקה נדבקת לשערות שעל גופה. כשהיא עפה לפרח הבא, חלק מהאבקה נופל עליו. המעבר הזה של אבקה מפרח לפרח נקרא האבקה, ובזכותו הפרח יכול להפוך לפרי.",
+          "תפוחים, אבטיחים, שקדים ומלפפונים הם רק חלק מהמאכלים שצריכים את עזרת הדבורים. בלי דבורים היו על המדפים בסופר הרבה פחות פירות וירקות.",
+          "היום יש בעולם פחות דבורים מבעבר. גם ילדים יכולים לעזור להן: לשתול פרחים במרפסת או בחצר, ולא לפגוע בדבורה שנוחתת לידם. דבורה שעסוקה באיסוף צוף לא תעקוץ, אם לא מפריעים לה."
+        ],
+        questions: [
+          { q: "מה התפקיד החשוב של הדבורים, לפי הטקסט?", options: ["לעקוץ אנשים", "לעזור לצמחים ליצור פירות", "לקשט את הגינה"], a: 1 },
+          { q: "מה נדבק לשערות של הדבורה?", options: ["אבקה", "דבש", "טיפות מים"], a: 0 },
+          { q: "מה פירוש המילה \"האבקה\" בטקסט?", options: ["עקיצה של דבורה", "הכנת דבש בכוורת", "מעבר של אבקה מפרח לפרח"], a: 2 },
+          { q: "מה כדאי לעשות כשדבורה נוחתת לידנו?", options: ["לברוח מהר", "לא להפריע לה", "לנסות לתפוס אותה"], a: 1 }
+        ]
+      },
+      {
+        title: "הפתעה לסבא 🎁",
+        paragraphs: [
+          "בעוד שבוע יחגוג סבא אברהם יום הולדת שבעים. התאומים עומר ומאיה רצו לתת לו מתנה מיוחדת, אבל בקופה שלהם היו רק עשרים שקלים.",
+          "\"אפשר לקנות לו עט,\" הציע עומר. \"עטים יש לו כבר עשרה,\" ענתה מאיה. \"בוא נכין משהו בעצמנו.\" הם ישבו וחשבו, עד שמאיה נזכרה שסבא תמיד מספר סיפורים מהילדות שלו, ותמיד אומר: \"חבל שאף אחד לא כותב את זה.\"",
+          "כל יום אחרי בית הספר התקשרו התאומים לסבתא, ושאלו אותה על סבא: איפה גדל, באילו משחקים שיחק, ומה עשה כשהיה בגילם. עומר כתב את הסיפורים, ומאיה ציירה ציור לכל סיפור. בעשרים השקלים קנו כריכה יפה, וחיברו את כל הדפים לספר.",
+          "ביום ההולדת פתח סבא את המתנה ושתק רגע ארוך. אחר כך הרכיב את המשקפיים והתחיל לקרוא בקול. כשהגיע לסיפור על הכלב שהיה לו בילדות, ראו כולם שהעיניים שלו נוצצות. \"זאת המתנה הכי יפה שקיבלתי אי פעם,\" אמר, וחיבק את שניהם."
+        ],
+        questions: [
+          { q: "למה התאומים לא קנו לסבא עט?", options: ["כי לא היה להם כסף בכלל", "כי יש לו כבר הרבה עטים", "כי סבא לא אוהב לכתוב"], a: 1 },
+          { q: "מה עשתה מאיה בספר?", options: ["כתבה את הסיפורים", "ציירה ציורים", "קנתה את הדפים"], a: 1 },
+          { q: "ממי שמעו התאומים את הסיפורים על סבא?", options: ["מסבתא", "מהספרנית", "מהמורה"], a: 0 },
+          { q: "למה העיניים של סבא נצצו?", options: ["כי הוא היה עייף", "כי האור בחדר היה חזק", "כי הוא התרגש מהמתנה"], a: 2 }
+        ]
+      },
+      {
+        title: "שמשון הלך לאיבוד 🐕",
+        paragraphs: [
+          "שמשון הוא כלב קטן וחום, עם אוזן אחת עומדת ואוזן אחת מקופלת. הוא גר עם משפחת לוי, ואוהב שלושה דברים: לרדוף אחרי יונים, לישון על הספה ולאכול נקניקיות.",
+          "ביום ראשון בערב שכח מישהו לסגור את השער. כשאריאל, הבן של המשפחה, יצא לחצר לקרוא לשמשון לארוחת הערב, הכלב לא הגיע. אריאל חיפש מתחת לעץ, מאחורי המחסן ובכל הרחוב, אבל שמשון נעלם.",
+          "המשפחה הדפיסה מודעות עם תמונה של שמשון, ותלתה אותן בכל השכונה. בלילה אריאל לא הצליח להירדם. הוא דמיין את שמשון לבד בחושך, קר ורעב.",
+          "למחרת בבוקר צלצל הטלפון. \"שלום, אני מהמאפייה שבסוף הרחוב,\" אמרה אישה. \"יש פה כלב קטן עם אוזן מקופלת, שיושב ליד הדלת כבר שעה ומסתכל על הנקניקיות בחלון.\" אריאל רץ למאפייה, ושמשון קפץ עליו וליקק לו את הפנים. מאז אריאל בודק בכל ערב שהשער סגור."
+        ],
+        questions: [
+          { q: "איך אפשר לזהות את שמשון?", options: ["יש לו זנב ארוך ולבן", "יש לו אוזן אחת מקופלת", "יש לו קולר אדום"], a: 1 },
+          { q: "איך יצא שמשון מהחצר?", options: ["השער נשאר פתוח", "הוא קפץ מעל הגדר", "הוא חפר בור"], a: 0 },
+          { q: "למה, לדעתכם, חיכה שמשון דווקא ליד המאפייה?", options: ["כי הוא היה עייף", "כי הוא אוהב נקניקיות", "כי אריאל חיכה לו שם"], a: 1 },
+          { q: "מה למד אריאל מהמקרה?", options: ["לבדוק שהשער סגור", "לא לגדל כלבים", "לקנות נקניקיות במאפייה"], a: 0 }
+        ]
+      },
+      {
+        title: "מזחל לפרפר 🦋",
+        paragraphs: [
+          "האם ידעתם שכל פרפר היה פעם זחל? החיים של פרפר מתחילים בביצה קטנטנה, שאמו מטילה על עלה. אחרי כמה ימים בוקע מהביצה זחל רעב מאוד.",
+          "הזחל עושה כמעט כל היום דבר אחד: אוכל. הוא אוכל עלים ועוד עלים, וגדל מהר מאוד. העור שלו לא גדל יחד איתו, ולכן הזחל מחליף את העור כמה פעמים, כמו ילד שמקבל בגדים חדשים כשהישנים קטנים עליו.",
+          "כשהזחל מסיים לגדול, הוא נתלה על ענף ויוצר סביבו מעטפת קשה שנקראת גולם. מבחוץ נראה שהגולם ישן ושלא קורה בו כלום, אבל בפנים מתרחש שינוי מדהים: הגוף של הזחל משתנה לגמרי.",
+          "אחרי כשבועיים הגולם נפתח, ויוצא ממנו פרפר עם כנפיים רטובות ומקומטות. הפרפר מחכה בסבלנות שהכנפיים יתייבשו ויתיישרו, ורק אז הוא עף לחפש פרחים. השינוי הגדול הזה, מביצה לזחל, לגולם ולפרפר, נקרא גלגול."
+        ],
+        questions: [
+          { q: "איפה מטילה אמא פרפר את הביצה?", options: ["על עלה", "בתוך פרח", "באדמה"], a: 0 },
+          { q: "למה הזחל מחליף את העור שלו?", options: ["כי העור מתלכלך", "כי העור לא גדל יחד איתו", "כי קר לו"], a: 1 },
+          { q: "מה הסדר הנכון בחיים של פרפר?", options: ["זחל, ביצה, פרפר, גולם", "ביצה, גולם, זחל, פרפר", "ביצה, זחל, גולם, פרפר"], a: 2 },
+          { q: "למה הפרפר לא עף מיד כשהוא יוצא מהגולם?", options: ["כי הכנפיים שלו עוד רטובות", "כי הוא רעב", "כי הוא מפחד"], a: 0 }
+        ]
+      },
+      {
+        title: "הכדור של כולם ⚽",
+        paragraphs: [
+          "בהפסקה הגדולה יצאו ילדי כיתה ג' לחצר. בארגז הספורט נשאר רק כדור אחד, ודניאל ורוני תפסו אותו באותו רגע בדיוק. \"אנחנו צריכים אותו לכדורגל!\" צעק דניאל. \"ואנחנו צריכים אותו לכדורסל!\" צעקה רוני.",
+          "שניהם משכו את הכדור, כל אחד לכיוון שלו, והוויכוח הלך וגדל. ילדים נוספים התאספו מסביב, וכל אחד צעק משהו אחר. חצי מההפסקה כבר עבר, ואף אחד עוד לא שיחק.",
+          "אז ניגשה אליהם ליה, ילדה שקטה שבדרך כלל רק מסתכלת מהצד. \"אולי נחלק את ההפסקה?\" הציעה. \"עשר דקות כדורגל ועשר דקות כדורסל. ואם כולנו נשחק ביחד, יהיו לנו קבוצות גדולות יותר.\"",
+          "דניאל ורוני הסתכלו זה על זו, והתחילו לצחוק. הם הטילו מטבע כדי להחליט במה מתחילים. מאותו יום שיחקו כל ילדי הכיתה ביחד, והמשחקים היו הרבה יותר שמחים. וליה? היא כבר לא הסתכלה מהצד. היא הייתה השחקנית הכי מהירה במגרש."
+        ],
+        questions: [
+          { q: "מה הייתה הבעיה בהפסקה?", options: ["הכדור היה קרוע", "היה רק כדור אחד לשני משחקים", "ירד גשם"], a: 1 },
+          { q: "מה הציעה ליה?", options: ["לחלק את ההפסקה בין שני המשחקים", "לקנות עוד כדור", "לשאול את המורה"], a: 0 },
+          { q: "איך החליטו במה מתחילים?", options: ["לפי מי שצעק חזק יותר", "המורה החליטה", "הטילו מטבע"], a: 2 },
+          { q: "מה הרעיון החשוב בסיפור?", options: ["שכדורגל עדיף על כדורסל", "שאפשר לפתור ריב בהסכמה ובשיתוף", "שצריך להביא כדור מהבית"], a: 1 }
+        ]
+      }
+    ]
   }
 ];
 
@@ -4321,8 +4449,16 @@ let currentReadingCategoryIdx = 0;
 let currentReadingStoryIdx = 0;
 let currentReadingQuestionIdx = 0;
 let readingScore = 0;
-// { catIdx: [bestStoryScore0, bestStoryScore1, bestStoryScore2] }  -1 = not done
+// { catIdx: [bestStoryScore0, bestStoryScore1, ...] }  -1 = not done
 let readingProgress = GaiaProgress.getReadingProgress();
+
+// a category's progress, one slot per story (older saves may hold fewer slots)
+function readingProgressFor(catIdx) {
+    const n = readingData[catIdx].stories.length;
+    const prog = readingProgress[catIdx] || [];
+    while (prog.length < n) prog.push(-1);
+    return prog;
+}
 
 // back to the map, with the reading land's category panel open
 function goToReadingMenu() {
@@ -4335,18 +4471,19 @@ function startReadingCategory(catIdx) {
     GaiaHooks.emit('game_start', { subject: 'reading', level: 'cat_' + catIdx });
     currentReadingCategoryIdx = catIdx;
     currentReadingQuestionIdx = 0;
-    if (!readingProgress[catIdx]) readingProgress[catIdx] = [-1, -1, -1];
+    readingProgress[catIdx] = readingProgressFor(catIdx);
     showScreen('reading-screen');
     renderStorySelection();
 }
 
 function renderStorySelection() {
     const cat = readingData[currentReadingCategoryIdx];
-    const prog = readingProgress[currentReadingCategoryIdx] || [-1, -1, -1];
+    const prog = readingProgressFor(currentReadingCategoryIdx);
     const doneCount = prog.filter(v => v >= 0).length;
+    const allDone = doneCount === cat.stories.length;
 
     document.getElementById('reading-cat-label').textContent = cat.label;
-    document.getElementById('reading-story-progress').textContent = doneCount + '/3 הֻשְׁלְמוּ';
+    document.getElementById('reading-story-progress').textContent = doneCount + '/' + cat.stories.length + ' הֻשְׁלְמוּ';
     document.getElementById('reading-q-progress').textContent = '';
 
     const content = document.getElementById('reading-content');
@@ -4361,10 +4498,10 @@ function renderStorySelection() {
             <button class="reading-story-pick-btn ${done ? 'done' : ''}" onclick="startReadingStory(${i})">
                 <span class="story-pick-icon">${done ? '✅' : '📖'}</span>
                 <span class="story-pick-title">${story.title}</span>
-                ${done ? `<span class="story-pick-score">⭐ ${score}/3</span>` : ''}
+                ${done ? `<span class="story-pick-score">⭐ ${score}/${story.questions.length}</span>` : ''}
             </button>`;
         }).join('')}
-        ${doneCount === 3 ? `
+        ${allDone ? `
         <button class="big-btn btn-reading reading-btn" onclick="showReadingCategoryComplete()">
             🏆 סִיכּוּם הַקָּטֶגוֹרְיָה
         </button>` : ''}
@@ -4374,7 +4511,7 @@ function renderStorySelection() {
 
 function startReadingStory(storyIdx) {
     currentReadingStoryIdx = storyIdx;
-    GaiaBoards.startClock();   // the board times each story: reading it and its 3 questions
+    GaiaBoards.startClock();   // the board times each story: reading it and its questions
     renderReadingStory();
 }
 
@@ -4384,7 +4521,7 @@ function renderReadingStory() {
 
     document.getElementById('reading-cat-label').textContent = cat.label;
     document.getElementById('reading-story-progress').textContent =
-        'סִיפּוּר ' + (currentReadingStoryIdx + 1) + '/3';
+        'סִיפּוּר ' + (currentReadingStoryIdx + 1) + '/' + cat.stories.length;
     document.getElementById('reading-q-progress').textContent = '';
 
     const content = document.getElementById('reading-content');
@@ -4393,14 +4530,19 @@ function renderReadingStory() {
             ← חֲזָרָה לִבְחִירַת סִיפּוּר
         </button>
         <div class="reading-title">${story.title}</div>
-        <div class="reading-story-box">
-            ${story.sentences.map(s => `<div class="reading-text">${s}</div>`).join('')}
-        </div>
+        <div class="reading-story-box">${readingStoryText(story)}</div>
         <button class="big-btn btn-reading reading-btn" onclick="startReadingQuiz()">
             סִיַּמְתִּי לִקְרֹא ✅
         </button>
     `;
     setGaiaState('idle');
+}
+
+// the story itself: short lines for the nikkud stories, paragraphs for the longer ones
+function readingStoryText(story) {
+    return story.paragraphs
+        ? story.paragraphs.map(p => `<p class="reading-para">${p}</p>`).join('')
+        : story.sentences.map(s => `<div class="reading-text">${s}</div>`).join('');
 }
 
 function startReadingQuiz() {
@@ -4415,11 +4557,17 @@ function renderReadingQuestion() {
     const q = story.questions[currentReadingQuestionIdx];
 
     document.getElementById('reading-q-progress').textContent =
-        'שְׁאֵלָה ' + (currentReadingQuestionIdx + 1) + '/3';
+        'שְׁאֵלָה ' + (currentReadingQuestionIdx + 1) + '/' + story.questions.length;
 
+    // a long story may be looked at again while answering, as in a reading test
+    const peek = story.paragraphs ? `
+        <details class="reading-peek">
+            <summary>📖 לְהָצִיץ בַּסִּפּוּר</summary>
+            <div class="reading-story-box">${readingStoryText(story)}</div>
+        </details>` : '';
     const content = document.getElementById('reading-content');
     content.innerHTML = `
-        <div class="reading-title reading-quiz-title">${story.title}</div>
+        <div class="reading-title reading-quiz-title">${story.title}</div>${peek}
         <div class="reading-question">❓ ${q.q}</div>
         <div id="reading-opts">
             ${q.options.map((opt, i) =>
@@ -4454,20 +4602,25 @@ function answerReading(chosen) {
 
     later(() => {
         currentReadingQuestionIdx++;
-        if (currentReadingQuestionIdx < 3) {
+        if (currentReadingQuestionIdx < story.questions.length) {
             renderReadingQuestion();
         } else {
-            if (!readingProgress[currentReadingCategoryIdx]) readingProgress[currentReadingCategoryIdx] = [-1, -1, -1];
-            const prog = readingProgress[currentReadingCategoryIdx];
+            const prog = readingProgress[currentReadingCategoryIdx] = readingProgressFor(currentReadingCategoryIdx);
             // the story keeps its best result; a weaker re-read doesn't lower it
             prog[currentReadingStoryIdx] = Math.max(prog[currentReadingStoryIdx], readingScore);
             // --- Progress persistence: each read-through earns its 0-3 stars (like any game) ---
             try {
-                GaiaProgress.recordReadingStory(readingProgress, currentReadingCategoryIdx, readingScore);
+                GaiaProgress.recordReadingStory(readingProgress, currentReadingCategoryIdx, readingStars());
             } catch (e) { console.warn('[progress] reading hook', e); }
             renderStoryDone();
         }
     }, 1200);
+}
+
+// a read-through's 0-3 stars: the share of its questions answered right
+function readingStars() {
+    const n = readingData[currentReadingCategoryIdx].stories[currentReadingStoryIdx].questions.length;
+    return Math.round(3 * readingScore / n);
 }
 
 // A story is done: its stars, and its place on the reading land's board.
@@ -4484,17 +4637,19 @@ function renderStoryDone() {
             <button class="big-btn btn-reading reading-btn" onclick="renderStorySelection()">חֲזָרָה לַסִּיפּוּרִים 📚</button>
         </div>
     `;
-    renderStarsEarned(document.getElementById('reading-story-stars'), readingScore);
-    const result = GaiaBoards.finish('reading', 'cat_' + currentReadingCategoryIdx, GaiaBoards.grade(readingScore, 3));
+    const total = story.questions.length;
+    renderStarsEarned(document.getElementById('reading-story-stars'), readingStars());
+    const result = GaiaBoards.finish('reading', 'cat_' + currentReadingCategoryIdx, GaiaBoards.grade(readingScore, total));
     if (result) document.getElementById('reading-board').appendChild(GaiaBoards.resultCard(result));
-    setGaiaState(readingScore === 3 ? 'dance' : 'idle');
+    setGaiaState(readingScore === total ? 'dance' : 'idle');
 }
 
 function showReadingCategoryComplete() {
     GaiaHooks.emit('game_end');
     const cat = readingData[currentReadingCategoryIdx];
-    const prog = readingProgress[currentReadingCategoryIdx] || [0, 0, 0];
+    const prog = readingProgressFor(currentReadingCategoryIdx);
     const totalScore = prog.reduce((s, v) => s + (v > 0 ? v : 0), 0);
+    const maxScore = cat.stories.reduce((s, st) => s + st.questions.length, 0);
     const content = document.getElementById('reading-content');
     document.getElementById('reading-q-progress').textContent = '';
     document.getElementById('reading-story-progress').textContent = 'הֻשְׁלַם! 🎉';
@@ -4504,13 +4659,13 @@ function showReadingCategoryComplete() {
             <div class="trophy-pop">🏆</div>
             <div class="reading-title">כָּל הַכָּבוֹד!</div>
             <div class="reading-sub">
-                כָּל הַסִּיפּוּרִים בְּ${cat.label} נִקְרְאוּ!
+                ${cat.doneLine || `כָּל הַסִּיפּוּרִים בְּ${cat.label} נִקְרְאוּ!`}
             </div>
             <div class="reading-total">
-                ⭐ ${totalScore} / 9 נְקֻדּוֹת
+                ⭐ ${totalScore} / ${maxScore} נְקֻדּוֹת
             </div>
             <button class="big-btn btn-reading reading-btn" onclick="goToReadingMenu()">
-                חֲזָרָה לִבְחִירַת נִקּוּד 📖
+                ${cat.plain ? 'חֲזָרָה לְעֵמֶק הַסִּפּוּרִים 📖' : 'חֲזָרָה לִבְחִירַת נִקּוּד 📖'}
             </button>
         </div>
     `;
@@ -6650,7 +6805,7 @@ const BOARD_MAX_MS = 99999999;   // the sort key k = grade * 10^8 + (BOARD_MAX_M
 
 // The games of every land, in the order of the land's buttons: [game key, chip label].
 const BOARD_GAMES = {
-    math: [['10', '➕ עַד 10'], ['20', '➕ עַד 20'], ['mult_all', '✖️ כָּל הַלּוּחוֹת']]
+    math: [['10', '➕ עַד 10'], ['20', '➕ עַד 20'], ['100', '➕ עַד 100'], ['mult_all', '✖️ כָּל הַלּוּחוֹת']]
         .concat([2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => ['mult_' + n, '✖️ ' + n])),
     hebrew: [['1', 'אוֹת רִאשׁוֹנָה'], ['2', 'אוֹת אַחֲרוֹנָה'], ['3', 'אוֹת חֲסֵרָה']],
     reading: readingData.map((cat, i) => ['cat_' + i, cat.label]),
@@ -7022,6 +7177,7 @@ const GaiaBoards = (function () {
             buttons: [
                 { cls: 'btn-level-1', label: 'חִבּוּר וְחִסּוּר עַד 10', fn: () => startMathGame(10), levelKey: '10' },
                 { cls: 'btn-level-2', label: 'חִבּוּר וְחִסּוּר עַד 20', fn: () => startMathGame(20), levelKey: '20' },
+                { cls: 'btn-level-3', label: 'חִבּוּר וְחִסּוּר עַד 100', fn: () => startMathGame(100), levelKey: '100' },
                 { cls: 'btn-math',    label: 'לוּחַ הַכֶּפֶל ✖️',        fn: () => goToMultMenu() }
             ]
         },
@@ -7040,7 +7196,8 @@ const GaiaBoards = (function () {
                 { cls: 'btn-reading', label: 'סֶגּוֹל וְצֵירֵי (ֶ ֵ)',    fn: () => startReadingCategory(1) },
                 { cls: 'btn-reading', label: 'חִירִיק (ִ)',              fn: () => startReadingCategory(2) },
                 { cls: 'btn-reading', label: 'חוֹלָם (וֹ ֹ)',            fn: () => startReadingCategory(3) },
-                { cls: 'btn-reading', label: 'שׁוּרוּק וְקֻבּוּץ (וּ ֻ)', fn: () => startReadingCategory(4) }
+                { cls: 'btn-reading', label: 'שׁוּרוּק וְקֻבּוּץ (וּ ֻ)', fn: () => startReadingCategory(4) },
+                { cls: 'btn-level-3', label: 'סִפּוּרִים לְכִתָּה ג׳ 📚', fn: () => startReadingCategory(5) }
             ]
         },
         english: {

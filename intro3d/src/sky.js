@@ -1,4 +1,4 @@
-// The night sky (a gradient dome with a soft milky way and the moon's halo), twinkling stars,
+// The twilight sky (a bright gradient dome with a soft milky way and the moon's halo), twinkling stars,
 // the moon, and the environment the gold and gems reflect.
 import * as THREE from 'three';
 import { rng, col } from './util.js';
@@ -19,8 +19,8 @@ export function buildSky() {
     group.name = 'sky';
 
     const uniforms = {
-        uZenith: { value: col('#070a2a') }, uMid: { value: col('#1d1652') }, uHorizon: { value: col('#5a2c78') },
-        uGlow: { value: col('#ff9a5a') }, uMoonDir: { value: MOON_DIR }, uFlash: { value: 0 }, uFlashColor: { value: new THREE.Color(1, 1, 1) }
+        uZenith: { value: col('#1b2d7c') }, uMid: { value: col('#4b40a8') }, uHorizon: { value: col('#c86ca8') },
+        uGlow: { value: col('#ffb46a') }, uMoonDir: { value: MOON_DIR }, uFlash: { value: 0 }, uFlashColor: { value: new THREE.Color(1, 1, 1) }
     };
     const dome = new THREE.Mesh(new THREE.SphereGeometry(1000, 48, 24), new THREE.ShaderMaterial({
         uniforms, side: THREE.BackSide, depthWrite: false,
@@ -105,15 +105,15 @@ export function buildSky() {
     };
 }
 
-// The surroundings the shiny things reflect: a night gradient with warm and cool light cards.
+// The surroundings the shiny things reflect: a twilight gradient with warm and cool light cards.
 export function buildEnvironment(renderer) {
     const env = new THREE.Scene();
     const sphere = new THREE.Mesh(new THREE.SphereGeometry(60, 32, 16), new THREE.ShaderMaterial({
         side: THREE.BackSide,
         vertexShader: `varying vec3 vDir; void main() { vDir = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
         fragmentShader: `varying vec3 vDir; void main() { vec3 d = normalize(vDir);
-            vec3 c = mix(vec3(0.16, 0.08, 0.2), vec3(0.025, 0.035, 0.11), smoothstep(-0.05, 0.6, d.y));
-            c = mix(c, vec3(0.04, 0.03, 0.05), smoothstep(0.0, -0.3, d.y));
+            vec3 c = mix(vec3(0.42, 0.24, 0.44), vec3(0.11, 0.15, 0.4), smoothstep(-0.05, 0.6, d.y));
+            c = mix(c, vec3(0.12, 0.1, 0.12), smoothstep(0.0, -0.3, d.y));
             gl_FragColor = vec4(c, 1.0); }`
     }));
     env.add(sphere);
