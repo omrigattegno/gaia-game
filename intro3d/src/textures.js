@@ -121,7 +121,7 @@ export function shingles(hex, seed = 3) {
 export function cobbles(seed = 11) {
     const S = 512, R = rng(seed);
     const [c, x] = canvas(S), [hc, hx] = canvas(S);
-    x.fillStyle = '#7a7290'; x.fillRect(0, 0, S, S);
+    x.fillStyle = '#4a4560'; x.fillRect(0, 0, S, S);
     hx.fillStyle = '#000'; hx.fillRect(0, 0, S, S);
     const n = 9, cw = S / n;
     for (let r = 0; r < n; r++) {
@@ -130,15 +130,15 @@ export function cobbles(seed = 11) {
             const cx = k * cw + (r % 2) * cw / 2 + cw / 2 + (R() - 0.5) * 6, cy = r * cw + cw / 2 + (R() - 0.5) * 6;
             const v = 150 + R() * 50;
             const g = x.createRadialGradient(cx - w * 0.15, cy - h * 0.2, 2, cx, cy, w * 0.6);
-            g.addColorStop(0, `rgb(${v + 12},${v + 6},${v + 30})`); g.addColorStop(1, `rgb(${v - 22},${v - 26},${v - 4})`);
+            g.addColorStop(0, `rgb(${v + 12},${v + 6},${v + 30})`); g.addColorStop(1, `rgb(${v - 40},${v - 44},${v - 20})`);
             x.fillStyle = g; roundRect(x, cx - w / 2, cy - h / 2, w, h, 14); x.fill();
             const hg = hx.createRadialGradient(cx, cy, 2, cx, cy, w * 0.6);
             hg.addColorStop(0, '#fff'); hg.addColorStop(1, '#555');
             hx.fillStyle = hg; roundRect(hx, cx - w / 2, cy - h / 2, w, h, 14); hx.fill();
         }
     }
-    speckle(x, S, S, 1600, 1.4, 0.1, seed + 3, ['#000', '#fff']);
-    return { map: tex(c, { repeat: true }), normalMap: normalFrom(hc, 1.6) };
+    speckle(x, S, S, 1600, 1.4, 0.18, seed + 3, ['#000', '#fff']);
+    return { map: tex(c, { repeat: true }), normalMap: normalFrom(hc, 2.5) };
 }
 
 // Soft grass: blotches of greens with fine blades.
