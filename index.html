@@ -1446,6 +1446,7 @@
         .whoami-stage { display: flex; flex-direction: column; align-items: center; gap: 10px; direction: rtl; }
         .whoami-stage .big-btn { margin: 6px 0 0; }
         .whoami-stage [hidden] { display: none !important; }   /* .big-btn sets display, so hidden needs saying twice */
+        .whoami-stage .whoami-wait { visibility: hidden; }   /* keeps its place, so nothing under the finger moves when it shows */
         .whoami-big { font-size: 5.5rem; line-height: 1.1; filter: drop-shadow(0 5px 5px oklch(0.3 0.05 300 / 0.15)); }
         .whoami-name { font-size: 2rem; font-weight: 800; color: var(--ink); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .whoami-line { font-size: 1.25rem; color: var(--ink-soft); margin: 0; }
@@ -1476,9 +1477,12 @@
         .whoami-order span { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; font-size: 1.3rem; background: var(--surface); border: 2px solid var(--lt-line); opacity: 0.4; }
         .whoami-order span.done { opacity: 1; }
         .whoami-order span.now { opacity: 1; outline: 3px solid var(--gold); outline-offset: 2px; }
-        /* the secret card: shows its face only while a finger holds it */
+        .whoami-order.many { gap: 4px; }   /* eight chips still fit one row on a phone */
+        .whoami-order.many span { width: 32px; height: 32px; font-size: 1.1rem; }
+        /* the secret card: shows its face only while a finger holds it. A fixed height, so the
+           guesser's card can never grow and give them away from across the table */
         .whoami-card {
-            width: min(100%, 320px); min-height: 230px; border-radius: 26px; padding: 16px; display: grid; place-items: center; text-align: center; box-sizing: border-box;
+            width: min(100%, 320px); height: 230px; border-radius: 26px; padding: 16px; display: grid; place-items: center; text-align: center; box-sizing: border-box;
             background: linear-gradient(160deg, var(--lt), var(--lt-deep)); color: #fff; border: 3px solid var(--lt-deep);
             box-shadow: 0 8px 0 var(--lt-deep), 0 14px 26px oklch(0.25 0.08 300 / 0.25); cursor: pointer;
             user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: none; -webkit-tap-highlight-color: transparent;
@@ -1488,7 +1492,8 @@
         .whoami-card .c-closed .c-mask { display: block; font-size: 4rem; line-height: 1.1; }
         .whoami-card .c-emoji { font-size: 5.5rem; line-height: 1.1; }
         .whoami-card .c-word { font-size: 2.2rem; font-weight: 800; line-height: 1.3; }
-        .whoami-card .c-small { font-size: 1.05rem; color: var(--ink-soft); }
+        .whoami-card .c-small { font-size: 1.05rem; color: var(--ink-soft); text-wrap: balance; }
+        @media (max-width: 380px) { .whoami-card .c-small { font-size: 0.95rem; } }
         /* the imposter's four guesses */
         .whoami-opts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; }
         .whoami-opt { position: relative; cursor: pointer; font: inherit; font-weight: bold; padding: 10px 6px; border-radius: 20px;
@@ -1505,15 +1510,16 @@
         /* over the whole card: the end of a round (same pattern as .chess-end) */
         .whoami-end { position: absolute; inset: 0; z-index: 20; display: grid; place-items: center; padding: 12px; background: oklch(0.2 0.04 350 / 0.45); }
         .whoami-end[hidden] { display: none; }
-        .whoami-end-box { position: relative; overflow: hidden; isolation: isolate; background: var(--surface); border-radius: 22px; padding: 14px 16px; text-align: center;
+        .whoami-end-box { position: relative; overflow: hidden; isolation: isolate; background: var(--surface); border-radius: 22px; padding: 14px 12px; text-align: center;
             box-shadow: 0 10px 30px oklch(0.2 0.05 300 / 0.35); animation: popIn 0.35s var(--ease-out-quart); width: min(94%, 360px); max-height: 100%; overflow-y: auto; direction: rtl; }
         .whoami-end-icon { font-size: 3.4rem; line-height: 1.1; }
         .whoami-end-box h2 { margin: 4px 0; font-size: 1.5rem; color: var(--lt-deep); }
         .whoami-end-line { margin: 0 0 4px; color: var(--ink-soft); line-height: 1.4; }
         .whoami-end-line .big { font-size: 2.2rem; vertical-align: middle; }
         .whoami-end-box .stars-earned { font-size: 2.1rem; margin: 2px 0 4px; }
+        .whoami-end-box .end-confetti { overflow: hidden; }   /* the falling pieces must not make the box scroll */
         .whoami-end-actions { display: flex; gap: 8px; justify-content: center; }
-        .whoami-end-actions .big-btn { margin: 8px 0 0; padding: 12px 16px; font-size: 1.1rem; }
+        .whoami-end-actions .big-btn { margin: 8px 0 0; padding: 12px 10px; font-size: 1.1rem; flex: 1; white-space: nowrap; }
         .btn-whoami { background: linear-gradient(135deg, oklch(0.70 0.19 350), oklch(0.56 0.20 345)); }
         /* the sisters stand in the corner only where they leave the tiles free */
         @media (max-width: 900px) { body:has(#whoami-screen.active) #gaia-char { display: none; } }
@@ -6904,9 +6910,10 @@ function chessPieceSVG(type, white, attrs) {
 (function () {
     const $ = id => document.getElementById(id);
     const HOLD_MS = 400;   // a tap this short has not really shown the card
+    const ARM_MS = 400;    // how long a fresh screen ignores taps (see armLater)
 
     // faces and disguises only, so an avatar can never be mistaken for a secret
-    const AVATARS = ['😎', '🤠', '🥳', '🤓', '🧐', '🥸', '🤩', '😇', '🤪', '😺', '👽', '👾'];
+    const AVATARS = ['😎', '🤠', '🥳', '🤓', '🧐', '🥸', '🤩', '😇', '🤪', '😜', '👽', '👾'];
     const CATEGORIES = {
         animals: { label: 'חַיּוֹת', emoji: '🐾', items: [
             { e: '🐶', w: 'כֶּלֶב' }, { e: '🐱', w: 'חָתוּל' }, { e: '🐘', w: 'פִּיל' }, { e: '🦒', w: 'גִ\'ירָפָה' }, { e: '🦁', w: 'אַרְיֵה' }, { e: '🐵', w: 'קוֹף' },
@@ -6921,7 +6928,7 @@ function chessPieceSVG(type, white, attrs) {
         jobs: { label: 'מִקְצוֹעוֹת', emoji: '🧑‍🚒', items: [
             { e: '🧑‍🚒', w: 'כַּבַּאי' }, { e: '👮', w: 'שׁוֹטֵר' }, { e: '🧑‍⚕️', w: 'רוֹפֵא' }, { e: '🧑‍🏫', w: 'מוֹרֶה' }, { e: '🧑‍🍳', w: 'טַבָּח' }, { e: '🧑‍🚀', w: 'אַסְטְרוֹנָאוּט' },
             { e: '🧑‍🌾', w: 'חַקְלַאי' }, { e: '🧑‍🎨', w: 'צַיָּר' }, { e: '🧑‍✈️', w: 'טַיָּס' }, { e: '🧑‍🔧', w: 'מְכוֹנַאי' }, { e: '🧑‍🎤', w: 'זַמָּר' }, { e: '🧑‍🔬', w: 'מַדְעָן' },
-            { e: '🚌', w: 'נַהָג' }, { e: '👷', w: 'בַּנַּאי' }, { e: '🦷', w: 'רוֹפֵא שִׁנַּיִם' }, { e: '💇', w: 'סַפָּר' }
+            { e: '🚌', w: 'נֶהָג' }, { e: '👷', w: 'בַּנַּאי' }, { e: '🦷', w: 'רוֹפֵא שִׁנַּיִם' }, { e: '💇', w: 'סַפָּר' }
         ] },
         tales: { label: 'דְּמֻיּוֹת מִסִּפּוּרִים', emoji: '🧚', items: [
             { e: '👸', w: 'נְסִיכָה' }, { e: '🤴', w: 'נָסִיךְ' }, { e: '👑', w: 'מֶלֶךְ' }, { e: '🧙', w: 'קוֹסֵם' }, { e: '🧚', w: 'פֵיָה' }, { e: '🐉', w: 'דְּרָקוֹן' },
@@ -6984,6 +6991,12 @@ function chessPieceSVG(type, white, attrs) {
         b.addEventListener('click', onTap);
         return b;
     }
+    // A screen that replaces the one under the finger stays deaf for a short beat, so a quick
+    // double tap on the last button cannot also press whatever now sits in the same spot.
+    function armLater(btns) {
+        btns.forEach(b => { b.disabled = true; });
+        later(() => btns.forEach(b => { b.disabled = false; }), ARM_MS);
+    }
     function say(text) { try { speakHebrew(text); } catch (e) {} }
     function hush() { try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) {} }
     function detachCard() {
@@ -6996,7 +7009,11 @@ function chessPieceSVG(type, white, attrs) {
         const items = CATEGORIES[G.cat].items;
         if (!G.used[G.cat]) G.used[G.cat] = new Set();
         let used = G.used[G.cat];
-        if (used.size >= items.length) used.clear();   // every secret was shown: start the pile again
+        if (used.size >= items.length) {
+            // every secret was shown: start the pile again, but not with the one just played
+            used.clear();
+            if (G.secret && items.some(x => x.w === G.secret.w)) used.add(G.secret.w);
+        }
         const left = items.filter(x => !used.has(x.w));
         G.secret = left[Math.floor(Math.random() * left.length)];
         used.add(G.secret.w);
@@ -7036,7 +7053,7 @@ function chessPieceSVG(type, white, attrs) {
         const s = stage();
         s.appendChild(title('אֵיךְ מְשַׂחֲקִים? ❓'));
         [['🤫', 'כֻּלָּם רוֹאִים סוֹד — חוּץ מֵאֶחָד'],
-         ['💬', 'כָּל אֶחָד אוֹמֵר מִלָּה אַחַת עָלָיו'],
+         ['💬', 'כָּל אֶחָד אוֹמֵר מִלָּה אַחַת עַל הַסּוֹד'],
          ['🗳️', 'מַצְבִּיעִים: מִי לֹא יוֹדֵעַ אֶת הַסּוֹד?'],
          ['🎭', 'הַמְּנַחֵשׁ מְנַסֶּה לְנַחֵשׁ מַה הַסּוֹד'],
          ['🏆', 'תְּפַסְתֶּם אוֹתוֹ וְהוּא לֹא נִחֵשׁ? הַקְּבוּצָה נִצְּחָה!']].forEach(function (row) {
@@ -7060,6 +7077,7 @@ function chessPieceSVG(type, white, attrs) {
             grid.appendChild(t);
         }
         s.appendChild(grid);
+        armLater(Array.from(grid.children));   // the 'הֵבַנְתִּי' tap must not pick a number too
     }
 
     function setupCat() {
@@ -7075,6 +7093,7 @@ function chessPieceSVG(type, white, attrs) {
             grid.appendChild(t);
         });
         s.appendChild(grid);
+        armLater(Array.from(grid.children));   // a double tap on a number must not choose the subject too
     }
 
     function setupNames() {
@@ -7103,8 +7122,12 @@ function chessPieceSVG(type, white, attrs) {
                 av.textContent = p.avatar;
             });
             const inp = node('input', 'name-input');
-            inp.type = 'text'; inp.maxLength = 12; inp.autocomplete = 'off'; inp.dir = 'rtl'; inp.enterKeyHint = 'next';
-            inp.value = p.name || 'שַׂחְקָן ' + (k + 1);
+            inp.type = 'text'; inp.maxLength = 20; inp.autocomplete = 'off'; inp.dir = 'rtl'; inp.enterKeyHint = 'next';
+            // the default name is only a hint in the box, so a child can just type their own
+            const def = 'שַׂחְקָן ' + (k + 1);
+            inp.placeholder = def;
+            inp.value = p.name && p.name !== def ? p.name : '';
+            inp.addEventListener('focus', () => inp.select());
             inp.setAttribute('aria-label', 'שֵׁם שַׂחְקָן ' + (k + 1));
             inp.addEventListener('keydown', function (e) {
                 if (e.key !== 'Enter') return;
@@ -7115,7 +7138,7 @@ function chessPieceSVG(type, white, attrs) {
             inputs.push(inp); avBtns.push(av);
             s.appendChild(row);
         });
-        s.appendChild(bigBtn('btn-whoami', 'מַתְחִילִים! ▶️', function () {
+        const startBtn = bigBtn('btn-whoami', 'מַתְחִילִים! ▶️', function () {
             const taken = {};
             G.players = draft.map(function (p, k) {
                 let name = (inputs[k].value || '').trim() || 'שַׂחְקָן ' + (k + 1);
@@ -7129,7 +7152,9 @@ function chessPieceSVG(type, white, attrs) {
             newRound();
             emitStart();
             render('pass');
-        }));
+        });
+        s.appendChild(startBtn);
+        armLater(avBtns.concat([startBtn]));   // a double tap on a subject tile must not start the game or change a face
     }
 
     function pass() {
@@ -7140,7 +7165,9 @@ function chessPieceSVG(type, white, attrs) {
         s.appendChild(node('p', 'whoami-line', 'הַטֶּלֶפוֹן עוֹבֵר אֶל:'));
         s.appendChild(node('div', 'whoami-big', p.avatar));
         s.appendChild(node('div', 'whoami-name', p.name));
-        s.appendChild(bigBtn('btn-whoami', 'זֶה אֲנִי! 👋', () => render('secret')));
+        const me = bigBtn('btn-whoami', 'זֶה אֲנִי! 👋', () => render('secret'));
+        s.appendChild(me);
+        armLater([me]);   // a double tap on 'רָאִיתִי' must not hand the next card to the wrong child
         say('הַטֶּלֶפוֹן עוֹבֵר אֶל ' + p.name);
     }
 
@@ -7158,7 +7185,7 @@ function chessPieceSVG(type, white, attrs) {
             G.i++;
             render(G.i < G.n ? 'pass' : 'ready');
         });
-        seenBtn.hidden = true;
+        seenBtn.classList.add('whoami-wait');
         s.appendChild(card);
         s.appendChild(seenBtn);
 
@@ -7174,7 +7201,7 @@ function chessPieceSVG(type, white, attrs) {
             const f = node('div', 'c-open');
             if (imposter) {
                 f.appendChild(node('div', 'c-emoji', '🕵️'));
-                f.appendChild(node('div', 'c-word', 'הַמְּנַחֵשׁ — זֶה אַתֶּם!'));
+                f.appendChild(node('div', 'c-word', 'אַתֶּם הַמְּנַחֵשׁ!'));   // short enough for one line, like every secret word
                 f.appendChild(node('div', 'c-small', 'הַנּוֹשֵׂא: ' + CATEGORIES[G.cat].label + '. תַּעֲמִידוּ פָּנִים!'));
             } else {
                 f.appendChild(node('div', 'c-emoji', G.secret.e));
@@ -7185,9 +7212,11 @@ function chessPieceSVG(type, white, attrs) {
         }
         buildClosed();
 
-        let downAt = 0;
+        // each child gets the 'hold longer' help, and a stray tap from the screen before cannot open the card
+        let downAt = 0, seen = false, armed = false;
+        later(() => { armed = true; }, ARM_MS);
         const open = function () {
-            if (card.classList.contains('open')) return;
+            if (!armed || card.classList.contains('open')) return;
             downAt = Date.now();
             card.classList.add('open');
             buildFace(G.i === G.imposter);
@@ -7197,10 +7226,10 @@ function chessPieceSVG(type, white, attrs) {
             card.classList.remove('open');
             buildClosed();
             if (Date.now() - downAt >= HOLD_MS) {
-                G.seen = true;
-                seenBtn.hidden = false;
+                seen = G.seen = true;
+                seenBtn.classList.remove('whoami-wait');
                 guide('googy', SECRET_GUIDE);
-            } else if (!G.seen) {
+            } else if (!seen) {
                 guide('googy', 'לְהַחֲזִיק עוֹד קְצָת ⏳');
             }
         };
@@ -7226,7 +7255,9 @@ function chessPieceSVG(type, white, attrs) {
         const s = stage();
         s.appendChild(title('כֻּלָּם רָאוּ! 👀'));
         s.appendChild(node('div', 'whoami-big', '📱'));
-        s.appendChild(bigBtn('btn-whoami', 'לָרְמָזִים! 💬', function () { G.round = 1; G.turn = 0; render('hint'); }));
+        const go = bigBtn('btn-whoami', 'לָרְמָזִים! 💬', function () { G.round = 1; G.turn = 0; render('hint'); });
+        s.appendChild(go);
+        armLater([go]);   // the phone has to reach the middle before the first turn is called
     }
 
     function hint() {
@@ -7234,7 +7265,7 @@ function chessPieceSVG(type, white, attrs) {
         pills('💬 סִבּוּב ' + G.round, (G.turn + 1) + '/' + G.n);
         guide('googy', G.round === 1 ? 'אִמְרוּ מִלָּה אַחַת עַל הַסּוֹד — רַק אַחַת! 💬' : 'עוֹד מִלָּה אַחַת — אַחֶרֶת מֵהַקּוֹדֶמֶת! 💬');
         const s = stage();
-        const row = node('div', 'whoami-order');
+        const row = node('div', G.n > 7 ? 'whoami-order many' : 'whoami-order');
         for (let k = 0; k < G.n; k++) {
             const chip = node('span', k < G.turn ? 'done' : k === G.turn ? 'now' : '', speaker(k).avatar);
             row.appendChild(chip);
@@ -7243,12 +7274,14 @@ function chessPieceSVG(type, white, attrs) {
         s.appendChild(node('div', 'whoami-big', p.avatar));
         s.appendChild(node('div', 'whoami-name', p.name));
         s.appendChild(node('p', 'whoami-line', 'מִלָּה אַחַת! 🗣️'));
-        s.appendChild(bigBtn('btn-whoami', last ? 'סִיַּמְנוּ! ✅' : 'אָמַרְתִּי! ✅', function () {
+        const said = bigBtn('btn-whoami', last ? 'סִיַּמְנוּ! ✅' : 'אָמַרְתִּי! ✅', function () {
             G.turn++;
             if (G.turn < G.n) { render('hint'); return; }
             G.roundsPlayed = G.round;
             render(G.round === 1 ? 'hint-more' : 'vote');
-        }));
+        });
+        s.appendChild(said);
+        armLater([said]);   // every turn redraws this button in the same spot
         say('תּוֹר ' + p.name);
     }
 
@@ -7258,8 +7291,11 @@ function chessPieceSVG(type, white, attrs) {
         const s = stage();
         s.appendChild(title('סִבּוּב הָרְמָזִים נִגְמַר! 🎉'));
         s.appendChild(node('div', 'whoami-big', '💬'));
-        s.appendChild(bigBtn('btn-soft', 'עוֹד סִבּוּב רְמָזִים 🔁', function () { G.round = 2; G.turn = 0; render('hint'); }));
-        s.appendChild(bigBtn('btn-whoami', 'לְהַצְבִּיעַ! 🗳️', () => render('vote')));
+        const more = bigBtn('btn-soft', 'עוֹד סִבּוּב רְמָזִים 🔁', function () { G.round = 2; G.turn = 0; render('hint'); });
+        const toVote = bigBtn('btn-whoami', 'לְהַצְבִּיעַ! 🗳️', () => render('vote'));
+        s.appendChild(more);
+        s.appendChild(toVote);
+        armLater([more, toVote]);
     }
 
     // one decision for the whole group: tap a child, then confirm, so a stray tap ends nothing
@@ -7274,14 +7310,15 @@ function chessPieceSVG(type, white, attrs) {
             G.voted = pick;
             render('vote-reveal');
         });
-        confirm.hidden = true;
+        confirm.textContent = '✅';   // a stand-in line, so the button is its real height while it waits
+        confirm.classList.add('whoami-wait');
         let pick = -1;
         const tiles = G.players.map(function (p, k) {
             const t = tile(p.avatar, p.name, function () {
                 pick = k;
                 tiles.forEach((o, j) => o.classList.toggle('picked', j === k));
                 confirm.textContent = 'זֶה ' + p.name + '! ✅';
-                confirm.hidden = false;
+                confirm.classList.remove('whoami-wait');
             });
             grid.appendChild(t);
             return t;
@@ -7352,6 +7389,7 @@ function chessPieceSVG(type, white, attrs) {
             return b;
         });
         s.appendChild(grid);
+        armLater(btns);   // the 'הַלְאָה' tap that brought us here must not choose for the guesser
         say('מַה הָיָה הַסּוֹד?');
     }
 
@@ -7411,7 +7449,7 @@ function chessPieceSVG(type, white, attrs) {
         setGaiaState('dance');
         const bursts = groupWon ? 5 : 3;
         for (let k = 0; k < bursts; k++) later(() => spawnStars({ clientX: Math.random() * innerWidth, clientY: Math.random() * innerHeight * 0.6 }), k * 200);
-        say(titleText);
+        say(groupWon ? 'הַקְּבוּצָה נִצְּחָה!' : 'הַנִּצָּחוֹן שֶׁל ' + imp.name + '!');   // no emoji: the voice would read its name
     }
 
     // leaving the tent, by 🏠 or by another game starting: nothing of the secret stays in the page
@@ -8050,7 +8088,7 @@ const GaiaBoards = (function () {
                 '<ellipse cx="-6" cy="-4" rx="3" ry="2" fill="#5A3A1E"/><ellipse cx="6" cy="-4" rx="3" ry="2" fill="#5A3A1E"/><path d="M-6 4 Q0 9 6 4" stroke="#5A3A1E" stroke-width="1.8" fill="none" stroke-linecap="round"/></g>' +
                 '<g transform="translate(40 16)"><path d="M-14 -12 Q0 -20 14 -12 Q16 4 0 14 Q-16 4 -14 -12 Z" fill="#B57BE8" stroke="#7C4DBD" stroke-width="1.5"/>' +
                 '<ellipse cx="-6" cy="-4" rx="3" ry="2" fill="#3A2A5E"/><ellipse cx="6" cy="-4" rx="3" ry="2" fill="#3A2A5E"/><path d="M-6 7 Q0 2 6 7" stroke="#3A2A5E" stroke-width="1.8" fill="none" stroke-linecap="round"/></g>' +
-                '<g class="map-float"><text x="-6" y="-30" font-family="Fredoka, sans-serif" font-size="18" font-weight="700" fill="#FFF6B0">?</text></g>' +
+                '<g class="map-float"><text x="-6" y="-30" font-family="Fredoka, sans-serif" font-size="18" font-weight="700" fill="#FFF6B0" stroke="oklch(0.45 0.17 350)" stroke-width="3" stroke-linejoin="round" paint-order="stroke">?</text></g>' +
                 use('dec-bush', -78, 36, 0.8) + use('dec-flowers', 78, 38, 1) +
                 '<g class="map-sparkle"><path d="M-74 -40 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3 Z" fill="#FFE066"/><path d="M72 -52 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 Z" fill="#FFE066"/></g>';
         },
