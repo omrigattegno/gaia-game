@@ -45,7 +45,6 @@
             --land-memory:    oklch(0.66 0.15 210);
             --land-puzzle:    oklch(0.72 0.17 70);
             --land-chess:     oklch(0.58 0.11 52);
-            --land-whoami:    oklch(0.62 0.20 350);
 
             /* The land being played (body[data-land]): its colour, a deep shade for the 3D edges,
                a soft tint for the question area and a light line colour. Default: the kingdom's purple. */
@@ -117,7 +116,6 @@
         body[data-land="memory"]    { --lt: oklch(0.55 0.17 285); --lt-deep: oklch(0.42 0.15 285); --lt-soft: oklch(0.97 0.025 285); --lt-line: oklch(0.88 0.06 285); }
         body[data-land="puzzle"]    { --lt: oklch(0.64 0.16 70);  --lt-deep: oklch(0.50 0.14 60);  --lt-soft: oklch(0.97 0.035 85);  --lt-line: oklch(0.89 0.08 80); }
         body[data-land="chess"]     { --lt: oklch(0.55 0.10 52);  --lt-deep: oklch(0.42 0.09 45);  --lt-soft: oklch(0.97 0.02 75);   --lt-line: oklch(0.88 0.05 65); }
-        body[data-land="whoami"]    { --lt: oklch(0.58 0.19 350); --lt-deep: oklch(0.45 0.17 350); --lt-soft: oklch(0.97 0.025 350); --lt-line: oklch(0.88 0.07 350); }
         #land-scene { position: absolute; inset: 0; display: none; }
         #land-scene > svg { display: block; width: 100%; height: 100%; }
         body[data-land] #land-scene { display: block; }
@@ -1435,100 +1433,11 @@
             .chess-star, .chess-sq.hint::before, .chess-pc.gone { animation: none; }
         }
 
-        /* =========================================================
-           THE TENT OF MASKS: one phone goes round the circle; everyone
-           sees the secret but one child, who must not be found out
-           ========================================================= */
-        #whoami-screen .game-container { padding: 64px 12px 14px; justify-content: flex-start; min-height: 0; }
-        .whoami-guide { margin: 0 0 8px; }
-        .whoami-guide .land-guide-bubble { font-size: 1.02rem; }
-        .whoami-title { font-size: 1.55rem; color: var(--lt-deep); margin: 2px 0 8px; line-height: 1.3; }
-        .whoami-stage { display: flex; flex-direction: column; align-items: center; gap: 10px; direction: rtl; }
-        .whoami-stage .big-btn { margin: 6px 0 0; }
-        .whoami-stage [hidden] { display: none !important; }   /* .big-btn sets display, so hidden needs saying twice */
-        .whoami-stage .whoami-wait { visibility: hidden; }   /* keeps its place, so nothing under the finger moves when it shows */
-        .whoami-big { font-size: 5.5rem; line-height: 1.1; filter: drop-shadow(0 5px 5px oklch(0.3 0.05 300 / 0.15)); }
-        .whoami-name { font-size: 2rem; font-weight: 800; color: var(--ink); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .whoami-line { font-size: 1.25rem; color: var(--ink-soft); margin: 0; }
-        .whoami-line.small { font-size: 1rem; }
-        /* tiles: a number of players, a subject, a player to vote for */
-        .whoami-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; }
-        .whoami-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
-        .whoami-players { grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); }
-        .whoami-tile {
-            border: 3px solid var(--lt); background: var(--surface); border-radius: 20px; padding: 10px 6px 8px;
-            box-shadow: 0 6px 0 var(--lt-deep); cursor: pointer; font: inherit; color: var(--ink); min-width: 0;
-            transition: transform var(--t-ui) var(--ease-out-quint), box-shadow var(--t-ui) var(--ease-out-quint);
-        }
-        .whoami-tile:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--lt-deep); }
-        .whoami-tile .t-emoji { display: block; font-size: 2.6rem; line-height: 1.15; font-family: 'Fredoka', sans-serif; font-weight: 700; }
-        .whoami-tile .t-label { display: block; font-size: 1.05rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .whoami-tile.picked { border-color: var(--gold); background: oklch(0.98 0.04 95); box-shadow: 0 6px 0 oklch(0.72 0.15 80); }
-        /* the how-to-play rows */
-        .whoami-step { display: flex; align-items: center; gap: 12px; width: 100%; text-align: right; box-sizing: border-box;
-            background: var(--lt-soft); border: 2px solid var(--lt-line); border-radius: 18px; padding: 8px 12px; font-size: 1.15rem; line-height: 1.4; }
-        .whoami-step .s-emoji { font-size: 2.2rem; flex-shrink: 0; }
-        /* names */
-        .whoami-name-row { display: flex; gap: 8px; align-items: center; width: 100%; }
-        .whoami-name-row .name-input { flex: 1; width: auto; margin: 0; min-width: 0; }
-        .whoami-avatar { width: 50px; height: 50px; flex-shrink: 0; border-radius: 50%; border: 3px solid var(--lt-line); background: var(--surface); font-size: 1.7rem; cursor: pointer; box-shadow: 0 3px 0 var(--lt-deep); padding: 0; }
-        /* who has spoken this round */
-        .whoami-order { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; }
-        .whoami-order span { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; font-size: 1.3rem; background: var(--surface); border: 2px solid var(--lt-line); opacity: 0.4; }
-        .whoami-order span.done { opacity: 1; }
-        .whoami-order span.now { opacity: 1; outline: 3px solid var(--gold); outline-offset: 2px; }
-        .whoami-order.many { gap: 4px; }   /* eight chips still fit one row on a phone */
-        .whoami-order.many span { width: 32px; height: 32px; font-size: 1.1rem; }
-        /* the secret card: shows its face only while a finger holds it. A fixed height, so the
-           guesser's card can never grow and give them away from across the table */
-        .whoami-card {
-            width: min(100%, 320px); height: 230px; border-radius: 26px; padding: 16px; display: grid; place-items: center; text-align: center; box-sizing: border-box;
-            background: linear-gradient(160deg, var(--lt), var(--lt-deep)); color: #fff; border: 3px solid var(--lt-deep);
-            box-shadow: 0 8px 0 var(--lt-deep), 0 14px 26px oklch(0.25 0.08 300 / 0.25); cursor: pointer;
-            user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: none; -webkit-tap-highlight-color: transparent;
-        }
-        .whoami-card.open { background: var(--surface); color: var(--ink); border-color: var(--lt); }
-        .whoami-card .c-closed { font-size: 1.3rem; font-weight: 700; }
-        .whoami-card .c-closed .c-mask { display: block; font-size: 4rem; line-height: 1.1; }
-        .whoami-card .c-emoji { font-size: 5.5rem; line-height: 1.1; }
-        .whoami-card .c-word { font-size: 2.2rem; font-weight: 800; line-height: 1.3; }
-        .whoami-card .c-small { font-size: 1.05rem; color: var(--ink-soft); text-wrap: balance; }
-        @media (max-width: 380px) { .whoami-card .c-small { font-size: 0.95rem; } }
-        /* the imposter's four guesses */
-        .whoami-opts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; }
-        .whoami-opt { position: relative; cursor: pointer; font: inherit; font-weight: bold; padding: 10px 6px; border-radius: 20px;
-            background: var(--surface); border: 3px solid var(--lt); color: var(--ink); box-shadow: 0 6px 0 var(--lt-deep);
-            transition: transform var(--t-ui) var(--ease-out-quint), box-shadow var(--t-ui) var(--ease-out-quint), background var(--t-ui); }
-        .whoami-opt:not(:disabled):active { transform: translateY(4px); box-shadow: 0 2px 0 var(--lt-deep); }
-        .whoami-opt:disabled { cursor: default; }
-        .whoami-opt .o-emoji { display: block; font-size: 3rem; line-height: 1.15; }
-        .whoami-opt .o-word { display: block; font-size: 1.1rem; }
-        .whoami-opt.correct { background: oklch(0.95 0.07 150); border-color: oklch(0.60 0.15 150); color: oklch(0.38 0.12 150); box-shadow: 0 6px 0 oklch(0.48 0.13 150); }
-        .whoami-opt.wrong   { background: oklch(0.95 0.04 25);  border-color: oklch(0.62 0.19 25);  color: oklch(0.48 0.18 25);  box-shadow: 0 6px 0 oklch(0.48 0.17 25); }
-        .whoami-drum { animation: bounce 0.5s infinite; }
-        .whoami-link { border: none; background: none; color: var(--brand); text-decoration: underline; cursor: pointer; font: inherit; font-size: 1rem; padding: 6px; }
-        /* over the whole card: the end of a round (same pattern as .chess-end) */
-        .whoami-end { position: absolute; inset: 0; z-index: 20; display: grid; place-items: center; padding: 12px; background: oklch(0.2 0.04 350 / 0.45); }
-        .whoami-end[hidden] { display: none; }
-        .whoami-end-box { position: relative; overflow: hidden; isolation: isolate; background: var(--surface); border-radius: 22px; padding: 14px 12px; text-align: center;
-            box-shadow: 0 10px 30px oklch(0.2 0.05 300 / 0.35); animation: popIn 0.35s var(--ease-out-quart); width: min(94%, 360px); max-height: 100%; overflow-y: auto; direction: rtl; }
-        .whoami-end-icon { font-size: 3.4rem; line-height: 1.1; }
-        .whoami-end-box h2 { margin: 4px 0; font-size: 1.5rem; color: var(--lt-deep); }
-        .whoami-end-line { margin: 0 0 4px; color: var(--ink-soft); line-height: 1.4; }
-        .whoami-end-line .big { font-size: 2.2rem; vertical-align: middle; }
-        .whoami-end-box .stars-earned { font-size: 2.1rem; margin: 2px 0 4px; }
-        .whoami-end-box .end-confetti { overflow: hidden; }   /* the falling pieces must not make the box scroll */
-        .whoami-end-actions { display: flex; gap: 8px; justify-content: center; }
-        .whoami-end-actions .big-btn { margin: 8px 0 0; padding: 12px 10px; font-size: 1.1rem; flex: 1; white-space: nowrap; }
-        .btn-whoami { background: linear-gradient(135deg, oklch(0.70 0.19 350), oklch(0.56 0.20 345)); }
-        /* the sisters stand in the corner only where they leave the tiles free */
-        @media (max-width: 900px) { body:has(#whoami-screen.active) #gaia-char { display: none; } }
-
         /* --- reduced motion: collapse map/parallax/character motion to instant --- */
         @media (prefers-reduced-motion: reduce) {
             #gaia-char .girl, .kg-cloud, .kg-sparkle, .kg-star, .map-cloud,
             .map-wave, .map-flag, .map-boat, .map-birds, .map-sparkle, .map-lamp, .map-float, .map-glow,
-            .sc-float, .sc-sway, .sc-spin, .sc-beat, .end-rays, .end-cup, .end-confetti i, .whoami-drum,
+            .sc-float, .sc-sway, .sc-spin, .sc-beat, .end-rays, .end-cup, .end-confetti i,
             .girl .g-eyes, .girl .g-arm, .girl .g-cheer, .map-walker,
             .stars-earned span, .feedback, .memory-card, .trophy-pop,
             #options button.opt-correct::after, .mult-opt-btn.correct::after, .reading-opt-btn.correct::after,
@@ -1537,7 +1446,7 @@
             .map-cloud { transform: none !important; }
             #gaia-map-avatar { transition: none !important; }
             .girl .g-arm { transition: none !important; }
-            .big-btn, .answer-btn, .mult-opt-btn, .reading-opt-btn, .whoami-tile, .whoami-opt, .whoami-card, .whoami-avatar,
+            .big-btn, .answer-btn, .mult-opt-btn, .reading-opt-btn,
             #land-panel, #land-scrim, .land-icon-circle,
             .btn-squash { transition: none !important; animation: none !important; }
             .googy-avatar .g-mouth, .gchat-typing span, #googy-mic, #repeat-mic { animation: none !important; }
@@ -1792,20 +1701,6 @@
             </div>
             <button class="home-btn" onclick="goHome()" aria-label="חֲזָרָה לַמַּפָּה">🏠</button>
             <div id="chess-end" class="chess-end" hidden></div>
-        </div>
-    </div>
-
-    <!-- ===== THE TENT OF MASKS: WHO AM I? ===== -->
-    <div id="whoami-screen" class="screen">
-        <div class="game-container">
-            <div class="hud-container">
-                <div id="whoami-phase"></div>
-                <div id="whoami-count" class="hud-num"></div>
-            </div>
-            <div id="whoami-guide" class="land-guide whoami-guide"></div>
-            <div id="whoami-stage" class="whoami-stage"></div>
-            <button class="home-btn" onclick="goHome()" aria-label="חֲזָרָה לַמַּפָּה">🏠</button>
-            <div id="whoami-end" class="whoami-end" hidden></div>
         </div>
     </div>
 
@@ -6899,591 +6794,6 @@ function chessPieceSVG(type, white, attrs) {
 })();
 </script>
 <script>
-// ===== WHO AM I: THE TENT OF MASKS =====
-// A party game for 3-8 children on one phone. Everyone is shown the same secret (an animal, a
-// food...) except one child, who is told only that they are "the guesser" and must not let on.
-// The phone goes round: each child says one word about the secret, the group votes on who
-// does not know, and the guesser gets one guess at the secret. No DOM is built with names
-// in HTML strings: a child's name goes in with textContent only, and the secret is built on
-// pointerdown and torn down on release, so it never sits in the page waiting to be seen.
-// The secret word is never handed to speakHebrew: the phone talks only about whose turn it is.
-(function () {
-    const $ = id => document.getElementById(id);
-    const HOLD_MS = 400;   // a tap this short has not really shown the card
-    const ARM_MS = 400;    // how long a fresh screen ignores taps (see armLater)
-
-    // faces and disguises only, so an avatar can never be mistaken for a secret
-    const AVATARS = ['😎', '🤠', '🥳', '🤓', '🧐', '🥸', '🤩', '😇', '🤪', '😜', '👽', '👾'];
-    const CATEGORIES = {
-        animals: { label: 'חַיּוֹת', emoji: '🐾', items: [
-            { e: '🐶', w: 'כֶּלֶב' }, { e: '🐱', w: 'חָתוּל' }, { e: '🐘', w: 'פִּיל' }, { e: '🦒', w: 'גִ\'ירָפָה' }, { e: '🦁', w: 'אַרְיֵה' }, { e: '🐵', w: 'קוֹף' },
-            { e: '🐸', w: 'צְפַרְדֵּעַ' }, { e: '🐢', w: 'צָב' }, { e: '🐰', w: 'אַרְנָב' }, { e: '🐧', w: 'פִּינְגְּוִין' }, { e: '🐬', w: 'דּוֹלְפִין' }, { e: '🦋', w: 'פַּרְפַּר' },
-            { e: '🐝', w: 'דְּבוֹרָה' }, { e: '🐍', w: 'נָחָשׁ' }, { e: '🦓', w: 'זֶבְּרָה' }, { e: '🐄', w: 'פָּרָה' }
-        ] },
-        foods: { label: 'אֹכֶל', emoji: '🍕', items: [
-            { e: '🍕', w: 'פִּיצָה' }, { e: '🍦', w: 'גְּלִידָה' }, { e: '🍌', w: 'בָּנָנָה' }, { e: '🍉', w: 'אֲבַטִּיחַ' }, { e: '🍎', w: 'תַּפּוּחַ' }, { e: '🥕', w: 'גֶּזֶר' },
-            { e: '🍝', w: 'סְפָּגֶטִי' }, { e: '🥚', w: 'בֵּיצָה' }, { e: '🧀', w: 'גְּבִינָה' }, { e: '🍫', w: 'שׁוֹקוֹלָד' }, { e: '🥒', w: 'מְלָפְפוֹן' }, { e: '🍓', w: 'תּוּת' },
-            { e: '🍞', w: 'לֶחֶם' }, { e: '🍟', w: 'צִ\'יפְּס' }, { e: '🍪', w: 'עוּגִיָּה' }, { e: '🥛', w: 'חָלָב' }, { e: '🍔', w: 'הַמְבּוּרְגֶּר' }
-        ] },
-        jobs: { label: 'מִקְצוֹעוֹת', emoji: '🧑‍🚒', items: [
-            { e: '🧑‍🚒', w: 'כַּבַּאי' }, { e: '👮', w: 'שׁוֹטֵר' }, { e: '🧑‍⚕️', w: 'רוֹפֵא' }, { e: '🧑‍🏫', w: 'מוֹרֶה' }, { e: '🧑‍🍳', w: 'טַבָּח' }, { e: '🧑‍🚀', w: 'אַסְטְרוֹנָאוּט' },
-            { e: '🧑‍🌾', w: 'חַקְלַאי' }, { e: '🧑‍🎨', w: 'צַיָּר' }, { e: '🧑‍✈️', w: 'טַיָּס' }, { e: '🧑‍🔧', w: 'מְכוֹנַאי' }, { e: '🧑‍🎤', w: 'זַמָּר' }, { e: '🧑‍🔬', w: 'מַדְעָן' },
-            { e: '🚌', w: 'נֶהָג' }, { e: '👷', w: 'בַּנַּאי' }, { e: '🦷', w: 'רוֹפֵא שִׁנַּיִם' }, { e: '💇', w: 'סַפָּר' }
-        ] },
-        tales: { label: 'דְּמֻיּוֹת מִסִּפּוּרִים', emoji: '🧚', items: [
-            { e: '👸', w: 'נְסִיכָה' }, { e: '🤴', w: 'נָסִיךְ' }, { e: '👑', w: 'מֶלֶךְ' }, { e: '🧙', w: 'קוֹסֵם' }, { e: '🧚', w: 'פֵיָה' }, { e: '🐉', w: 'דְּרָקוֹן' },
-            { e: '🧜‍♀️', w: 'בַּת־יָם' }, { e: '🐺', w: 'הַזְּאֵב הָרָע' }, { e: '🦄', w: 'חַד־קֶרֶן' }, { e: '🤖', w: 'רוֹבּוֹט' }, { e: '🏴‍☠️', w: 'שׁוֹדֵד יָם' }, { e: '🦸', w: 'גִּבּוֹר־עַל' },
-            { e: '🤡', w: 'לֵיצָן' }, { e: '👧', w: 'כִּפָּה אֲדֻמָּה' }, { e: '🤥', w: 'פִּינוֹקְיוֹ' }, { e: '🐷', w: 'חֲזִירוֹן' }, { e: '🧞', w: 'גִ\'ין' }, { e: '👠', w: 'סִינְדֶּרֶלָה' }
-        ] },
-        objects: { label: 'חֲפָצִים', emoji: '🎒', items: [
-            { e: '🎒', w: 'תִּיק' }, { e: '☂️', w: 'מִטְרִיָּה' }, { e: '🔑', w: 'מַפְתֵּחַ' }, { e: '📱', w: 'טֶלֶפוֹן' }, { e: '⚽', w: 'כַּדּוּר' }, { e: '🧸', w: 'דֻּבִּי' },
-            { e: '📚', w: 'סֵפֶר' }, { e: '✏️', w: 'עִפָּרוֹן' }, { e: '🪑', w: 'כִּסֵּא' }, { e: '🛏️', w: 'מִטָּה' }, { e: '👓', w: 'מִשְׁקָפַיִם' }, { e: '🧦', w: 'גֶּרֶב' },
-            { e: '⏰', w: 'שָׁעוֹן' }, { e: '🧹', w: 'מַטְאֲטֵא' }, { e: '🎈', w: 'בַּלּוֹן' }, { e: '🚲', w: 'אוֹפַנַּיִם' }, { e: '🧩', w: 'פָּאזֶל' }, { e: '🪥', w: 'מִבְרֶשֶׁת שִׁנַּיִם' }
-        ] },
-        places: { label: 'מְקוֹמוֹת', emoji: '🏖️', items: [
-            { e: '🏖️', w: 'חוֹף הַיָּם' }, { e: '🏫', w: 'בֵּית סֵפֶר' }, { e: '🏥', w: 'בֵּית חוֹלִים' }, { e: '🛒', w: 'סוּפֶּר' }, { e: '🎡', w: 'לוּנָה פַּארְק' }, { e: '🏊', w: 'בְּרֵכָה' },
-            { e: '🌳', w: 'פַּארְק' }, { e: '🎬', w: 'קוֹלְנוֹעַ' }, { e: '🦁', w: 'גַּן חַיּוֹת' }, { e: '🏔️', w: 'הַר' }, { e: '🌲', w: 'יַעַר' }, { e: '🏝️', w: 'אִי' },
-            { e: '🚀', w: 'הֶחָלָל' }, { e: '🏰', w: 'טִירָה' }, { e: '🍕', w: 'פִּיצֶרִיָּה' }, { e: '📚', w: 'סִפְרִיָּה' }, { e: '🛝', w: 'גַּן שַׁעֲשׁוּעִים' }, { e: '🎪', w: 'קִרְקָס' }
-        ] }
-    };
-    const CAT_ORDER = ['animals', 'foods', 'jobs', 'tales', 'objects', 'places'];
-    const SECRET_GUIDE = 'לַחֲצוּ עַל הַכַּרְטִיס וְהַחֲזִיקוּ. מַה שֶּׁתִּרְאוּ — סוֹד! 🤫';
-
-    // ---- state: one round of the game, plus what to prefill next time ----
-    function fresh() {
-        return {
-            phase: 'idle', n: 0, cat: null, players: [], secret: null, imposter: -1, lastImposter: -1,
-            used: {},            // catKey -> Set of words already used this sitting
-            i: 0,                // whose turn it is to see the card
-            order: [], round: 1, turn: 0, voted: -1, guessed: null, seen: false, roundsPlayed: 0,
-            last: { n: 4, cat: 'animals', names: [], avatars: [] }
-        };
-    }
-    const G = fresh();
-    let cardClose = null;   // the open card's close handler, while a card is on the stage
-
-    // ---- small builders: nothing here takes HTML, every string goes in as text ----
-    function pills(phase, count) { $('whoami-phase').textContent = phase; $('whoami-count').textContent = count || ''; }
-    function guide(who, text) {
-        const g = $('whoami-guide');
-        g.innerHTML = girlSVG(who, { mode: 'head', size: 54 }) + '<div class="land-guide-bubble"></div>';
-        g.querySelector('.land-guide-bubble').textContent = text;
-    }
-    function node(tag, cls, text) {
-        const el = document.createElement(tag);
-        if (cls) el.className = cls;
-        if (text != null) el.textContent = text;
-        return el;
-    }
-    function stage() { const s = $('whoami-stage'); s.textContent = ''; return s; }
-    function title(text) { return node('h2', 'whoami-title', text); }
-    function tile(emoji, label, onTap) {
-        const b = node('button', 'whoami-tile');
-        b.type = 'button';
-        b.appendChild(node('span', 't-emoji', emoji));
-        b.appendChild(node('span', 't-label', label));
-        b.addEventListener('click', onTap);
-        return b;
-    }
-    function bigBtn(cls, label, onTap) {
-        const b = node('button', 'big-btn ' + cls, label);
-        b.type = 'button';
-        b.addEventListener('click', onTap);
-        return b;
-    }
-    // A screen that replaces the one under the finger stays deaf for a short beat, so a quick
-    // double tap on the last button cannot also press whatever now sits in the same spot.
-    function armLater(btns) {
-        btns.forEach(b => { b.disabled = true; });
-        later(() => btns.forEach(b => { b.disabled = false; }), ARM_MS);
-    }
-    function say(text) { try { speakHebrew(text); } catch (e) {} }
-    function hush() { try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) {} }
-    function detachCard() {
-        if (cardClose) document.removeEventListener('visibilitychange', cardClose);
-        cardClose = null;
-    }
-
-    // ---- the round's rules ----
-    function newRound() {
-        const items = CATEGORIES[G.cat].items;
-        if (!G.used[G.cat]) G.used[G.cat] = new Set();
-        let used = G.used[G.cat];
-        if (used.size >= items.length) {
-            // every secret was shown: start the pile again, but not with the one just played
-            used.clear();
-            if (G.secret && items.some(x => x.w === G.secret.w)) used.add(G.secret.w);
-        }
-        const left = items.filter(x => !used.has(x.w));
-        G.secret = left[Math.floor(Math.random() * left.length)];
-        used.add(G.secret.w);
-        // a new guesser, never the same child twice in a row (3+ players leave at least two to pick from)
-        const cands = [];
-        for (let k = 0; k < G.n; k++) if (k !== G.lastImposter) cands.push(k);
-        G.imposter = cands[Math.floor(Math.random() * cands.length)];
-        G.lastImposter = G.imposter;
-        // who speaks first is luck of the draw; the guesser is in the ring like everyone else
-        const start = Math.floor(Math.random() * G.n);
-        G.order = [];
-        for (let k = 0; k < G.n; k++) G.order.push((start + k) % G.n);
-        G.i = 0; G.round = 1; G.turn = 0; G.voted = -1; G.guessed = null; G.seen = false; G.roundsPlayed = 0;
-    }
-    // the right answer and three others from the same subject, in a random order
-    function pickOptions(items, secret) {
-        const others = shuffle(items.filter(x => x.w !== secret.w)).slice(0, 3);
-        return shuffle([secret].concat(others));
-    }
-    // round 2 starts half a circle away, so the same child is not first twice
-    function speaker(k) {
-        const shift = G.round === 2 ? Math.floor(G.n / 2) : 0;
-        return G.players[G.order[(k + shift) % G.n]];
-    }
-    function emitStart() { GaiaHooks.emit('game_start', { subject: 'whoami', level: G.cat, players: G.n }); }
-
-    // ---- the screens ----
-    function render(phase) {
-        detachCard();
-        G.phase = phase;
-        VIEWS[phase]();
-    }
-
-    function how() {
-        pills('🎭 מִי אֲנִי?');
-        guide('googy', 'אֲנִי אַסְבִּיר בְּקִצּוּר! 🎭');
-        const s = stage();
-        s.appendChild(title('אֵיךְ מְשַׂחֲקִים? ❓'));
-        [['🤫', 'כֻּלָּם רוֹאִים סוֹד — חוּץ מֵאֶחָד'],
-         ['💬', 'כָּל אֶחָד אוֹמֵר מִלָּה אַחַת עַל הַסּוֹד'],
-         ['🗳️', 'מַצְבִּיעִים: מִי לֹא יוֹדֵעַ אֶת הַסּוֹד?'],
-         ['🎭', 'הַמְּנַחֵשׁ מְנַסֶּה לְנַחֵשׁ מַה הַסּוֹד'],
-         ['🏆', 'תְּפַסְתֶּם אוֹתוֹ וְהוּא לֹא נִחֵשׁ? הַקְּבוּצָה נִצְּחָה!']].forEach(function (row) {
-            const r = node('div', 'whoami-step');
-            r.appendChild(node('span', 's-emoji', row[0]));
-            r.appendChild(node('span', null, row[1]));
-            s.appendChild(r);
-        });
-        s.appendChild(bigBtn('btn-whoami', 'הֵבַנְתִּי! ▶️', () => render('setup-count')));
-    }
-
-    function setupCount() {
-        pills('🎭 מִי אֲנִי?');
-        guide('googy', 'לַחֲצוּ עַל מִסְפַּר הַחֲבֵרִים שֶׁמְּשַׂחֲקִים 👇');
-        const s = stage();
-        s.appendChild(title('כַּמָּה מְשַׂחֲקִים? 👥'));
-        const grid = node('div', 'whoami-grid');
-        for (let n = 3; n <= 8; n++) {
-            const t = tile(String(n), 'חֲבֵרִים', () => { G.n = n; render('setup-cat'); });
-            if (n === G.last.n) t.classList.add('picked');
-            grid.appendChild(t);
-        }
-        s.appendChild(grid);
-        armLater(Array.from(grid.children));   // the 'הֵבַנְתִּי' tap must not pick a number too
-    }
-
-    function setupCat() {
-        pills('🎭 מִי אֲנִי?');
-        guide('yoovy', 'בַּחֲרוּ נוֹשֵׂא. הַסּוֹד יִהְיֶה מִתּוֹכוֹ!');
-        const s = stage();
-        s.appendChild(title('בּוֹחֲרִים נוֹשֵׂא 🔍'));
-        const grid = node('div', 'whoami-grid cols-2');
-        CAT_ORDER.forEach(function (key) {
-            const c = CATEGORIES[key];
-            const t = tile(c.emoji, c.label, () => { G.cat = key; render('setup-names'); });
-            if (key === G.last.cat && G.last.n === G.n) t.classList.add('picked');
-            grid.appendChild(t);
-        });
-        s.appendChild(grid);
-        armLater(Array.from(grid.children));   // a double tap on a number must not choose the subject too
-    }
-
-    function setupNames() {
-        pills('🎭 מִי אֲנִי?');
-        guide('googy', 'אֶפְשָׁר לִכְתֹּב שֵׁמוֹת — וְאֶפְשָׁר פָּשׁוּט לְהַתְחִיל!');
-        const s = stage();
-        s.appendChild(title('מִי מְשַׂחֵק? ✏️'));
-        const same = G.last.names.length === G.n;
-        const draft = [];
-        for (let k = 0; k < G.n; k++) draft.push({ name: same ? G.last.names[k] : '', avatar: same ? G.last.avatars[k] : AVATARS[k] });
-        const inputs = [], avBtns = [];
-        draft.forEach(function (p, k) {
-            const row = node('div', 'whoami-name-row');
-            const av = node('button', 'whoami-avatar', p.avatar);
-            av.type = 'button';
-            av.setAttribute('aria-label', 'לְהַחֲלִיף סֵמֶל');
-            av.addEventListener('click', function () {
-                // the next face no one else at the table is wearing
-                const taken = draft.filter((q, j) => j !== k).map(q => q.avatar);
-                let idx = AVATARS.indexOf(p.avatar);
-                for (let step = 0; step < AVATARS.length; step++) {
-                    idx = (idx + 1) % AVATARS.length;
-                    if (taken.indexOf(AVATARS[idx]) < 0) break;
-                }
-                p.avatar = AVATARS[idx];
-                av.textContent = p.avatar;
-            });
-            const inp = node('input', 'name-input');
-            inp.type = 'text'; inp.maxLength = 20; inp.autocomplete = 'off'; inp.dir = 'rtl'; inp.enterKeyHint = 'next';
-            // the default name is only a hint in the box, so a child can just type their own
-            const def = 'שַׂחְקָן ' + (k + 1);
-            inp.placeholder = def;
-            inp.value = p.name && p.name !== def ? p.name : '';
-            inp.addEventListener('focus', () => inp.select());
-            inp.setAttribute('aria-label', 'שֵׁם שַׂחְקָן ' + (k + 1));
-            inp.addEventListener('keydown', function (e) {
-                if (e.key !== 'Enter') return;
-                e.preventDefault();
-                if (inputs[k + 1]) inputs[k + 1].focus(); else inp.blur();
-            });
-            row.appendChild(av); row.appendChild(inp);
-            inputs.push(inp); avBtns.push(av);
-            s.appendChild(row);
-        });
-        const startBtn = bigBtn('btn-whoami', 'מַתְחִילִים! ▶️', function () {
-            const taken = {};
-            G.players = draft.map(function (p, k) {
-                let name = (inputs[k].value || '').trim() || 'שַׂחְקָן ' + (k + 1);
-                // two children with one name: the second becomes "name 2", the third "name 3"
-                const base = name;
-                for (let c = 2; taken[name]; c++) name = base + ' ' + c;
-                taken[name] = true;
-                return { name: name, avatar: p.avatar };
-            });
-            G.last = { n: G.n, cat: G.cat, names: G.players.map(p => p.name), avatars: G.players.map(p => p.avatar) };
-            newRound();
-            emitStart();
-            render('pass');
-        });
-        s.appendChild(startBtn);
-        armLater(avBtns.concat([startBtn]));   // a double tap on a subject tile must not start the game or change a face
-    }
-
-    function pass() {
-        const p = G.players[G.i];
-        pills('🤫 הַסּוֹד', '👤 ' + (G.i + 1) + '/' + G.n);
-        guide('yoovy', 'כֻּלָּם הָאֲחֵרִים — לֹא מְצִיצִים! 🙈');
-        const s = stage();
-        s.appendChild(node('p', 'whoami-line', 'הַטֶּלֶפוֹן עוֹבֵר אֶל:'));
-        s.appendChild(node('div', 'whoami-big', p.avatar));
-        s.appendChild(node('div', 'whoami-name', p.name));
-        const me = bigBtn('btn-whoami', 'זֶה אֲנִי! 👋', () => render('secret'));
-        s.appendChild(me);
-        armLater([me]);   // a double tap on 'רָאִיתִי' must not hand the next card to the wrong child
-        say('הַטֶּלֶפוֹן עוֹבֵר אֶל ' + p.name);
-    }
-
-    // The only screen that shows the secret, and only while the card is held down. The face is
-    // built on press and removed on release; both faces have the same three slots, so from
-    // across the table the guesser's card looks like everyone else's.
-    function secret() {
-        hush();
-        pills('🤫 הַסּוֹד', '👤 ' + (G.i + 1) + '/' + G.n);
-        guide('googy', SECRET_GUIDE);
-        const s = stage();
-        const card = node('div', 'whoami-card');
-        card.tabIndex = 0; card.setAttribute('role', 'button'); card.setAttribute('aria-label', 'כַּרְטִיס הַסּוֹד');
-        const seenBtn = bigBtn('btn-whoami', 'רָאִיתִי! ✅', function () {
-            G.i++;
-            render(G.i < G.n ? 'pass' : 'ready');
-        });
-        seenBtn.classList.add('whoami-wait');
-        s.appendChild(card);
-        s.appendChild(seenBtn);
-
-        function buildClosed() {
-            card.textContent = '';
-            const c = node('div', 'c-closed');
-            c.appendChild(node('span', 'c-mask', '🎭'));
-            c.appendChild(document.createTextNode('לִלְחֹץ וּלְהַחֲזִיק 👇'));
-            card.appendChild(c);
-        }
-        function buildFace(imposter) {
-            card.textContent = '';
-            const f = node('div', 'c-open');
-            if (imposter) {
-                f.appendChild(node('div', 'c-emoji', '🕵️'));
-                f.appendChild(node('div', 'c-word', 'אַתֶּם הַמְּנַחֵשׁ!'));   // short enough for one line, like every secret word
-                f.appendChild(node('div', 'c-small', 'הַנּוֹשֵׂא: ' + CATEGORIES[G.cat].label + '. תַּעֲמִידוּ פָּנִים!'));
-            } else {
-                f.appendChild(node('div', 'c-emoji', G.secret.e));
-                f.appendChild(node('div', 'c-word', G.secret.w));
-                f.appendChild(node('div', 'c-small', 'זֶה הַסּוֹד! לֹא מְגַלִּים 🤫'));
-            }
-            card.appendChild(f);
-        }
-        buildClosed();
-
-        // each child gets the 'hold longer' help, and a stray tap from the screen before cannot open the card
-        let downAt = 0, seen = false, armed = false;
-        later(() => { armed = true; }, ARM_MS);
-        const open = function () {
-            if (!armed || card.classList.contains('open')) return;
-            downAt = Date.now();
-            card.classList.add('open');
-            buildFace(G.i === G.imposter);
-        };
-        const closeCard = function () {
-            if (!card.classList.contains('open')) return;
-            card.classList.remove('open');
-            buildClosed();
-            if (Date.now() - downAt >= HOLD_MS) {
-                seen = G.seen = true;
-                seenBtn.classList.remove('whoami-wait');
-                guide('googy', SECRET_GUIDE);
-            } else if (!seen) {
-                guide('googy', 'לְהַחֲזִיק עוֹד קְצָת ⏳');
-            }
-        };
-        card.addEventListener('pointerdown', function (e) {
-            e.preventDefault();
-            try { if (card.setPointerCapture) card.setPointerCapture(e.pointerId); } catch (err) {}
-            open();
-        });
-        ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(ev => card.addEventListener(ev, closeCard));
-        card.addEventListener('keydown', function (e) {
-            if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) { e.preventDefault(); open(); }
-        });
-        card.addEventListener('keyup', closeCard);
-        card.addEventListener('contextmenu', e => e.preventDefault());
-        // the phone put down or an app switched to: the card closes by itself
-        cardClose = closeCard;
-        document.addEventListener('visibilitychange', cardClose);
-    }
-
-    function ready() {
-        pills('🤫 הַסּוֹד', '✅ ' + G.n + '/' + G.n);
-        guide('yoovy', 'שִׂימוּ אֶת הַטֶּלֶפוֹן בָּאֶמְצַע, שֶׁכֻּלָּם יִרְאוּ');
-        const s = stage();
-        s.appendChild(title('כֻּלָּם רָאוּ! 👀'));
-        s.appendChild(node('div', 'whoami-big', '📱'));
-        const go = bigBtn('btn-whoami', 'לָרְמָזִים! 💬', function () { G.round = 1; G.turn = 0; render('hint'); });
-        s.appendChild(go);
-        armLater([go]);   // the phone has to reach the middle before the first turn is called
-    }
-
-    function hint() {
-        const p = speaker(G.turn), last = G.turn === G.n - 1;
-        pills('💬 סִבּוּב ' + G.round, (G.turn + 1) + '/' + G.n);
-        guide('googy', G.round === 1 ? 'אִמְרוּ מִלָּה אַחַת עַל הַסּוֹד — רַק אַחַת! 💬' : 'עוֹד מִלָּה אַחַת — אַחֶרֶת מֵהַקּוֹדֶמֶת! 💬');
-        const s = stage();
-        const row = node('div', G.n > 7 ? 'whoami-order many' : 'whoami-order');
-        for (let k = 0; k < G.n; k++) {
-            const chip = node('span', k < G.turn ? 'done' : k === G.turn ? 'now' : '', speaker(k).avatar);
-            row.appendChild(chip);
-        }
-        s.appendChild(row);
-        s.appendChild(node('div', 'whoami-big', p.avatar));
-        s.appendChild(node('div', 'whoami-name', p.name));
-        s.appendChild(node('p', 'whoami-line', 'מִלָּה אַחַת! 🗣️'));
-        const said = bigBtn('btn-whoami', last ? 'סִיַּמְנוּ! ✅' : 'אָמַרְתִּי! ✅', function () {
-            G.turn++;
-            if (G.turn < G.n) { render('hint'); return; }
-            G.roundsPlayed = G.round;
-            render(G.round === 1 ? 'hint-more' : 'vote');
-        });
-        s.appendChild(said);
-        armLater([said]);   // every turn redraws this button in the same spot
-        say('תּוֹר ' + p.name);
-    }
-
-    function hintMore() {
-        pills('💬 רְמָזִים');
-        guide('yoovy', 'עוֹד רְמָזִים — אוֹ שֶׁכְּבָר יוֹדְעִים מִי זֶה?');
-        const s = stage();
-        s.appendChild(title('סִבּוּב הָרְמָזִים נִגְמַר! 🎉'));
-        s.appendChild(node('div', 'whoami-big', '💬'));
-        const more = bigBtn('btn-soft', 'עוֹד סִבּוּב רְמָזִים 🔁', function () { G.round = 2; G.turn = 0; render('hint'); });
-        const toVote = bigBtn('btn-whoami', 'לְהַצְבִּיעַ! 🗳️', () => render('vote'));
-        s.appendChild(more);
-        s.appendChild(toVote);
-        armLater([more, toVote]);
-    }
-
-    // one decision for the whole group: tap a child, then confirm, so a stray tap ends nothing
-    function vote() {
-        pills('🗳️ הַצְבָּעָה');
-        guide('googy', 'דַּבְּרוּ בֵּינֵיכֶם, וְאָז לַחֲצוּ יַחַד עַל הֶחָשׁוּד');
-        const s = stage();
-        s.appendChild(title('מִי הַמְּנַחֵשׁ? 🕵️'));
-        const grid = node('div', 'whoami-grid whoami-players');
-        const confirm = bigBtn('btn-whoami', '', function () {
-            if (pick < 0) return;
-            G.voted = pick;
-            render('vote-reveal');
-        });
-        confirm.textContent = '✅';   // a stand-in line, so the button is its real height while it waits
-        confirm.classList.add('whoami-wait');
-        let pick = -1;
-        const tiles = G.players.map(function (p, k) {
-            const t = tile(p.avatar, p.name, function () {
-                pick = k;
-                tiles.forEach((o, j) => o.classList.toggle('picked', j === k));
-                confirm.textContent = 'זֶה ' + p.name + '! ✅';
-                confirm.classList.remove('whoami-wait');
-            });
-            grid.appendChild(t);
-            return t;
-        });
-        s.appendChild(grid);
-        s.appendChild(confirm);
-        say('מִי הַמְּנַחֵשׁ?');
-    }
-
-    function voteReveal() {
-        pills('🗳️ הַצְבָּעָה');
-        guide('googy', 'רֶגַע שֶׁל מֶתַח... 🥁');
-        const s = stage();
-        s.appendChild(title('הַמְּנַחֵשׁ הָיָה… 🥁'));
-        const drum = node('div', 'whoami-big whoami-drum', '🥁');
-        s.appendChild(drum);
-        // a short drumroll, scheduled on the audio clock so nothing is left to clear
-        if (audioCtx) {
-            const now = audioCtx.currentTime;
-            for (let k = 0; k < 12; k++) playNote(180 + (k % 2) * 40, now + k * 0.09, 0.06, 'square', 0.12);
-        }
-        later(function () {
-            if (G.phase !== 'vote-reveal') return;
-            const imp = G.players[G.imposter], caught = G.voted === G.imposter;
-            drum.remove();
-            s.appendChild(node('div', 'whoami-big', imp.avatar));
-            s.appendChild(node('div', 'whoami-name', imp.name));
-            s.appendChild(node('p', 'whoami-line', caught ? 'תְּפַסְתֶּם! 🎉' : 'אוֹי! זֶה לֹא ' + G.players[G.voted].name + ' 😅'));
-            if (caught) {
-                guide('yoovy', 'כָּל הַכָּבוֹד! עַכְשָׁו — הַהִזְדַּמְּנוּת שֶׁל הַמְּנַחֵשׁ');
-                playSound('correct'); setGaiaState('happy'); spawnStars();
-            } else {
-                guide('yoovy', 'הַמְּנַחֵשׁ הִצְלִיחַ לְהִתְחַבֵּא! נִרְאֶה אִם יְנַחֵשׁ גַּם אֶת הַסּוֹד');
-                playSound('wrong'); setGaiaState('surprised');
-            }
-            s.appendChild(bigBtn('btn-whoami', 'הַלְאָה ◀️', () => render('guess')));
-            say('הַמְּנַחֵשׁ הָיָה ' + imp.name);
-        }, 1200);
-    }
-
-    function guess() {
-        const imp = G.players[G.imposter];
-        pills('🎭 הַנִּחוּשׁ');
-        guide('yoovy', 'נִחוּשׁ אֶחָד בִּלְבַד. בְּהַצְלָחָה! 🍀');
-        const s = stage();
-        s.appendChild(title(imp.name + ', מַה הָיָה הַסּוֹד? 🤔'));
-        s.appendChild(node('p', 'whoami-line small', 'מַעֲבִירִים אֶת הַטֶּלֶפוֹן אֶל ' + imp.name + ' 📱'));
-        const grid = node('div', 'whoami-opts');
-        const opts = pickOptions(CATEGORIES[G.cat].items, G.secret);
-        const btns = opts.map(function (o) {
-            const b = node('button', 'whoami-opt');
-            b.type = 'button';
-            b.appendChild(node('span', 'o-emoji', o.e));
-            b.appendChild(node('span', 'o-word', o.w));
-            b.addEventListener('click', function () {
-                if (G.guessed !== null) return;
-                const right = o.w === G.secret.w;
-                G.guessed = right;
-                btns.forEach(function (x, j) {
-                    x.disabled = true;
-                    if (opts[j].w === G.secret.w) x.classList.add('correct');
-                    else if (x === b) x.classList.add('wrong');
-                });
-                playSound(right ? 'correct' : 'wrong');
-                later(showResult, 1100);
-            });
-            grid.appendChild(b);
-            return b;
-        });
-        s.appendChild(grid);
-        armLater(btns);   // the 'הַלְאָה' tap that brought us here must not choose for the guesser
-        say('מַה הָיָה הַסּוֹד?');
-    }
-
-    // ---- the end of a round ----
-    function showResult() {
-        if (G.phase !== 'guess') return;
-        G.phase = 'result';
-        pills('🏁 סוֹף');
-        const imp = G.players[G.imposter], caught = G.voted === G.imposter, guessed = !!G.guessed;
-        const groupWon = caught && !guessed;
-        const stars = groupWon ? 3 : caught ? 2 : 1;
-        GaiaHooks.emit('game_end', { subject: 'whoami', level: G.cat, outcome: groupWon ? 'group' : 'imposter', players: G.n, caught: caught, guessed: guessed, rounds: G.roundsPlayed });
-        try { GaiaProgress.recordGame('whoami', 'party', stars); } catch (e) { console.warn('[progress] whoami', e); }
-
-        const titleText = groupWon ? 'הַקְּבוּצָה נִצְּחָה! 🏆' : 'הַנִּצָּחוֹן שֶׁל ' + imp.name + '! 🎭';
-        let line;
-        if (groupWon) line = 'תְּפַסְתֶּם אֶת הַמְּנַחֵשׁ, וְהוּא לֹא נִחֵשׁ אֶת הַסּוֹד';
-        else if (caught) line = 'הַמְּנַחֵשׁ נִתְפַּס — אֲבָל נִחֵשׁ אֶת הַסּוֹד!';
-        else line = 'אַף אֶחָד לֹא תָּפַס אֶת הַמְּנַחֵשׁ!' + (guessed ? ' וְגַם נִחֵשׁ אֶת הַסּוֹד! 🌟' : '');
-
-        const end = $('whoami-end');
-        end.textContent = '';
-        const box = node('div', 'whoami-end-box');
-        const confetti = node('div', 'end-confetti');
-        confetti.setAttribute('aria-hidden', 'true');
-        for (let k = 0; k < 12; k++) confetti.appendChild(document.createElement('i'));
-        box.appendChild(confetti);
-        box.appendChild(node('div', 'whoami-end-icon', groupWon ? '🏆' : '🎭'));
-        box.appendChild(node('h2', null, titleText));
-        box.appendChild(node('p', 'whoami-end-line', line));
-        const l1 = node('p', 'whoami-end-line', 'הַסּוֹד הָיָה: ');
-        l1.appendChild(node('span', 'big', G.secret.e));
-        l1.appendChild(document.createTextNode(' ' + G.secret.w));
-        box.appendChild(l1);
-        box.appendChild(node('p', 'whoami-end-line', 'הַמְּנַחֵשׁ: ' + imp.avatar + ' ' + imp.name));
-        const starsEl = node('div', 'stars-earned');
-        renderStarsEarned(starsEl, stars);
-        box.appendChild(starsEl);
-        const actions = node('div', 'whoami-end-actions');
-        actions.appendChild(bigBtn('btn-whoami', 'עוֹד סִבּוּב 🔁', function () {
-            // the same children and subject, a new secret and a new guesser
-            newRound();
-            emitStart();
-            end.hidden = true;
-            render('pass');
-        }));
-        actions.appendChild(bigBtn('btn-soft', 'לַמַּפָּה 🗺️', goHome));
-        box.appendChild(actions);
-        const link = node('button', 'whoami-link', 'לְשַׁנּוֹת שַׂחְקָנִים אוֹ נוֹשֵׂא ⚙️');
-        link.type = 'button';
-        link.addEventListener('click', function () { end.hidden = true; render('setup-count'); });
-        box.appendChild(link);
-        end.appendChild(box);
-        end.hidden = false;
-
-        playSound('victory');
-        setGaiaState('dance');
-        const bursts = groupWon ? 5 : 3;
-        for (let k = 0; k < bursts; k++) later(() => spawnStars({ clientX: Math.random() * innerWidth, clientY: Math.random() * innerHeight * 0.6 }), k * 200);
-        say(groupWon ? 'הַקְּבוּצָה נִצְּחָה!' : 'הַנִּצָּחוֹן שֶׁל ' + imp.name + '!');   // no emoji: the voice would read its name
-    }
-
-    // leaving the tent, by 🏠 or by another game starting: nothing of the secret stays in the page
-    function stop() {
-        detachCard();
-        G.phase = 'idle';
-        $('whoami-stage').textContent = '';
-        $('whoami-end').hidden = true;
-        hush();
-    }
-    GaiaHooks.on(function (type, data) {
-        if (type === 'game_exit' || (type === 'nav' && data && data.screen !== 'whoami-screen')) stop();
-    });
-
-    const VIEWS = { how: how, 'setup-count': setupCount, 'setup-cat': setupCat, 'setup-names': setupNames, pass: pass, secret: secret, ready: ready,
-        hint: hint, 'hint-more': hintMore, vote: vote, 'vote-reveal': voteReveal, guess: guess };
-
-    // ---- start: from the land's panel, straight to the setup or to the rules first ----
-    window.startWhoAmI = function (mode) {
-        stopAllGames();
-        const keep = { last: G.last, used: G.used };
-        Object.assign(G, fresh(), keep);
-        $('whoami-end').hidden = true;
-        showScreen('whoami-screen');
-        render(mode === 'how' ? 'how' : 'setup-count');
-    };
-    // for the tests
-    window.GaiaWhoAmI = {
-        get state() { return G; }, CATEGORIES, AVATARS, pickOptions, newRound, render,
-        force(o) { Object.assign(G, o); }
-    };
-})();
-</script>
-<script>
 // ===== LEADERBOARDS MODULE =====
 // Every land has a board for each of its games: the highest grade (0-100) first, and
 // between equal grades the fastest time. One row per player, and only a better result
@@ -7843,7 +7153,7 @@ const GaiaBoards = (function () {
     'use strict';
 
     const SVG_NS = 'http://www.w3.org/2000/svg';
-    const VIEW_W = 800, VIEW_H = 1820;
+    const VIEW_W = 800, VIEW_H = 1660;
     const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     // Land definitions (top -> bottom). x,y are on the winding path (RTL feel).
@@ -7857,8 +7167,7 @@ const GaiaBoards = (function () {
         { key: 'biology',   name: 'מְעָרַת הַגּוּף',   x: 240, y: 1020 },
         { key: 'memory',    name: 'אִי הַזִּכָּרוֹן',   x: 570, y: 1170 },
         { key: 'puzzle',    name: 'גֶּשֶׁר הַפָּאזֶל',  x: 250, y: 1330 },
-        { key: 'chess',     name: 'גַּן הַשַּׁחְמָט',   x: 560, y: 1490 },
-        { key: 'whoami',    name: 'אֹהֶל הַמַּסֵּכוֹת', x: 240, y: 1650 }
+        { key: 'chess',     name: 'גַּן הַשַּׁחְמָט',   x: 560, y: 1490 }
     ];
 
     // Level buttons per land — same start* functions used today.
@@ -7946,14 +7255,6 @@ const GaiaBoards = (function () {
                 { cls: 'btn-level-3', label: 'נֶגֶד הַמַּחְשֵׁב — קָשֶׁה 🤖',     fn: () => startChess('hard'), levelKey: 'hard' },
                 { cls: 'btn-soft',    label: 'שְׁנֵי שַׂחְקָנִים עַל מַכְשִׁיר אֶחָד 👫', fn: () => startChess('two') }
             ]
-        },
-        whoami: {
-            title: '🎭 אֹהֶל הַמַּסֵּכוֹת', hue: '--land-whoami',
-            note: 'מִשְׂחָק לְ־3 עַד 8 חֲבֵרִים עַל טֶלֶפוֹן אֶחָד 📱',
-            buttons: [
-                { cls: 'btn-whoami', label: 'מִי אֲנִי? — מִשְׂחָק לַחֲבֵרִים 🎭', fn: () => startWhoAmI('play'), levelKey: 'party' },
-                { cls: 'btn-soft',   label: 'אֵיךְ מְשַׂחֲקִים? ❓',             fn: () => startWhoAmI('how') }
-            ]
         }
     };
 
@@ -7967,8 +7268,7 @@ const GaiaBoards = (function () {
         biology:   ['googy', 'מָה יֵשׁ לָנוּ בְּתוֹךְ הַגּוּף? בּוֹאוּ נְגַלֶּה! 🫀'],
         memory:    ['yoovy', 'בּוֹאוּ נִבְדֹּק אֶת הַזִּכָּרוֹן! 🃏'],
         puzzle:    ['googy', 'עַל הַגֶּשֶׁר הַזֶּה הַחֲתִיכוֹת הִתְבַּלְבְּלוּ. נְסַדֵּר אוֹתָן? 🧩'],
-        chess:     ['yoovy', 'בְּגַן הַשַּׁחְמָט כָּל כְּלִי זָז אַחֶרֶת. בּוֹאוּ נִלְמַד — וְאָז נְנַסֶּה לְנַצֵּחַ אֶת הַמַּחְשֵׁב! ♞'],
-        whoami:    ['googy', 'בָּאֹהֶל הַזֶּה כֻּלָּם יוֹדְעִים אֶת הַסּוֹד — חוּץ מֵאֶחָד! תְּגַלּוּ מִי? 🎭']
+        chess:     ['yoovy', 'בְּגַן הַשַּׁחְמָט כָּל כְּלִי זָז אַחֶרֶת. בּוֹאוּ נִלְמַד — וְאָז נְנַסֶּה לְנַצֵּחַ אֶת הַמַּחְשֵׁב! ♞']
     };
 
     // castle land key maps to nothing playable
@@ -8058,10 +7358,8 @@ const GaiaBoards = (function () {
          [120, 1062, 'dec-rock', 1], [400, 1010, 'dec-rock', 1.2], [745, 1005, 'dec-bush', 1], [380, 1170, 'dec-tree', 1.1],
          [430, 1200, 'dec-flowers', 1.2], [60, 1150, 'dec-tree', 1.2], [95, 1230, 'dec-pine', 1.2], [40, 1290, 'dec-bush', 1.1],
          [740, 1410, 'dec-tree', 1.1], [400, 1430, 'dec-flowers', 1.2], [380, 1540, 'dec-rock', 1], [740, 1560, 'dec-bush', 1.1],
-         [90, 1470, 'dec-tree', 1.2], [160, 1540, 'dec-pine', 1.2], [60, 1610, 'dec-bush', 1.1], [340, 1770, 'dec-flowers', 1.3],
-         [430, 1630, 'dec-tree', 1], [700, 1640, 'dec-flowers', 1.2],
-         [700, 1700, 'dec-tree', 1.1], [560, 1760, 'dec-flowers', 1.2], [420, 1800, 'dec-bush', 1], [90, 1740, 'dec-pine', 1.2],
-         [760, 1790, 'dec-rock', 1], [640, 1640, 'dec-bush', 1], [40, 1690, 'dec-tree', 1.2]
+         [90, 1470, 'dec-tree', 1.2], [160, 1540, 'dec-pine', 1.2], [60, 1610, 'dec-bush', 1.1], [250, 1610, 'dec-flowers', 1.3],
+         [430, 1630, 'dec-tree', 1], [700, 1640, 'dec-flowers', 1.2]
         ].forEach(function (d) { t += use(d[2], d[0], d[1], d[3]); });
         // birds over the castle
         t += '<g class="map-birds">' + use('dec-bird', 170, 95, 1.2) + use('dec-bird', 200, 115, 1) + use('dec-bird', 650, 60, 1.1) + '</g>';
@@ -8070,28 +7368,6 @@ const GaiaBoards = (function () {
 
     // One landmark per land, drawn around (0,0); its base stands at y≈+40, the name plaque is below.
     const LAND_ART = {
-        whoami: function () {
-            // the tent's body is rose; every other stripe is painted white over it, roof peak to hem
-            let stripes = '';
-            for (let i = 0; i < 6; i++) if (i % 2) stripes += '<path d="M' + (-60 + 20 * i) + ' -6 L' + (-40 + 20 * i) + ' -6 L' + (-44 + 22 * i) + ' 40 L' + (-66 + 22 * i) + ' 40 Z" fill="#fff" opacity="0.9"/>';
-            return '' +
-                '<ellipse cx="0" cy="40" rx="88" ry="13" fill="oklch(0.78 0.12 140)"/>' +                                  // the lawn
-                '<path d="M-66 40 L-60 -6 L60 -6 L66 40 Z" fill="oklch(0.62 0.20 350)"/>' + stripes +                       // the striped body
-                '<path d="M-64 -6 L0 -64 L64 -6 Z" fill="oklch(0.56 0.20 348)"/>' +                                           // the roof
-                '<path d="M-32 -6 L0 -64 L-10 -6 Z M10 -6 L0 -64 L32 -6 Z" fill="#fff" opacity="0.85"/>' +                  // roof stripes
-                '<path d="M-68 -4 Q-51 6 -34 -4 Q-17 6 0 -4 Q17 6 34 -4 Q51 6 68 -4 L68 2 L-68 2 Z" fill="oklch(0.45 0.17 350)"/>' + // scalloped hem
-                '<line x1="0" y1="-64" x2="0" y2="-84" stroke="#7A5A3A" stroke-width="2.5"/>' +
-                '<path class="map-flag" d="M0 -84 L20 -78 L0 -72 Z" fill="#FFC83D"/>' +                                      // the flag
-                '<path d="M-16 40 L0 6 L16 40 Z" fill="oklch(0.32 0.10 350)"/>' +                                             // the dark door
-                // two masks hang left and right of the door: a gold happy one, a purple sad one
-                '<g transform="translate(-40 16)"><path d="M-14 -12 Q0 -20 14 -12 Q16 4 0 14 Q-16 4 -14 -12 Z" fill="#FFD54F" stroke="#C9A227" stroke-width="1.5"/>' +
-                '<ellipse cx="-6" cy="-4" rx="3" ry="2" fill="#5A3A1E"/><ellipse cx="6" cy="-4" rx="3" ry="2" fill="#5A3A1E"/><path d="M-6 4 Q0 9 6 4" stroke="#5A3A1E" stroke-width="1.8" fill="none" stroke-linecap="round"/></g>' +
-                '<g transform="translate(40 16)"><path d="M-14 -12 Q0 -20 14 -12 Q16 4 0 14 Q-16 4 -14 -12 Z" fill="#B57BE8" stroke="#7C4DBD" stroke-width="1.5"/>' +
-                '<ellipse cx="-6" cy="-4" rx="3" ry="2" fill="#3A2A5E"/><ellipse cx="6" cy="-4" rx="3" ry="2" fill="#3A2A5E"/><path d="M-6 7 Q0 2 6 7" stroke="#3A2A5E" stroke-width="1.8" fill="none" stroke-linecap="round"/></g>' +
-                '<g class="map-float"><text x="-6" y="-30" font-family="Fredoka, sans-serif" font-size="18" font-weight="700" fill="#FFF6B0" stroke="oklch(0.45 0.17 350)" stroke-width="3" stroke-linejoin="round" paint-order="stroke">?</text></g>' +
-                use('dec-bush', -78, 36, 0.8) + use('dec-flowers', 78, 38, 1) +
-                '<g class="map-sparkle"><path d="M-74 -40 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3 Z" fill="#FFE066"/><path d="M72 -52 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 Z" fill="#FFE066"/></g>';
-        },
         chess: function () {
             let tiles = '';
             for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) {
@@ -8310,41 +7586,6 @@ const GaiaBoards = (function () {
     }
 
     const LAND_SCENES = {
-        whoami: function () {
-            let t = '<circle cx="230" cy="110" r="80" fill="url(#sc-sunglow)"/><circle cx="230" cy="110" r="36" fill="#FFD54F"/>';
-            t += cloud(560, 95, 1.1, 0.85) + cloud(980, 150, 1.3) + cloud(760, 215, 0.75, 0.7);
-            // bunting across the sky: two strings of little flags
-            const colors = ['oklch(0.62 0.20 350)', '#FFD54F', '#42A5F5', '#66BB6A', '#fff', '#AB47BC'];
-            [[150, 60], [60, 170]].forEach(function (s, j) {
-                t += '<path d="M0 ' + s[0] + ' Q600 ' + (s[0] + s[1]) + ' 1200 ' + s[0] + '" stroke="#7A5A3A" stroke-width="3" fill="none"/>';
-                for (let i = 0; i < 20; i++) {
-                    const u = (i + 0.5) / 20, x = 1200 * u, y = (1 - u) * (1 - u) * s[0] + 2 * u * (1 - u) * (s[0] + s[1]) + u * u * s[0];
-                    t += '<path d="M' + x.toFixed(1) + ' ' + y.toFixed(1) + ' l26 0 l-13 30 Z" fill="' + colors[(i + j) % 6] + '" stroke="oklch(0.6 0.05 60)" stroke-width="1"/>';
-                }
-            });
-            // far hedge, then the lawn
-            t += '<path d="M0 500 Q200 470 400 490 T800 486 T1200 480 L1200 560 L0 560 Z" fill="oklch(0.58 0.12 150)"/>';
-            t += '<rect x="0" y="540" width="1200" height="260" fill="url(#sc-meadow)"/>';
-            // the big tent in the middle (its roof shows above the card on a phone)
-            t += '<path d="M330 560 L370 330 L830 330 L870 560 Z" fill="oklch(0.62 0.20 350)"/>';
-            for (let i = 0; i < 5; i++) t += '<path d="M' + (370 + i * 92 + 46) + ' 330 L' + (370 + i * 92 + 92) + ' 330 L' + (330 + (i + 1) * 108) + ' 560 L' + (330 + (i + 0.5) * 108) + ' 560 Z" fill="#fff" opacity="0.9"/>';
-            t += '<path d="M350 330 L600 120 L850 330 Z" fill="oklch(0.56 0.20 348)"/><path d="M470 330 L600 120 L540 330 Z M660 330 L600 120 L730 330 Z" fill="#fff" opacity="0.85"/>';
-            t += '<line x1="600" y1="120" x2="600" y2="70" stroke="#7A5A3A" stroke-width="5"/><path class="map-flag" d="M600 70 L650 84 L600 98 Z" fill="#FFC83D"/>';
-            t += '<path d="M540 560 L600 440 L660 560 Z" fill="oklch(0.32 0.10 350)"/>';
-            // two small tents at the sides, lanterns on poles, balloons that float
-            t += '<path d="M60 560 L85 440 L255 440 L280 560 Z" fill="#42A5F5"/><path d="M70 440 L170 350 L270 440 Z" fill="#1E88E5"/><path d="M150 560 L170 500 L190 560 Z" fill="oklch(0.3 0.08 250)"/>';
-            t += '<path d="M930 560 L955 440 L1125 440 L1150 560 Z" fill="#FFD54F"/><path d="M940 440 L1040 350 L1140 440 Z" fill="#FFB300"/><path d="M1020 560 L1040 500 L1060 560 Z" fill="oklch(0.4 0.1 80)"/>';
-            [[320, 300], [880, 300]].forEach(function (p) { t += '<rect x="' + (p[0] - 3) + '" y="' + p[1] + '" width="6" height="260" fill="#7A5A3A"/><circle class="map-lamp" cx="' + p[0] + '" cy="' + (p[1] - 10) + '" r="34" fill="url(#lampGlow)"/><rect x="' + (p[0] - 12) + '" y="' + (p[1] - 24) + '" width="24" height="28" rx="5" fill="#FFF3A0" stroke="#546E7A" stroke-width="3"/>'; });
-            function balloon(x, y, c, d) { return anim('sc-float', d, '<path d="M' + x + ' ' + (y + 40) + ' q6 40 0 90" stroke="#555" stroke-width="2" fill="none"/><ellipse cx="' + x + '" cy="' + y + '" rx="30" ry="38" fill="' + c + '"/><ellipse cx="' + (x - 9) + '" cy="' + (y - 12) + '" rx="7" ry="11" fill="#fff" opacity="0.5"/>'); }
-            t += balloon(120, 250, '#EF5350', 0) + balloon(180, 300, '#AB47BC', -1.1) + balloon(1060, 240, '#66BB6A', -0.6) + balloon(1130, 300, '#42A5F5', -1.8);
-            // confetti on the grass, and masks on sticks by the door
-            [[420, 640, '#EF5350'], [470, 700, '#FFD54F'], [740, 660, '#42A5F5'], [800, 720, '#AB47BC'], [300, 760, '#66BB6A'], [900, 770, '#EF5350'], [640, 760, '#FFD54F'], [560, 700, '#AB47BC']]
-                .forEach(function (c) { t += '<rect x="' + c[0] + '" y="' + c[1] + '" width="14" height="22" rx="3" fill="' + c[2] + '" transform="rotate(' + ((c[0] * 7) % 60 - 30) + ' ' + c[0] + ' ' + c[1] + ')"/>'; });
-            t += '<rect x="383" y="600" width="5" height="120" fill="#7A5A3A"/><path d="M360 600 Q385 580 410 600 Q414 630 385 648 Q356 630 360 600 Z" fill="#FFD54F" stroke="#C9A227" stroke-width="2"/><ellipse cx="375" cy="610" rx="5" ry="3" fill="#5A3A1E"/><ellipse cx="395" cy="610" rx="5" ry="3" fill="#5A3A1E"/><path d="M374 625 Q385 634 396 625" stroke="#5A3A1E" stroke-width="3" fill="none" stroke-linecap="round"/>';
-            t += '<rect x="812" y="600" width="5" height="120" fill="#7A5A3A"/><path d="M789 600 Q814 580 839 600 Q843 630 814 648 Q785 630 789 600 Z" fill="#B57BE8" stroke="#7C4DBD" stroke-width="2"/><ellipse cx="804" cy="610" rx="5" ry="3" fill="#3A2A5E"/><ellipse cx="824" cy="610" rx="5" ry="3" fill="#3A2A5E"/><path d="M803 631 Q814 622 825 631" stroke="#3A2A5E" stroke-width="3" fill="none" stroke-linecap="round"/>';
-            t += use('dec-flowers', 120, 770, 1.8) + use('dec-flowers', 1080, 760, 1.7) + use('dec-bush', 40, 790, 2) + use('dec-bush', 1170, 795, 2);
-            return t;
-        },
         chess: function () {
             let t = '<circle cx="985" cy="95" r="80" fill="url(#sc-sunglow)"/><circle cx="985" cy="95" r="36" fill="#FFD54F"/>';
             t += cloud(190, 115, 1.3) + cloud(620, 75, 1) + cloud(420, 205, 0.8, 0.7) + cloud(830, 215, 0.75, 0.7);
@@ -8868,10 +8109,10 @@ const GaiaBoards = (function () {
     // body[data-land] follows the game that starts (game_start) and the screen shown (nav);
     // the map and the welcome screen have none. CSS colours the cards from it.
     const SUBJECT_LAND = { math: 'math', multiplication: 'math', hebrew: 'hebrew', reading: 'reading', english: 'english', repeat: 'english',
-        googy: 'english', geography: 'geography', biology: 'biology', memory: 'memory', puzzle: 'puzzle', chess: 'chess', whoami: 'whoami' };
+        googy: 'english', geography: 'geography', biology: 'biology', memory: 'memory', puzzle: 'puzzle', chess: 'chess' };
     const SCREEN_LAND = { 'welcome-screen': '', 'main-menu': '', 'mult-menu': 'math', 'mult-screen': 'math', 'puzzle-menu': 'puzzle',
         'puzzle-screen': 'puzzle', 'reading-screen': 'reading', 'memory-screen': 'memory',
-        'googy-topics': 'english', 'googy-screen': 'english', 'repeat-screen': 'english', 'chess-screen': 'chess', 'whoami-screen': 'whoami' };
+        'googy-topics': 'english', 'googy-screen': 'english', 'repeat-screen': 'english', 'chess-screen': 'chess' };
     function setLand(land) {
         const body = document.body;
         if ((body.dataset.land || '') === land) return;
