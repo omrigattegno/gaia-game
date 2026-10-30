@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="24.0 20.1 939.0 679.8">
+  <defs>
+    <mask id="dmLogoMask" maskUnits="userSpaceOnUse" x="24.0" y="20.1" width="939.0" height="679.8">
+      <rect x="24.0" y="20.1" width="939.0" height="679.8" fill="#fff"/>
+      <ellipse cx="492.23" cy="395.81" rx="271.97" ry="143.73" transform="rotate(-17.08 492.23 395.81)" fill="#000"/>
+      <polygon points="601.24,21.00 685.41,21.00 512.19,346.29" fill="#000"/>
+    </mask>
+    <clipPath id="dmLogoHole"><ellipse cx="492.23" cy="395.81" rx="271.97" ry="143.73" transform="rotate(-17.08 492.23 395.81)"/></clipPath>
+  </defs>
+  <g fill="#223C8A">
+    <g mask="url(#dmLogoMask)"><ellipse cx="492.97" cy="393.79" rx="485.86" ry="278.08" transform="rotate(-18.25 492.97 393.79)"/></g>
+    <polygon points="685.41,23.00 782.50,23.00 666.96,170.00 606.64,170.00"/>
+    <polygon points="589.44,23.00 601.24,23.00 512.19,346.29 500.40,346.29"/>
+    <polygon points="512.19,346.29 582.53,215.00 660.00,215.00 628.53,236.00 542.59,340.00 527.50,350.00"/>
+    <g clip-path="url(#dmLogoHole)">
+      <rect x="150" y="385.30" width="700" height="14.4"/>
+      <polygon points="513.40,342.99 525.52,349.59 324.66,718.44 312.54,711.84"/>
+    </g>
+  </g>
+</svg>
