@@ -117,7 +117,9 @@
         body[data-land="puzzle"]    { --lt: oklch(0.64 0.16 70);  --lt-deep: oklch(0.50 0.14 60);  --lt-soft: oklch(0.97 0.035 85);  --lt-line: oklch(0.89 0.08 80); }
         body[data-land="chess"]     { --lt: oklch(0.55 0.10 52);  --lt-deep: oklch(0.42 0.09 45);  --lt-soft: oklch(0.97 0.02 75);   --lt-line: oklch(0.88 0.05 65); }
         #land-scene { position: absolute; inset: 0; display: none; }
-        #land-scene > svg { display: block; width: 100%; height: 100%; }
+        #land-scene > svg, #land-scene > canvas { display: block; width: 100%; height: 100%; }
+        #land-scene > canvas { object-fit: cover; object-position: 50% 100%; }   /* the land itself, from the 3D kingdom */
+        #kingdom-bg:has(#land-scene > canvas) .kg-cloud { display: none; }        /* it has clouds of its own */
         body[data-land] #land-scene { display: block; }
         body[data-land] #kg-castle, body[data-land] .kg-star, body[data-land] .kg-sparkle { display: none; }
         body[data-land="biology"] .kg-cloud { display: none; }   /* inside the cave */
@@ -211,9 +213,13 @@
         @keyframes g-swing-r { from { transform: rotate(18deg); } to { transform: rotate(-18deg); } }
         /* the welcome screen and the map show the girls themselves */
         body:has(#welcome-screen.active) #gaia-char, body:has(#main-menu.active) #gaia-char { display: none; }
+        /* in 3D (see THE SISTERS IN 3D) the drawn girls give way to a canvas, with room above them to jump */
+        #gaia-char[data-k3d] .girl { display: none; }
+        .k3d-buddies { display: block; width: 172px; height: 206px; margin: 0 -10px 0 0; }
         @media (max-height: 700px) {   /* short phones: smaller, so they cover less of the game */
             #gaia-char .girl { height: 118px; width: auto; }
             #gaia-char .girl-googy { margin-right: -22px; }
+            .k3d-buddies { width: 136px; height: 163px; margin-right: -8px; }
         }
         @keyframes gaia-breathe {
             0%,100% { transform: scaleY(1); }
@@ -3054,6 +3060,7 @@ const GaiaPlayer = (function () {
             if (!el) return;
             clearTimeout(gaiaResetTimer);
             el.className = 'gaia-' + state;
+            if (window.GaiaBuddies) GaiaBuddies.mood(state);   // the sisters in 3D, where they are
             if (state === 'happy') {
                 const rect = el.getBoundingClientRect();
                 const cx = rect.left + rect.width / 2;
@@ -3069,7 +3076,7 @@ const GaiaPlayer = (function () {
                 });
             }
             if (state === 'happy' || state === 'sad' || state === 'surprised') {
-                gaiaResetTimer = setTimeout(() => { el.className = 'gaia-idle'; }, state === 'sad' ? 900 : 1200);
+                gaiaResetTimer = setTimeout(() => setGaiaState('idle'), state === 'sad' ? 900 : 1200);
             }
         }
 
@@ -4030,7 +4037,7 @@ const GaiaPlayer = (function () {
         if (reducedMotion() || (net && net.saveData) || (navigator.deviceMemory && navigator.deviceMemory < 2)) { film = 'no'; return; }
         film = 'loading';
         const script = document.createElement('script');
-        script.src = 'kingdom3d.js?v=20261113';
+        script.src = 'kingdom3d.js?v=20261113b';
         script.async = true;
         script.onerror = () => { film = 'no'; };
         script.onload = () => {
@@ -8176,6 +8183,7 @@ const GaiaBoards = (function () {
                 if (!ok) { world3d = 'no'; K3().world.release(); return false; }
                 world3d = 'ready';
                 if (onMap()) show3D(true);
+                setTimeout(startBuddies, 1200);   // once the map has settled
                 return true;
             })
             .catch(function (e) { console.warn('[kingdom3d] no 3D map', e); world3d = 'no'; return false; });
@@ -8297,6 +8305,7 @@ const GaiaBoards = (function () {
         if (world3d === 'no') return;
         const was = world3d === 'on';
         world3d = 'no';
+        dropBuddies();
         try { K3().dispose(); } catch (e) { console.warn('[kingdom3d]', e); }
         const menu = document.getElementById('main-menu');
         menu.classList.remove('map3d', 'map3d-focus');
@@ -8314,6 +8323,39 @@ const GaiaBoards = (function () {
         else if (world3d === 'on') K3().world.detach();
     });
     window.GaiaMap3D = { prepare: prepare3D, get state() { return world3d; } };
+
+    // ---- THE SISTERS IN 3D ----
+    // Where the map is in 3D, Yoovy and Googy in the corner of the games are too: a small canvas
+    // of their own in #gaia-char (Kingdom3D.buddies) takes the drawn girls' place and their moods
+    // (setGaiaState). They are drawn only while the corner shows.
+    let buddies3d = false;
+    function startBuddies() {
+        if (buddies3d || (world3d !== 'ready' && world3d !== 'on')) return;
+        const el = document.getElementById('gaia-char');
+        try {
+            const canvas = K3().buddies.create();
+            canvas.addEventListener('webglcontextlost', dropBuddies, { once: true });
+            el.appendChild(canvas);
+            el.dataset.k3d = '1';
+            buddies3d = true;
+            K3().buddies.mood((el.className.match(/gaia-(\w+)/) || [])[1] || 'idle');
+            syncBuddies();
+        } catch (e) { console.warn('[kingdom3d] no 3D sisters', e); dropBuddies(); }
+    }
+    function dropBuddies() {
+        buddies3d = false;
+        delete document.getElementById('gaia-char').dataset.k3d;
+        try { if (K3()) K3().buddies.dispose(); } catch (e) { /* gone already */ }
+    }
+    function syncBuddies() {
+        if (!buddies3d) return;
+        const B = K3().buddies, canvas = document.querySelector('#gaia-char .k3d-buddies');
+        if (canvas && canvas.getClientRects().length) { B.resize(canvas.clientWidth, canvas.clientHeight); B.start(); }
+        else B.stop();
+    }
+    GaiaHooks.on(function (type) { if (buddies3d && (type === 'nav' || type === 'game_start')) setTimeout(syncBuddies, 0); });
+    window.addEventListener('resize', function () { if (buddies3d) setTimeout(syncBuddies, 80); });
+    window.GaiaBuddies = { mood: function (m) { if (buddies3d) K3().buddies.mood(m); }, get on() { return buddies3d; } };
 
     // The shapes and gradients of the map and the land scenes, kept once in the page in a hidden
     // <svg> (not display:none, which switches its gradients off in some browsers).
@@ -8343,8 +8385,28 @@ const GaiaBoards = (function () {
             return;
         }
         body.dataset.land = land;
-        if (holder) holder.innerHTML = '<svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax slice" xmlns="' + SVG_NS + '">' + LAND_SCENES[land]() + '</svg>';
+        if (!holder) return;
+        const shot = landShot(land);
+        if (shot) { holder.textContent = ''; holder.appendChild(shot); }
+        else holder.innerHTML = '<svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax slice" xmlns="' + SVG_NS + '">' + LAND_SCENES[land]() + '</svg>';
     }
+    // the land itself, as it stands in the 3D kingdom, where there is one
+    function landShot(land) {
+        if (world3d !== 'ready' && world3d !== 'on') return null;
+        try { return K3().world.snapshot(land, innerWidth, innerHeight); }
+        catch (e) { console.warn('[kingdom3d] no backdrop', e); return null; }
+    }
+    // the screen turned or changed size: the picture is taken again to fit it
+    let shotTimer = null;
+    window.addEventListener('resize', function () {
+        clearTimeout(shotTimer);
+        shotTimer = setTimeout(function () {
+            const land = document.body.dataset.land, holder = document.getElementById('land-scene');
+            if (!land || !holder || !holder.querySelector('canvas')) return;
+            const shot = landShot(land);
+            if (shot) { holder.textContent = ''; holder.appendChild(shot); }
+        }, 250);
+    });
     GaiaHooks.on(function (type, data) {
         if (type === 'game_start' && SUBJECT_LAND[data.subject]) setLand(SUBJECT_LAND[data.subject]);
         else if (type === 'nav' && Object.prototype.hasOwnProperty.call(SCREEN_LAND, data.screen)) setLand(SCREEN_LAND[data.screen]);

@@ -9,10 +9,10 @@ import { ROAD, landByKey } from './layout.js';
 const SCALE = 2.25, APART = 0.3;
 
 export function buildSisters(stage, roadY) {
-    const mats = girlMaterials();
+    const mats = girlMaterials(), faces = stage.dayFaces;
     mats.skin.emissiveIntensity = 0.04;
     const girls = ['yoovy', 'googy'].map(who => {
-        const g = buildGirl(who, stage.faces[who], mats, { royal: false });
+        const g = buildGirl(who, faces[who], mats, { royal: false });
         g.root.scale.setScalar(SCALE);
         g.root.traverse(o => { if (o.isMesh) o.castShadow = false; });   // the sun's shadows are drawn once; theirs is the soft one at their feet
         g.side = who === 'yoovy' ? -1 : 1;

@@ -43,9 +43,11 @@ export function buildScenery(ctx) {
     }
 
     const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), v = new THREE.Vector3(), sc = new THREE.Vector3(), c = new THREE.Color();
-    const place = (list, geo, material, { shade = 0.12, cast = true, sink = 0, tilt = 0 } = {}) => {
+    const tall = [];     // the trees, which can stand in a camera's way (see clear)
+    const place = (list, geo, material, { shade = 0.12, cast = true, sink = 0, tilt = 0, high = false } = {}) => {
         if (!list.length) return;
         const mesh = new THREE.InstancedMesh(geo, material, list.length);
+        if (high) tall.push([mesh, list]);
         list.forEach(([x, y, z, s], i) => {
             q.setFromEuler(e.set((R() - 0.5) * tilt, R() * TAU, (R() - 0.5) * tilt));
             mesh.setMatrixAt(i, m4.compose(v.set(x, y - sink * s, z), q, sc.set(s, s * (0.9 + R() * 0.2), s)));
@@ -55,10 +57,10 @@ export function buildScenery(ctx) {
         mesh.castShadow = cast; mesh.receiveShadow = true;
         group.add(mesh);
     };
-    place(spots.tree, one(roundTree(0, 0, 1)), ctx.mats.paint);
-    place(spots.pine, one(pineTree(0, 0, 0.95)), ctx.mats.paint);
+    place(spots.tree, one(roundTree(0, 0, 1)), ctx.mats.paint, { high: true });
+    place(spots.pine, one(pineTree(0, 0, 0.95)), ctx.mats.paint, { high: true });
     // trees in blossom: the same tree with pink crowns
-    place(spots.blossom, one(roundTree(0, 0, 1).map((g, i) => i ? tint(g, ['#ff9ec4', '#ffb7d5', '#ff8fba', '#ffd0e4'][i - 1]) : g)), ctx.mats.paint, { shade: 0.06 });
+    place(spots.blossom, one(roundTree(0, 0, 1).map((g, i) => i ? tint(g, ['#ff9ec4', '#ffb7d5', '#ff8fba', '#ffd0e4'][i - 1]) : g)), ctx.mats.paint, { shade: 0.06, high: true });
     place(spots.bush, one([blob(0.42, '#4aa648', { x: -0.3, y: 0.3, sy: 0.8 }), blob(0.5, '#5ab850', { x: 0.12, y: 0.38, z: 0.1, sy: 0.85 }), blob(0.36, '#3f9a44', { x: 0.52, y: 0.26, z: -0.12, sy: 0.8 })]), ctx.mats.paint);
     place(spots.rock, one([roughen(blob(0.55, '#a6a3ac', { y: 0.22, sy: 0.7 }, 1), 0.2, 3), roughen(blob(0.32, '#96939d', { x: 0.5, y: 0.14, z: 0.2, sy: 0.7 }, 1), 0.2, 7)]), ctx.mats.rock, { shade: 0.08 });
     place(spots.cactus, one([
@@ -71,7 +73,7 @@ export function buildScenery(ctx) {
     const peaks = [];
     for (let i = 0; i < 2400 && peaks.length < 70; i++) {
         const x = -44 + R() * 88, z = -96 + R() * 74, b = biome(x, z), s = 0.75 + R() * 0.75 + (b.mountain - 0.6) * 0.8;
-        if (b.mountain < 0.6 || peaks.some(p => Math.hypot(p[0] - x, p[2] - z) < 2.1 * (s + p[3]))) continue;
+        if (b.mountain < 0.6 || heightAt(x, z) < 0.8 || peaks.some(p => Math.hypot(p[0] - x, p[2] - z) < 2.1 * (s + p[3]))) continue;
         peaks.push([x, heightAt(x, z) - 0.5, z, s]);
     }
     const peak = new THREE.ConeGeometry(2.6, 4.6, 11, 6);
@@ -104,6 +106,21 @@ export function buildScenery(ctx) {
     }
     return {
         group,
+        // takes the trees that are in a camera's way (inTheWay(x, z)) out of sight; returns what puts them back
+        clear(inTheWay) {
+            const undo = [], none = new THREE.Matrix4().makeScale(0, 0, 0);
+            for (const [mesh, list] of tall) {
+                list.forEach((p, i) => {
+                    if (!inTheWay(p[0], p[2])) return;
+                    const keep = new THREE.Matrix4();
+                    mesh.getMatrixAt(i, keep);
+                    mesh.setMatrixAt(i, none);
+                    undo.push([mesh, i, keep]);
+                });
+                mesh.instanceMatrix.needsUpdate = true;
+            }
+            return () => { for (const [mesh, i, keep] of undo) { mesh.setMatrixAt(i, keep); mesh.instanceMatrix.needsUpdate = true; } };
+        },
         update(t) {
             for (const m of clouds) {
                 const u = m.userData;

@@ -29,7 +29,23 @@ const LOOKS = {
 };
 
 // the camera: looks north along the road from above
-const FOV = 34, FIT_WIDTH = 16.5, D_MIN = 34, D_MAX = 60, Z_TOP = -44.5, Z_BOTTOM = 40;
+const FOV = 34, FIT_WIDTH = 16.5, D_MIN = 34, D_MAX = 60, Z_TOP = -44.5, Z_BOTTOM = 40, FOCUS_PITCH = 17;
+
+// How each land is framed behind its games (see snapshot): how much of its height shows over
+// the game's card on a tall screen (top), how high the camera looks from (pitch, degrees) and
+// how far it swings round toward the road (yaw, degrees).
+const SHOTS = {
+    castle:    { top: 0.5,  pitch: 3,  yaw: 0 },
+    math:      { top: 0.37, pitch: 3,  yaw: 22 },
+    hebrew:    { top: 0.6,  pitch: 4,  yaw: 22 },
+    reading:   { top: 0.85, pitch: 10, yaw: 18 },
+    english:   { top: 0.5,  pitch: 3,  yaw: 24 },
+    geography: { top: 0.6,  pitch: 4,  yaw: 22 },
+    biology:   { top: 0.95, pitch: 8,  yaw: 20 },
+    memory:    { top: 0.8,  pitch: 9,  yaw: 20 },
+    puzzle:    { top: 0.7,  pitch: 8,  yaw: 28 },
+    chess:     { top: 0.9,  pitch: 14, yaw: 20 }
+};
 
 export async function createWorld(stage, opts = {}) {
     const { renderer, bloom } = stage;
@@ -136,12 +152,15 @@ export async function createWorld(stage, opts = {}) {
         if (goal.focus) {
             // near enough to fill what the page's panel leaves of the view with the land and the sisters beside it
             const L = goal.focus, th = Math.tan(FOV * RAD / 2), open = clamp(1 - goal.inset / Math.max(1, stage.height), 0.25, 1);
-            const tall = 0.8 * L.h + 1.1 * L.r, wide = 2.3 * L.r + 1.6;
+            // the camera swoops down to the road: the land stands against the sky, the far lands behind it
+            const tall = 1.0 * L.h + 0.5 * L.r + 1.2, wide = 2.3 * L.r + 2.2;
             const d = Math.max(tall / (2 * th * open), wide / (2 * th * aspect));
-            return { x: L.x * 0.72, y: landY(L.key) + L.h * 0.36, z: L.z + 0.5, d: clamp(d, 15, 46), pitch: 38 * RAD, shift: goal.inset / 2 };
+            return { x: L.x * 0.7, y: landY(L.key) + L.h * 0.4, z: L.z + 0.8, d: clamp(d, 13, 46), pitch: FOCUS_PITCH * RAD, shift: goal.inset / 2 };
         }
         const z = lerp(Z_TOP, Z_BOTTOM, goal.scroll);
-        return { x: 0, y: 0.6, z, d: baseDist(), pitch: lerp(40, 47, smooth(Z_TOP, Z_TOP + 16, z)) * RAD, shift: 0 };
+        // at the castle's end of the road the camera looks up, to the peaks and the sky behind the castle
+        const up = 1 - smooth(Z_TOP, Z_TOP + 20, z);
+        return { x: 0, y: 0.6 + up * 2.2, z: z - up * 3, d: baseDist() * (1 - up * 0.14), pitch: lerp(47, 27, up) * RAD, shift: 0 };
     };
     const ease = (dt, snap) => {
         const w = wanted(), k = snap ? 1 : 1 - Math.exp(-dt * (goal.focus ? 5.5 : 14));
@@ -293,6 +312,78 @@ export async function createWorld(stage, opts = {}) {
                 if (ms < (tier ? 26 : 45)) return true;
             }
             return false;
+        },
+        // A picture of a land for the backdrop of its games, drawn at the stage's size (or at
+        // w x h, the screen's, when the map is not showing) and returned as a canvas of its own.
+        // The game's card covers the middle of the screen, so the land is framed around it:
+        // on a tall screen its top rises over the card, on a wide one it stands beside it.
+        snapshot(key, w, h, opts = {}) {
+            const l = lands.find(l => l.L.key === key);
+            if (!l) return null;
+            if (w && h && !running && (w !== stage.width || h !== stage.height)) stage.resize(w, h);
+            const L = l.L, was = stage.show, aspect = stage.width / stage.height, S = { ...SHOTS[key], ...opts };
+            const wide = aspect > 1.15, fov = S.fov || (wide ? 36 : 26), tv = Math.tan(fov * RAD / 2), th = tv * aspect;
+            // where the land's middle goes on the screen (from the left and from the top), and how much of the screen it may take
+            let sx = 0.5, sy, fw = 1.15, fh;
+            if (wide) { const side = clamp((stage.width - 540) / 2 / stage.width, 0.14, 0.32); sx = side * 0.53; fw = side * 0.96; fh = 0.62; sy = 0.47; }
+            else { fh = 0.2 / S.top; sy = 0.03 + fh / 2; }
+            const pitch = (wide ? S.pitch + 4 : S.pitch) * RAD;
+            const tall = L.h * Math.cos(pitch) + 2 * L.r * Math.sin(pitch), broad = 2.1 * L.r;
+            const D = Math.max(tall / (fh * 2 * tv), broad / (fw * 2 * th));
+            const C = new THREE.Vector3(L.x, l.group.position.y + L.h * 0.5, L.z);
+            const cam = new THREE.PerspectiveCamera(fov, aspect, 0.5, 1600);
+            // the camera stands south of the land, swung round to one side: on a tall screen to the
+            // road's side (the land is seen against the country beyond it), on a wide one to the
+            // outer side (nothing of the lands next door comes between); the first clear view is taken
+            const out = Math.sign(L.x || 1), swing = S.yaw;
+            const tries = S.swing !== undefined ? [S.swing] : wide ? [swing, swing + 10, swing - 9, -swing, -swing - 10] : [-swing, -swing - 10, -swing + 9, swing, swing + 10];
+            const place = (deg) => {
+                const yaw = out * deg * RAD;
+                cam.position.set(C.x + Math.sin(yaw) * Math.cos(pitch) * D, C.y + Math.sin(pitch) * D, C.z + Math.cos(yaw) * Math.cos(pitch) * D);
+                cam.position.y = Math.max(cam.position.y, terrain.heightAt(cam.position.x, cam.position.z) + 3.4);
+                // turned so that the land's middle falls on its point of the screen
+                const a = (2 * sx - 1) * th, b = (1 - 2 * sy) * tv, to = V2.copy(C).sub(cam.position).normalize();
+                const rho = Math.asin(clamp(Math.hypot(a, b, 1) * to.y / Math.hypot(1, b), -1, 1)) - Math.atan(b);
+                cam.rotation.set(rho, Math.atan2(to.x, to.z) - Math.atan2(a, b * Math.sin(rho) - Math.cos(rho)), 0, 'YXZ');
+                cam.updateMatrixWorld();
+            };
+            const frustum = new THREE.Frustum(), ball = new THREE.Sphere();
+            const clear = () => {
+                // the ground does not rise into the line to the land
+                for (let k = 0.06; k < 0.86; k += 0.04) if (terrain.heightAt(lerp(cam.position.x, C.x, k), lerp(cam.position.z, C.z, k)) > lerp(cam.position.y, C.y, k) - 0.5) return false;
+                // and no other land stands in the picture nearer than this one
+                frustum.setFromProjectionMatrix(new THREE.Matrix4().multiplyMatrices(cam.projectionMatrix, cam.matrixWorldInverse));
+                for (const o of lands) {
+                    if (o === l) continue;
+                    ball.center.set(o.L.x, o.group.position.y + o.L.h * 0.5, o.L.z); ball.radius = Math.max(o.L.r, o.L.h * 0.5);
+                    if (ball.center.distanceTo(cam.position) < D - L.r && frustum.intersectsSphere(ball)) return false;
+                }
+                return true;
+            };
+            let found = false;
+            for (const deg of tries) { place(deg); if (clear()) { found = true; break; } }
+            if (!found) place(tries[0]);
+            sky.dome.position.copy(cam.position);
+            sisters.group.visible = false;
+            // no tree right in front of the lens, nor between it and the land
+            const px = cam.position.x, pz = cam.position.z, dx = C.x - px, dz = C.z - pz, len = Math.hypot(dx, dz) || 1;
+            const back = scenery.clear((x, z) => {
+                const along = ((x - px) * dx + (z - pz) * dz) / len, off = Math.abs((x - px) * dz - (z - pz) * dx) / len;
+                return Math.hypot(x - px, z - pz) < D * 0.5 || (along > 0 && along < len + L.r * 0.4 && off < L.r * 0.75 + 0.8);
+            });
+            stage.use({ scene, camera: cam });
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = look.exposure;
+            bloom.strength = look.bloom[0]; bloom.radius = look.bloom[1]; bloom.threshold = look.bloom[2];
+            stage.render();
+            const c = document.createElement('canvas');
+            c.width = stage.canvas.width; c.height = stage.canvas.height;
+            c.getContext('2d').drawImage(stage.canvas, 0, 0);
+            back();
+            sisters.group.visible = true;
+            stage.use(was === world || !was ? world : was);
+            if (running) draw(0);   // the map's own view is back on its canvas
+            return c;
         },
         info() { const i = renderer.info; return { calls: i.render.calls, triangles: i.render.triangles, geometries: i.memory.geometries, textures: i.memory.textures, tier: stage.tier }; },
 

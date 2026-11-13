@@ -348,7 +348,7 @@ export function buildGirl(who, faceTex, mats, { royal = true } = {}) {
     body.add(head);
     head.add(mesh(new THREE.SphereGeometry(1, 48, 36), skin));
     const faceMat = new THREE.MeshStandardMaterial({ map: faceTex.open, transparent: true, roughness: 0.5, depthWrite: false,
-        polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2, premultipliedAlpha: true,
+        polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2, premultipliedAlpha: !faceTex.open.userData.plain,
         emissive: '#ffffff', emissiveMap: faceTex.open, emissiveIntensity: 0.14 });
     const face = new THREE.Mesh(faceShell(), faceMat);
     face.renderOrder = 1;
