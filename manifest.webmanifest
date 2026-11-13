@@ -1,0 +1,20 @@
+{
+  "name": "Yoovy & Googy — לומדים בכיף",
+  "short_name": "Yoovy & Googy",
+  "description": "ממלכת הידע של יובי וגוגי: חשבון, עברית, קריאה, אנגלית, דגלים, גוף האדם, זיכרון, פאזלים ושחמט — לילדות ולילדים.",
+  "lang": "he",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "minimal-ui",
+  "display_override": ["standalone"],
+  "orientation": "any",
+  "background_color": "#cfe6fb",
+  "theme_color": "#8f55e0",
+  "categories": ["education", "kids", "games"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

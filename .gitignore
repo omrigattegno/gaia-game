@@ -4,3 +4,5 @@ other-games/
 node_modules/
 .wrangler/
 .dev.vars
+# screenshots and reports of tests/sweep.js
+tests/out/

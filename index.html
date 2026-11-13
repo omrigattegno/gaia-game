@@ -4,18 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Yoovy &amp; Googy - לומדים בכיף</title>
+    <meta name="description" content="ממלכת הידע של יובי וגוגי: משחקי חשבון, עברית, קריאה, אנגלית, דגלים, גוף האדם, זיכרון, פאזלים ושחמט לילדות ולילדים.">
+    <meta name="theme-color" content="#8f55e0">
+    <link rel="icon" type="image/png" href="icons/favicon.png">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Yoovy &amp; Googy - לומדים בכיף">
+    <meta property="og:description" content="ממלכת הידע של יובי וגוגי: משחקי חשבון, עברית, קריאה, אנגלית, דגלים, גוף האדם, זיכרון, פאזלים ושחמט.">
+    <meta property="og:image" content="https://omrigattegno.github.io/gaia-game/icons/icon-512.png">
+    <meta property="og:locale" content="he_IL">
 
     <!-- Firebase (deferred: never blocks the first paint; initialised on DOMContentLoaded) -->
     <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 
-    <!-- Fonts: Fredoka (variable, Latin/digits) + Varela Round (full Hebrew coverage) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400..700&family=Varela+Round&display=swap" rel="stylesheet">
+    <!-- Fonts: Fredoka (variable, Latin/digits) + Varela Round (full Hebrew coverage), served by the
+         site itself (fonts/, under the SIL Open Font License): no third party, and they work offline -->
+    <link rel="preload" href="fonts/varela-round-hebrew.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
 
     <style>
+        @font-face {
+            font-family: 'Fredoka'; font-style: normal; font-weight: 400 700; font-stretch: 100%; font-display: swap;
+            src: url(fonts/fredoka-hebrew.woff2) format('woff2');
+            unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F;
+        }
+        @font-face {
+            font-family: 'Fredoka'; font-style: normal; font-weight: 400 700; font-stretch: 100%; font-display: swap;
+            src: url(fonts/fredoka-latin.woff2) format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'Varela Round'; font-style: normal; font-weight: 400; font-display: swap;
+            src: url(fonts/varela-round-hebrew.woff2) format('woff2');
+            unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F;
+        }
+        @font-face {
+            font-family: 'Varela Round'; font-style: normal; font-weight: 400; font-display: swap;
+            src: url(fonts/varela-round-latin.woff2) format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+
         /* =========================================================
            PALETTE — OKLCH custom properties (warm day → indigo night)
            No pure #000 / #fff; neutrals tinted toward brand purple.
@@ -117,7 +148,9 @@
         body[data-land="puzzle"]    { --lt: oklch(0.64 0.16 70);  --lt-deep: oklch(0.50 0.14 60);  --lt-soft: oklch(0.97 0.035 85);  --lt-line: oklch(0.89 0.08 80); }
         body[data-land="chess"]     { --lt: oklch(0.55 0.10 52);  --lt-deep: oklch(0.42 0.09 45);  --lt-soft: oklch(0.97 0.02 75);   --lt-line: oklch(0.88 0.05 65); }
         #land-scene { position: absolute; inset: 0; display: none; }
-        #land-scene > svg { display: block; width: 100%; height: 100%; }
+        #land-scene > svg, #land-scene > canvas { display: block; width: 100%; height: 100%; }
+        #land-scene > canvas { object-fit: cover; object-position: 50% 100%; }   /* the land itself, from the 3D kingdom */
+        #kingdom-bg:has(#land-scene > canvas) .kg-cloud { display: none; }        /* it has clouds of its own */
         body[data-land] #land-scene { display: block; }
         body[data-land] #kg-castle, body[data-land] .kg-star, body[data-land] .kg-sparkle { display: none; }
         body[data-land="biology"] .kg-cloud { display: none; }   /* inside the cave */
@@ -211,9 +244,13 @@
         @keyframes g-swing-r { from { transform: rotate(18deg); } to { transform: rotate(-18deg); } }
         /* the welcome screen and the map show the girls themselves */
         body:has(#welcome-screen.active) #gaia-char, body:has(#main-menu.active) #gaia-char { display: none; }
+        /* in 3D (see THE SISTERS IN 3D) the drawn girls give way to a canvas, with room above them to jump */
+        #gaia-char[data-k3d] .girl { display: none; }
+        .k3d-buddies { display: block; width: 172px; height: 206px; margin: 0 -10px 0 0; }
         @media (max-height: 700px) {   /* short phones: smaller, so they cover less of the game */
             #gaia-char .girl { height: 118px; width: auto; }
             #gaia-char .girl-googy { margin-right: -22px; }
+            .k3d-buddies { width: 136px; height: 163px; margin-right: -8px; }
         }
         @keyframes gaia-breathe {
             0%,100% { transform: scaleY(1); }
@@ -258,10 +295,12 @@
             min-height: 100dvh;
             margin: 0;
             overflow: hidden;
-            user-select: none;
+            -webkit-user-select: none; user-select: none;   /* Safari needs the prefix: no text selection on a long press */
+            -webkit-touch-callout: none;
             touch-action: manipulation;
             color: var(--ink);
         }
+        input, textarea { -webkit-user-select: text; user-select: text; }
         /* Latin & digits prefer Fredoka; Hebrew stays on Varela Round via body fallback */
         .lat { font-family: 'Fredoka', sans-serif; }
 
@@ -455,7 +494,7 @@
 
         .math-display {
             font-size: clamp(2.8rem, 15vw, 4rem); font-weight: bold; color: var(--ink);
-            font-family: 'Fredoka', 'Courier New', monospace; margin: 22px 0;
+            font-family: 'Fredoka', 'Varela Round', 'Arial Rounded MT Bold', 'Trebuchet MS', sans-serif; margin: 22px 0;
             direction: ltr; unicode-bidi: bidi-override; white-space: nowrap;
         }
         .math-display.wide { font-size: clamp(2rem, 10.5vw, 3.4rem); }
@@ -601,7 +640,7 @@
         }
         .board-chips button {
             flex-shrink: 0; border: 2px solid oklch(0.85 0.08 90); background: oklch(0.98 0.03 95); color: var(--ink);
-            border-radius: 999px; padding: 6px 12px; font-size: 0.95rem; cursor: pointer; white-space: nowrap;
+            border-radius: 999px; padding: 6px 14px; min-height: 44px; font-size: 0.95rem; cursor: pointer; white-space: nowrap;
             font-family: 'Varela Round', 'Fredoka', sans-serif;
         }
         .board-chips button.active { background: var(--gold); border-color: oklch(0.72 0.15 80); font-weight: 700; }
@@ -613,7 +652,7 @@
         .board-rule { font-size: 0.85rem; color: var(--ink-soft); margin: 4px 0 6px; }
         .board-player-btn {
             border: none; background: none; color: var(--brand); text-decoration: underline; cursor: pointer;
-            font-size: 0.95rem; font-family: 'Varela Round', sans-serif; padding: 6px;
+            font-size: 0.95rem; font-family: 'Varela Round', sans-serif; padding: 6px 14px; min-height: 44px; min-width: 88px;
         }
         .player-girls { display: flex; justify-content: center; direction: rtl; }
         .player-girls .girl-googy { margin-right: -6px; }
@@ -718,26 +757,26 @@
         .english-word-display {
             font-size: 3.5rem; font-weight: 800; color: var(--ink);
             letter-spacing: 4px; direction: ltr; unicode-bidi: bidi-override;
-            font-family: 'Fredoka', 'Courier New', monospace;
+            font-family: 'Fredoka', 'Varela Round', 'Arial Rounded MT Bold', 'Trebuchet MS', sans-serif;
         }
 
         /* --- פוניקס אלפבית --- */
         .phonics-letter-big {
             font-size: 8rem; font-weight: 700; color: oklch(0.58 0.20 350);
-            font-family: 'Fredoka', 'Comic Sans MS', cursive;
+            font-family: 'Fredoka', 'Varela Round', 'Arial Rounded MT Bold', 'Trebuchet MS', sans-serif;
             text-shadow: 4px 4px 0 oklch(0.58 0.20 350 / 0.15);
             line-height: 1.05; cursor: pointer; animation: popIn 0.35s var(--ease-out-quart); display: inline-block;
         }
         .phonics-letter-small {
             font-size: 3rem; font-weight: 700; color: oklch(0.48 0.18 350);
-            font-family: 'Fredoka', 'Comic Sans MS', cursive; opacity: 0.6;
+            font-family: 'Fredoka', 'Varela Round', 'Arial Rounded MT Bold', 'Trebuchet MS', sans-serif; opacity: 0.6;
             cursor: pointer; margin-right: 8px;
         }
         .phonics-emoji-big { font-size: 3.8rem; margin: 4px 0; cursor: pointer; display: block; }
         .phonics-word-label { font-size: 1.3rem; color: var(--ink-soft); letter-spacing: 3px; direction: ltr; font-weight: 700; font-family: 'Fredoka', sans-serif; }
         .answer-btn-letter {
             border-radius: 20px; font-weight: 900; color: var(--lt-deep);
-            font-family: 'Fredoka', 'Comic Sans MS', cursive;
+            font-family: 'Fredoka', 'Varela Round', 'Arial Rounded MT Bold', 'Trebuchet MS', sans-serif;
             width: 28%; padding: 12px 4px; display: inline-flex; flex-direction: column;
             align-items: center; justify-content: center; margin: 4px 2% 10px; vertical-align: top;
         }
@@ -746,8 +785,10 @@
 
         /* --- גיאוגרפיה --- */
         .geo-flag-display { line-height: 1; margin: 10px 0; animation: bounce 3s infinite; }
-        .flag-img { width: 160px; border-radius: 8px; box-shadow: 0 4px 12px oklch(0.3 0.05 300 / 0.25); }
-        .flag-img-small { width: 60px; border-radius: 5px; box-shadow: 0 2px 6px oklch(0.3 0.05 300 / 0.25); }
+        .flag-img { width: 160px; height: auto; border-radius: 8px; box-shadow: 0 4px 12px oklch(0.3 0.05 300 / 0.25); }
+        .flag-img-small { width: 60px; height: auto; border-radius: 5px; box-shadow: 0 2px 6px oklch(0.3 0.05 300 / 0.25); }
+        .flag-emoji { font-size: 5rem; line-height: 1; }
+        .memory-card .flag-emoji { font-size: 2.4rem; }
         .geo-question { font-size: 1.1rem; color: var(--ink-soft); margin: 6px 0 10px; }
 
 
@@ -831,6 +872,7 @@
         .reading-back {
             background: none; border: none; font-size: 1.1rem; color: var(--lt-deep); cursor: pointer;
             direction: rtl; margin-bottom: 6px; font-family: 'Varela Round', 'Fredoka', sans-serif;
+            min-height: 44px; padding: 8px 12px;
         }
         .reading-btn { margin-top: 8px; font-size: 1.3rem; padding: 12px; }
         .reading-pick-head { direction: rtl; margin-bottom: 10px; }
@@ -861,7 +903,7 @@
         #mult-content { margin-top: 62px; padding: 8px 10px; }
         .mult-question {
             font-size: clamp(3rem, 16vw, 4.2rem); font-weight: bold; color: var(--ink);
-            font-family: 'Fredoka', 'Courier New', monospace; margin: 4px 0 18px; padding: 6px 0;
+            font-family: 'Fredoka', 'Varela Round', 'Arial Rounded MT Bold', 'Trebuchet MS', sans-serif; margin: 4px 0 18px; padding: 6px 0;
             direction: ltr; unicode-bidi: bidi-override; text-align: center; white-space: nowrap;
             background: radial-gradient(120% 100% at 50% 0%, var(--lt-soft), var(--surface) 75%);
             border: 2px solid var(--lt-line); border-radius: 24px;
@@ -919,7 +961,7 @@
         }
         #player-chip {
             pointer-events: auto; border: 2px solid var(--gold); background: var(--surface); color: var(--ink);
-            border-radius: 999px; padding: 7px 12px; font-size: 1rem; font-weight: 700; cursor: pointer;
+            border-radius: 999px; padding: 7px 12px; min-height: 44px; font-size: 1rem; font-weight: 700; cursor: pointer;
             box-shadow: 0 4px 10px oklch(0.3 0.05 300 / 0.2); font-family: 'Varela Round', sans-serif;
             max-width: 42vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
@@ -1024,6 +1066,31 @@
             .land-plaque .lp-name { font-size: 0.95rem; }
             #map-title { font-size: 1.2rem; }
         }
+
+        /* --- the map in 3D (see THE MAP IN 3D): the kingdom fills the screen and stays put, the
+           page scrolls a spacer behind it, and the lands' plaques are laid over it --- */
+        #main-menu.map3d #map-scene-holder, #main-menu.map3d #map-parallax, #main-menu.map3d #map-sky-fill { display: none; }
+        #main-menu.map3d #map-topbar { height: 0; padding-bottom: 0; align-items: flex-start; margin-bottom: calc(-1 * max(10px, env(safe-area-inset-top))); }
+        #map3d { position: sticky; top: 0; height: 100vh; height: 100dvh; overflow: hidden; z-index: 1; background: oklch(0.80 0.13 142); }
+        #map3d-stage, #map3d-labels { position: absolute; inset: 0; }
+        #map3d-stage { cursor: grab; touch-action: pan-y; -webkit-tap-highlight-color: transparent; }
+        #map3d-stage canvas { display: block; width: 100%; height: 100%; }
+        #map3d-labels { pointer-events: none; transition: opacity 250ms var(--ease-out-quart); }
+        #map3d-spacer { margin-top: -100vh; margin-top: -100dvh; pointer-events: none; }
+        .land3d-plaque {
+            position: absolute; left: 0; top: 0; visibility: hidden; pointer-events: auto; will-change: transform;
+            margin: 0; padding: 0; border: 0; background: none; font: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent;
+        }
+        div.land3d-plaque { cursor: default; }
+        .land3d-plaque .land-plaque { min-height: 40px; padding: 3px 12px; box-shadow: 0 3px 0 oklch(0.72 0.12 85), 0 6px 12px oklch(0.3 0.05 300 / 0.25); }
+        .land3d-plaque:active .land-plaque { transform: translateY(2px); box-shadow: 0 1px 0 oklch(0.72 0.12 85), 0 3px 8px oklch(0.3 0.05 300 / 0.25); }
+        .land3d-plaque:focus-visible .land-plaque { outline: 3px solid var(--brand); outline-offset: 2px; }
+        /* a land's panel is open: the camera is on the land, the plaques step aside */
+        #main-menu.map3d-focus #map3d-labels { opacity: 0; }
+        #main-menu.map3d-focus .land3d-plaque { pointer-events: none; }
+        #main-menu.map3d #land-scrim { background: linear-gradient(to top, oklch(0.3 0.05 300 / 0.3), oklch(0.3 0.05 300 / 0) 55%); }
+        .map3d-arriving { animation: map3d-in 0.6s var(--ease-out-quart); }
+        @keyframes map3d-in { from { opacity: 0; } to { opacity: 1; } }
 
         /* =========================================================
            GOOGY — English conversation friend
@@ -1330,7 +1397,7 @@
             border: 2px solid oklch(1 0 0 / 0.5); border-radius: 999px; padding: 8px 16px; cursor: pointer;
             font: inherit; font-size: 1.05rem; color: #fff; background: oklch(0.2 0.05 290 / 0.45);
         }
-        /* the 3D film (intro3d.js): its canvas under the same title, flash and skip button */
+        /* the 3D film (kingdom3d.js): its canvas under the same title, flash and skip button */
         #intro.in3d { background: #07051a; animation: in-out 0.7s 13.3s ease-in forwards; }
         .in3d-stage, .in3d-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
         .in3d .in-title { top: max(4vh, env(safe-area-inset-top)); z-index: 1; }
@@ -1428,6 +1495,41 @@
         .btn-chess { background: linear-gradient(135deg, oklch(0.62 0.11 55), oklch(0.48 0.10 45)); }
         /* the sisters stand in the corner only where they leave the board free */
         @media (max-width: 900px) { body:has(#chess-screen.active) #gaia-char { display: none; } }
+        /* "say it again" beside a question: big enough for a small finger */
+        .say-line { font-size: 1.05rem; color: var(--ink-soft); margin-top: 4px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .say-again {
+            width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--lt-line); background: var(--lt-soft);
+            font-size: 1.35rem; line-height: 1; cursor: pointer; padding: 0; -webkit-tap-highlight-color: transparent;
+        }
+        .say-again:active { transform: scale(0.94); }
+
+        /* the narrowest phones (320px): the three answers stay in one row */
+        @media (max-width: 340px) {
+            .options-container { gap: 7px; }
+            .answer-btn { min-width: 66px; height: 70px; font-size: 2rem; padding: 0 8px; }
+        }
+        /* short screens: the welcome card fits without scrolling to its button */
+        @media (max-height: 620px) {
+            #welcome-screen { padding: 20px 16px; }
+            .welcome-girls .girl { height: 128px; width: auto; }
+            .welcome-girls .girl-googy { margin-right: -24px; }
+            .logo-container { margin-bottom: 12px; }
+            .welcome-text { font-size: 1.5rem; }
+            .welcome-story { font-size: 1rem; line-height: 1.45; }
+        }
+
+        /* === THE ROTATE HINT (see THE ROTATE HINT in the script): a phone on its side === */
+        #rotate-hint {
+            display: none; position: fixed; inset: 0; z-index: 5000;
+            align-items: center; justify-content: center; gap: 22px; padding: 20px; text-align: center;
+            background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-bottom) 100%);
+        }
+        body.rotate-me:not(:has(#intro)) #rotate-hint { display: flex; }   /* the film is fine on its side */
+        #rotate-hint .rh-phone { font-size: 4.6rem; line-height: 1; animation: rh-turn 2.6s var(--ease-out-quart) infinite; }
+        #rotate-hint p { margin: 0; max-width: 60vw; font-size: 1.5rem; font-weight: 700; color: var(--brand-deep); line-height: 1.4; }
+        @keyframes rh-turn { 0%, 25% { transform: rotate(90deg); } 65%, 100% { transform: rotate(0deg); } }
+        @media (prefers-reduced-motion: reduce) { #rotate-hint .rh-phone { animation: none; } }
+
         @media (prefers-reduced-motion: reduce) {
             .chess-pc { transition: none; }
             .chess-star, .chess-sq.hint::before, .chess-pc.gone { animation: none; }
@@ -1486,6 +1588,7 @@
 </div>
 
 <div id="gaia-char" class="gaia-idle" aria-hidden="true"></div>
+<div id="rotate-hint" role="status"><span class="rh-phone" aria-hidden="true">📱</span><p>מְסוֹבְבִים אֶת הַטֶּלֶפוֹן — וּמַמְשִׁיכִים לְשַׂחֵק!</p></div>
 
     <div id="welcome-screen" class="screen active">
         <div class="logo-container">
@@ -1534,7 +1637,7 @@
                 <div class="hud-num">הֲפִיכוֹת: <span id="mem-flips">0</span></div>
             </div>
             <div id="memory-grid"></div>
-            <button class="home-btn" onclick="goHome()">🏠</button>
+            <button class="home-btn" onclick="goHome()" aria-label="חֲזָרָה לַמַּפָּה">🏠</button>
         </div>
     </div>
 
@@ -1571,7 +1674,7 @@
                 <div id="puzzle-grid" class="puzzle-grid"></div>
             </div>
             <button class="big-btn btn-puzzle puzzle-reshuffle" onclick="reshufflePuzzle()">לְעַרְבֵּב מֵחָדָשׁ 🔀</button>
-            <button class="home-btn" onclick="goHome()">🏠</button>
+            <button class="home-btn" onclick="goHome()" aria-label="חֲזָרָה לַמַּפָּה">🏠</button>
         </div>
     </div>
 
@@ -1587,7 +1690,7 @@
             <div class="options-container" id="options"></div>
             <div class="feedback" id="feedback"></div>
 
-            <button class="home-btn" onclick="goHome()">🏠</button>
+            <button class="home-btn" onclick="goHome()" aria-label="חֲזָרָה לַמַּפָּה">🏠</button>
         </div>
     </div>
 
@@ -1601,6 +1704,7 @@
 
             <div id="end-board"></div>
 
+            <button class="big-btn btn-level-1" id="end-again" onclick="playAgain()">סִיבּוּב נוֹסָף 🔁</button>
             <button class="big-btn btn-home" onclick="goHome()">חֲזָרָה לַמַּפָּה 🏠</button>
         </div>
     </div>
@@ -1614,7 +1718,7 @@
                 <div class="reading-progress" id="reading-q-progress"></div>
             </div>
             <div id="reading-content" style="margin-top:62px; padding:8px 10px;"></div>
-            <button class="home-btn" onclick="goHome()">🏠</button>
+            <button class="home-btn" onclick="goHome()" aria-label="חֲזָרָה לַמַּפָּה">🏠</button>
         </div>
     </div>
 
@@ -1646,7 +1750,7 @@
                 <div id="mult-score">⭐ 0</div>
             </div>
             <div id="mult-content"></div>
-            <button class="home-btn" onclick="goHome()">🏠</button>
+            <button class="home-btn" onclick="goHome()" aria-label="חֲזָרָה לַמַּפָּה">🏠</button>
         </div>
     </div>
 
@@ -1676,7 +1780,7 @@
                 <button id="googy-send" aria-label="לִשְׁלֹחַ">➤</button>
             </div>
             <div id="googy-end"></div>
-            <button class="home-btn" onclick="goHome()">🏠</button>
+            <button class="home-btn" onclick="goHome()" aria-label="חֲזָרָה לַמַּפָּה">🏠</button>
         </div>
     </div>
 
@@ -1732,7 +1836,7 @@
                 <button id="repeat-skip">דִּלּוּג עַל הַמִּשְׁפָּט</button>
             </div>
             <div id="repeat-end"></div>
-            <button class="home-btn" onclick="goHome()">🏠</button>
+            <button class="home-btn" onclick="goHome()" aria-label="חֲזָרָה לַמַּפָּה">🏠</button>
         </div>
     </div>
     <!-- ===== LEADERBOARD & PLAYER DIALOGS ===== -->
@@ -1780,6 +1884,97 @@
             });
         }
     };
+})();
+
+// ===== OFFLINE =====
+// sw.js keeps the page and what it needs, so the game also opens without a network
+// (the leaderboards then show this device's results).
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').catch(function (e) { console.warn('[offline] no service worker:', e && e.message); });
+    });
+}
+
+// ===== PAUSE =====
+// The game's clocks wait while the child cannot see the game: the page out of sight (another
+// tab, the screen locked, a phone call), or a phone turned on its side (the rotate hint below).
+// Whoever keeps a clock asks GaiaPause.on, and hears of a change through GaiaPause.onChange.
+window.GaiaPause = (function () {
+    const listeners = [];
+    let rotated = false, paused = document.hidden;
+    function update() {
+        const now = document.hidden || rotated;
+        if (now === paused) return;
+        paused = now;
+        listeners.forEach(fn => { try { fn(paused); } catch (e) { console.warn('[pause]', e); } });
+    }
+    document.addEventListener('visibilitychange', update);
+    return {
+        get on() { return paused; },
+        onChange(fn) { listeners.push(fn); },
+        setRotated(value) { rotated = !!value; update(); }
+    };
+})();
+
+// ===== THE ROTATE HINT =====
+// The game is laid out for a phone held upright; on its side the cards do not fit. A phone
+// on its side gets a friendly "turn me" over the game (see #rotate-hint), and the clocks wait.
+// Tablets and computers have the room, and are left alone. The screen's own orientation is
+// asked, not the window's shape: an open keyboard makes an upright phone's window wide and short.
+(function () {
+    const coarse = window.matchMedia ? window.matchMedia('(pointer: coarse)') : null;
+    function check() {
+        const type = screen.orientation && screen.orientation.type;
+        const sideways = type ? type.indexOf('landscape') === 0 : Math.abs(window.orientation) === 90;
+        const phone = Math.min(screen.width, screen.height) <= 480 && (!coarse || coarse.matches);
+        const on = !!(sideways && phone && window.innerWidth > window.innerHeight);
+        document.body.classList.toggle('rotate-me', on);
+        GaiaPause.setRotated(on);
+    }
+    window.addEventListener('orientationchange', check);
+    window.addEventListener('resize', check);
+    if (screen.orientation && screen.orientation.addEventListener) screen.orientation.addEventListener('change', check);
+    check();
+})();
+
+// ===== AWAKE =====
+// While a game is on, the screen is asked not to go dark: a story takes a few minutes to read
+// and a chess move a while to think of, with no finger on the glass. The request is dropped on
+// the map, when the page is out of sight, and after four minutes without a touch (a phone left
+// open on a game still goes to sleep). Where the browser has no such thing, nothing happens.
+(function () {
+    if (!navigator.wakeLock || !navigator.wakeLock.request) return;
+    const IDLE = 4 * 60 * 1000;
+    let lock = null, asking = false, wanted = false, idle = null;
+    function hold() {
+        if (lock || asking || !wanted || document.hidden) return;
+        asking = true;
+        navigator.wakeLock.request('screen').then(function (l) {
+            asking = false;
+            lock = l;
+            l.addEventListener('release', function () { if (lock === l) lock = null; });
+            if (!wanted) drop();
+        }, function () { asking = false; });   // refused (battery saver, no touch yet): the next touch asks again
+    }
+    function drop() {
+        const l = lock;
+        lock = null;
+        if (l) l.release().catch(function () {});
+    }
+    function touched() {
+        clearTimeout(idle);
+        if (!wanted) return;
+        idle = setTimeout(drop, IDLE);
+        hold();
+    }
+    GaiaHooks.on(function (type, data) {
+        if (type !== 'nav') return;
+        wanted = data.screen !== 'main-menu' && data.screen !== 'welcome-screen';
+        if (wanted) touched();
+        else { clearTimeout(idle); drop(); }
+    });
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) touched(); });
+    document.addEventListener('pointerdown', touched, { passive: true });
 })();
 
 // ===== PROGRESS PERSISTENCE MODULE (loads before the engine) =====
@@ -2208,7 +2403,7 @@ const GaiaPlayer = (function () {
             { full: "פינגווין", emoji: "🐧" }, { full: "ינשוף", emoji: "🦉" }, { full: "שועל", emoji: "🦊" }, { full: "נמר", emoji: "🐆" },
             { full: "קנגורו", emoji: "🦘" }, { full: "תנין", emoji: "🐊" }, { full: "דולפין", emoji: "🐬" }, { full: "כריש", emoji: "🦈" },
             { full: "תמנון", emoji: "🐙" }, { full: "פנדה", emoji: "🐼" }, { full: "קיפוד", emoji: "🦔" }, { full: "יונה", emoji: "🕊️" },
-            { full: "טווס", emoji: "🦚" }, { full: "חמור", emoji: "🫏" }, { full: "חזיר", emoji: "🐷" }, { full: "ברווז", emoji: "🦆" },
+            { full: "טווס", emoji: "🦚" }, { full: "גמל", emoji: "🐫" }, { full: "חזיר", emoji: "🐷" }, { full: "ברווז", emoji: "🦆" },
             { full: "פלמינגו", emoji: "🦩" }, { full: "לטאה", emoji: "🦎" }, { full: "דבורה", emoji: "🐝" }, { full: "נמלה", emoji: "🐜" },
 
             // עוד אוכל (20)
@@ -2233,7 +2428,7 @@ const GaiaPlayer = (function () {
             // צבעים (10)
             { full: "אדום", emoji: "🔴" }, { full: "כחול", emoji: "🔵" }, { full: "ירוק", emoji: "🟢" }, { full: "צהוב", emoji: "🟡" },
             { full: "כתום", emoji: "🟠" }, { full: "סגול", emoji: "🟣" }, { full: "לבן", emoji: "⬜" }, { full: "שחור", emoji: "⬛" },
-            { full: "ורוד", emoji: "🩷" }, { full: "חום", emoji: "🟤" },
+            { full: "ורוד", emoji: "💗" }, { full: "חום", emoji: "🟤" },
 
             // טכנולוגיה וחפצים (7)
             { full: "מחשב", emoji: "💻" }, { full: "טלוויזיה", emoji: "📺" }, { full: "רדיו", emoji: "📻" }, { full: "מנורה", emoji: "💡" },
@@ -2256,7 +2451,7 @@ const GaiaPlayer = (function () {
 
             // מקצועות (10)
             { full: "רופא", emoji: "👨‍⚕️" }, { full: "טבח", emoji: "👨‍🍳" }, { full: "שוטר", emoji: "👮" },
-            { full: "כבאי", emoji: "🧑‍🚒" }, { full: "חייל", emoji: "💂" }, { full: "קוסם", emoji: "🪄" },
+            { full: "כבאי", emoji: "🧑‍🚒" }, { full: "חייל", emoji: "💂" }, { full: "קוסם", emoji: "🧙" },
             { full: "זמר", emoji: "🎤" }, { full: "גנן", emoji: "🌱" }, { full: "נגר", emoji: "🪚" },
             { full: "דייג", emoji: "🎣" },
 
@@ -2273,14 +2468,14 @@ const GaiaPlayer = (function () {
 
             // כלי בית ומטבח (12)
             { full: "מחבת", emoji: "🍳" }, { full: "קומקום", emoji: "☕" }, { full: "מראה", emoji: "🪞" },
-            { full: "אמבטיה", emoji: "🛁" }, { full: "מקלחת", emoji: "🚿" }, { full: "כרית", emoji: "🛌" },
+            { full: "אמבטיה", emoji: "🛁" }, { full: "מקלחת", emoji: "🚿" }, { full: "כף", emoji: "🥄" },
             { full: "סבון", emoji: "🧼" }, { full: "חלון", emoji: "🪟" }, { full: "מטאטא", emoji: "🧹" },
-            { full: "דלי", emoji: "🪣" }, { full: "צלחת", emoji: "🍽️" }, { full: "מגבת", emoji: "🧻" },
+            { full: "דלי", emoji: "🪣" }, { full: "צלחת", emoji: "🍽️" }, { full: "ספוג", emoji: "🧽" },
 
             // מקומות ובילוי (10)
             { full: "פארק", emoji: "🎡" }, { full: "קולנוע", emoji: "🎬" }, { full: "מוזיאון", emoji: "🏛️" },
             { full: "חוף", emoji: "🏖️" }, { full: "שוק", emoji: "🛒" }, { full: "חנות", emoji: "🏪" },
-            { full: "גן ילדים", emoji: "🛝" }, { full: "בית חולים", emoji: "🏥" },
+            { full: "קרקס", emoji: "🎪" }, { full: "בית חולים", emoji: "🏥" },
             { full: "אצטדיון", emoji: "🏟️" }, { full: "מסעדה", emoji: "🍴" }
         ];
 
@@ -2298,7 +2493,7 @@ const GaiaPlayer = (function () {
             // רמה 2 — כל האיברים
             { emoji: "🟤", name: "כָּבֵד",    func: "מְנַקֶּה אֶת הַדָּם מֵרַעֲלִים",         level: 2 },
             { emoji: "🟡", name: "קֵיבָה",    func: "מְפָרֶקֶת אֶת הָאוֹכֶל אַחֲרֵי הָאֲכִילָה", level: 2 },
-            { emoji: "🫘", name: "כְּלָיוֹת",  func: "מְסַנְּנוֹת פְּסוֹלֶת מֵהַדָּם",          level: 2 },
+            { emoji: "🟣", name: "כְּלָיוֹת",  func: "מְסַנְּנוֹת פְּסוֹלֶת מֵהַדָּם",          level: 2 },
             { emoji: "💪", name: "שְׁרִירִים", func: "מְאַפְשְׁרִים תְּנוּעָה שֶׁל הַגּוּף",     level: 2 },
             { emoji: "🩸", name: "דָּם",       func: "מוֹבִיל חַמְצָן וּמָזוֹן לְכָל הַגּוּף",   level: 2 },
             { emoji: "🧴", name: "עוֹר",       func: "מָגֵן עַל הַגּוּף מִבַּחוּץ",            level: 2 },
@@ -2323,7 +2518,7 @@ const GaiaPlayer = (function () {
             // גב ובטן
             { emoji: "🦴", name: "עַמּוּד הַשִּׁדְרָה",    func: "תּוֹמֵךְ בַּגּוּף וּמָגֵן עַל חוּט הַשִּׁדְרָה",         level: 2 },
             { emoji: "🤸", name: "גַּב",                  func: "תּוֹמֵךְ בַּגּוּף וּמְאַפְשֵׁר עֲמִידָה זְקוּפָה",       level: 2 },
-            { emoji: "🫃", name: "בֶּטֶן",               func: "מְכִילָה אֶת אֵיבְרֵי הָעִיכּוּל",                        level: 2 },
+            { emoji: "🧍", name: "בֶּטֶן",               func: "מְכִילָה אֶת אֵיבְרֵי הָעִיכּוּל",                        level: 2 },
             // מערכת עיכול
             { emoji: "🌀", name: "מֵעִי דַּק",            func: "סוֹפֵג חָמְרֵי תְּזוּנָה מֵהָאוֹכֶל לַגּוּף",            level: 2 },
             { emoji: "〰️", name: "מֵעִי גַּס",            func: "סוֹפֵג מַיִם וּמוֹצִיא פְּסוֹלֶת מֵהַגּוּף",              level: 2 },
@@ -2363,11 +2558,11 @@ const GaiaPlayer = (function () {
             { word: "CANDY",    emoji: "🍬" },
             // צבעים (8)
             { word: "RED",      emoji: "🔴" }, { word: "BLUE",   emoji: "🔵" }, { word: "GREEN",  emoji: "🟢" },
-            { word: "PINK",     emoji: "🩷" }, { word: "GOLD",   emoji: "🟡" }, { word: "WHITE",  emoji: "⬜" },
+            { word: "PINK",     emoji: "💗" }, { word: "YELLOW", emoji: "🟡" }, { word: "WHITE",  emoji: "⬜" },
             { word: "BLACK",    emoji: "⬛" }, { word: "PURPLE", emoji: "🟣" },
             // בית ספר (8)
-            { word: "PEN",      emoji: "🖊️" }, { word: "BOOK",   emoji: "📚" }, { word: "DESK",   emoji: "🪑" },
-            { word: "RULER",    emoji: "📏" }, { word: "CLASS",  emoji: "🏫" }, { word: "PENCIL", emoji: "✏️" },
+            { word: "PEN",      emoji: "🖊️" }, { word: "BOOK",   emoji: "📚" }, { word: "CHAIR",  emoji: "🪑" },
+            { word: "RULER",    emoji: "📏" }, { word: "SCHOOL", emoji: "🏫" }, { word: "PENCIL", emoji: "✏️" },
             { word: "BAG",      emoji: "🎒" }, { word: "PAPER",  emoji: "📄" },
             // טבע (12)
             { word: "SUN",      emoji: "☀️" }, { word: "MOON",   emoji: "🌙" }, { word: "STAR",   emoji: "⭐" },
@@ -2396,7 +2591,7 @@ const GaiaPlayer = (function () {
             { letter: 'K', emoji: '🪁', word: 'KITE' },
             { letter: 'L', emoji: '🦁', word: 'LION' },
             { letter: 'M', emoji: '🐒', word: 'MONKEY' },
-            { letter: 'N', emoji: '🪺', word: 'NEST' },
+            { letter: 'N', emoji: '👃', word: 'NOSE' },
             { letter: 'O', emoji: '🍊', word: 'ORANGE' },
             { letter: 'P', emoji: '🐷', word: 'PIG' },
             { letter: 'Q', emoji: '👑', word: 'QUEEN' },
@@ -2429,7 +2624,7 @@ const GaiaPlayer = (function () {
             // רמה 2 — מדינות נוספות
             { code: "ca", name: "קָנָדָה",              level: 2 },
             { code: "mx", name: "מֶקְסִיקוֹ",           level: 2 },
-            { code: "kr", name: "קוֹרֵאָה",             level: 2 },
+            { code: "kr", name: "דְּרוֹם קוֹרֵאָה",     level: 2 },
             { code: "in", name: "הוֹדּוּ",              level: 2 },
             { code: "tr", name: "טוּרְקִיָּה",          level: 2 },
             { code: "pl", name: "פּוֹלִין",             level: 2 },
@@ -2437,12 +2632,12 @@ const GaiaPlayer = (function () {
             { code: "no", name: "נוֹרְוֶגְיָה",         level: 2 },
             { code: "nl", name: "הוֹלַנְד",             level: 2 },
             { code: "be", name: "בֶּלְגְיָה",           level: 2 },
-            { code: "ch", name: "שְׁוַיְצַרְיָה",       level: 2 },
+            { code: "ch", name: "שְׁוַיְץ",             level: 2 },
             { code: "at", name: "אוֹסְטְרִיָּה",        level: 2 },
             { code: "gr", name: "יָוָן",                level: 2 },
             { code: "pt", name: "פּוֹרְטוּגָל",         level: 2 },
             { code: "eg", name: "מִצְרַיִם",            level: 2 },
-            { code: "za", name: "דָּרוֹם אַפְרִיקָה",   level: 2 },
+            { code: "za", name: "דְּרוֹם אַפְרִיקָה",   level: 2 },
             { code: "ar", name: "אַרְגֶנְטִינָה",       level: 2 },
             { code: "ua", name: "אוּקְרַאִינָה",        level: 2 },
             // רמה 2 — עוד מדינות
@@ -2461,7 +2656,7 @@ const GaiaPlayer = (function () {
             { code: "pe", name: "פֵּרוּ",               level: 2 },
             { code: "bo", name: "בּוֹלִיבְיָה",         level: 2 },
             { code: "ec", name: "אֶקְוָדוֹר",           level: 2 },
-            { code: "sa", name: "עַרַב הַסַּעוּדִית",   level: 2 },
+            { code: "sa", name: "עֲרַב הַסְּעוּדִית",   level: 2 },
             { code: "jo", name: "יַרְדֵּן",              level: 2 },
             { code: "lb", name: "לְבָנוֹן",             level: 2 },
             { code: "iq", name: "עִירַאק",              level: 2 },
@@ -2478,8 +2673,19 @@ const GaiaPlayer = (function () {
             { code: "sg", name: "סִינְגַפּוּר",          level: 2 },
         ];
 
-        function flagImg(code, size) {
-            return `<img src="https://flagcdn.com/w${size}/${code}.png" class="flag-img" alt="${code}">`;
+        // The flags are the site's own files (flags/, drawn by the flag-icons project): nothing is
+        // fetched from elsewhere, so they also show offline. The few with a detailed coat of arms
+        // are small pictures instead of long drawings. The alt text is empty: a country's code
+        // would give the answer away. If a file is ever missing, the flag's emoji stands in.
+        const FLAG_PICTURES = new Set(['rs', 'bo', 'mx', 'es', 'hr', 'ec']);
+        function flagImg(code, className) {
+            return `<img src="flags/${code}.${FLAG_PICTURES.has(code) ? 'webp' : 'svg'}" class="${className || 'flag-img'}" alt="" width="160" height="120" data-code="${code}" onerror="flagMissing(this)">`;
+        }
+        function flagMissing(img) {
+            const emoji = document.createElement('span');
+            emoji.className = 'flag-emoji';
+            emoji.textContent = String.fromCodePoint(...[...img.dataset.code.toUpperCase()].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
+            img.replaceWith(emoji);
         }
 
         let biologyOrg = {};
@@ -2566,6 +2772,7 @@ const GaiaPlayer = (function () {
             answerLocked = false;
             memoryLocked = false;
             memoryFlipped = [];
+            if (window.speechSynthesis) window.speechSynthesis.cancel();   // a word still being said
         }
 
         // --- ניהול מסכים ---
@@ -2842,6 +3049,7 @@ const GaiaPlayer = (function () {
         function startPuzzle(rows, cols, mode) {
             stopAllGames();
             if (mode) puzzleMode = mode;
+            replayGame = () => startPuzzle(rows, cols);
             currentGameType = 'puzzle';
             currentLevel = rows + 'x' + cols;
             scoreMax = PUZZLE_MAX_SCORE[currentLevel] || rows * cols * 10;
@@ -2862,7 +3070,7 @@ const GaiaPlayer = (function () {
             document.getElementById('puzzle-grid').classList.remove('puzzle-solved');
 
             puzzleTimerInterval = setInterval(() => {
-                if (!puzzleSolved) {
+                if (!puzzleSolved && !GaiaPause.on) {
                     puzzleSeconds++;
                     document.getElementById('puzzle-timer').innerText = puzzleSeconds;
                 }
@@ -2951,13 +3159,21 @@ const GaiaPlayer = (function () {
             });
         }
 
+        // A tap on a tile in the gap's row or column slides it, and every tile between it and
+        // the gap, one place over (each tile that moves counts as a move).
         function clickPuzzleTile(idx) {
             if (puzzleSolved) return;
-            const emptyIdx = puzzleGrid.indexOf(0);
-            if (!getPuzzleNeighbors(emptyIdx).includes(idx)) return;
-
-            [puzzleGrid[emptyIdx], puzzleGrid[idx]] = [puzzleGrid[idx], puzzleGrid[emptyIdx]];
-            puzzleMoves++;
+            let emptyIdx = puzzleGrid.indexOf(0);
+            const sameRow = Math.floor(idx / puzzleCols) === Math.floor(emptyIdx / puzzleCols);
+            const sameCol = idx % puzzleCols === emptyIdx % puzzleCols;
+            if (idx === emptyIdx || (!sameRow && !sameCol)) return;
+            const step = (sameRow ? 1 : puzzleCols) * (idx > emptyIdx ? 1 : -1);
+            while (emptyIdx !== idx) {
+                puzzleGrid[emptyIdx] = puzzleGrid[emptyIdx + step];
+                emptyIdx += step;
+                puzzleMoves++;
+            }
+            puzzleGrid[idx] = 0;
             document.getElementById('puzzle-moves').innerText = puzzleMoves;
             renderPuzzle();
             checkPuzzleSolved();
@@ -3029,6 +3245,7 @@ const GaiaPlayer = (function () {
             if (!el) return;
             clearTimeout(gaiaResetTimer);
             el.className = 'gaia-' + state;
+            if (window.GaiaBuddies) GaiaBuddies.mood(state);   // the sisters in 3D, where they are
             if (state === 'happy') {
                 const rect = el.getBoundingClientRect();
                 const cx = rect.left + rect.width / 2;
@@ -3044,7 +3261,7 @@ const GaiaPlayer = (function () {
                 });
             }
             if (state === 'happy' || state === 'sad' || state === 'surprised') {
-                gaiaResetTimer = setTimeout(() => { el.className = 'gaia-idle'; }, state === 'sad' ? 900 : 1200);
+                gaiaResetTimer = setTimeout(() => setGaiaState('idle'), state === 'sad' ? 900 : 1200);
             }
         }
 
@@ -3109,10 +3326,18 @@ const GaiaPlayer = (function () {
         }
 
         // --- שעון עצר ---
+        // The question's clock. It waits while the page is out of sight (another tab, the screen
+        // locked, a phone call): a child who comes back finds the question as it was left.
+        let timerWaiting = false;   // a clock that should be running, held while the game is paused (see PAUSE)
         function startTimer() {
             stopTimer();
             timeLeft = getTimerSeconds();
             updateTimerDisplay();
+            runTimer();
+        }
+
+        function runTimer() {
+            if (GaiaPause.on) { timerWaiting = true; return; }
             timerInterval = setInterval(() => {
                 timeLeft--;
                 updateTimerDisplay();
@@ -3126,7 +3351,17 @@ const GaiaPlayer = (function () {
         function stopTimer() {
             clearInterval(timerInterval);
             timerInterval = null;
+            timerWaiting = false;
         }
+
+        GaiaPause.onChange(paused => {
+            if (paused) {
+                if (timerInterval) { clearInterval(timerInterval); timerInterval = null; timerWaiting = true; }
+            } else if (timerWaiting) {
+                timerWaiting = false;
+                runTimer();
+            }
+        });
 
         function updateTimerDisplay() {
             const el = document.getElementById('timer-num');
@@ -3210,9 +3445,17 @@ const GaiaPlayer = (function () {
             return a;
         }
 
+        // The game that is on, for the end screen's "another round".
+        let replayGame = null;
+        function playAgain() {
+            if (replayGame) replayGame();
+            else goHome();
+        }
+
         // Shared start for the 15-question games (hebrew / biology / math / english / geography).
         function startQuiz(type, level, pool, analyticsLevel) {
             stopAllGames();
+            replayGame = () => startQuiz(type, level, pool, analyticsLevel);
             currentGameType = type;
             currentLevel = level;
             scoreMax = MAX_QUESTIONS * 10;
@@ -3276,7 +3519,8 @@ const GaiaPlayer = (function () {
                 else htmlWord += wordStr[i];
             }
             container.innerHTML = `<div class="emoji-display">${hebrewWordObj.emoji}</div><div class="word-display">${htmlWord}</div>`;
-            generateButtons(currentAnswer, 'hebrew');
+            const endsWord = hiddenIndex === wordStr.length - 1 || wordStr[hiddenIndex + 1] === ' ';
+            generateButtons(currentAnswer, 'hebrew', endsWord);
             startTimer();
         }
 
@@ -3333,16 +3577,19 @@ const GaiaPlayer = (function () {
                 }
                 currentAnswer = isAddition ? n1 + n2 : n1 - n2;
                 container.innerHTML = `<div class="math-display wide">${n1} ${isAddition ? '+' : '-'} ${n2} = ?</div>`;
-            } else if (isAddition) {
-                n1 = Math.floor(Math.random() * (currentLevel - 1)) + 1;   // 1..N-1
-                n2 = Math.floor(Math.random() * (currentLevel - n1 + 1));  // 0..N-n1 → sum ≤ N
-                currentAnswer = n1 + n2;
-                container.innerHTML = `<div class="math-display">${n1} + ${n2} = ?</div>`;
             } else {
-                n1 = Math.floor(Math.random() * (currentLevel - 1)) + 2;   // 2..N
-                n2 = Math.floor(Math.random() * n1);                       // 0..n1-1
-                currentAnswer = n1 - n2;
-                container.innerHTML = `<div class="math-display">${n1} - ${n2} = ?</div>`;
+                // adding or taking away nothing is worth meeting, but only now and then
+                const zero = Math.random() < 0.06;
+                if (isAddition) {
+                    n1 = Math.floor(Math.random() * (currentLevel - 1)) + 1;                  // 1..N-1
+                    n2 = zero ? 0 : Math.floor(Math.random() * (currentLevel - n1)) + 1;      // 1..N-n1 → sum ≤ N
+                    currentAnswer = n1 + n2;
+                } else {
+                    n1 = Math.floor(Math.random() * (currentLevel - 1)) + 2;                  // 2..N
+                    n2 = zero ? 0 : Math.floor(Math.random() * (n1 - 1)) + 1;                 // 1..n1-1
+                    currentAnswer = n1 - n2;
+                }
+                container.innerHTML = `<div class="math-display">${n1} ${isAddition ? '+' : '-'} ${n2} = ?</div>`;
             }
             generateButtons(currentAnswer, 'math');
             startTimer();
@@ -3361,7 +3608,7 @@ const GaiaPlayer = (function () {
                     </div>
                     <div class="phonics-emoji-big" onclick="speakPhonics('${item.letter}','${item.word}')">${item.emoji}</div>
                     <div class="phonics-word-label">${item.word}</div>
-                    <div style="font-size:0.95rem; color:var(--ink-soft); margin-top:6px;">מָה הָאוֹת? <span onclick="speakPhonics('${item.letter}','${item.word}')" style="cursor:pointer; font-size:1.2rem;">🔊</span></div>`;
+                    <div class="say-line">מָה הָאוֹת? <button type="button" class="say-again" onclick="speakPhonics('${item.letter}','${item.word}')" aria-label="לִשְׁמֹעַ שׁוּב">🔊</button></div>`;
                 speakPhonics(item.letter, item.word);
                 const optionsEl = document.getElementById('options');
                 optionsEl.innerHTML = '';
@@ -3390,7 +3637,7 @@ const GaiaPlayer = (function () {
             if (currentLevel === 0) {
                 currentAnswer = englishWordObj.word;
                 container.innerHTML = `<div class="emoji-display" style="cursor:pointer;" onclick="speakWord('${englishWordObj.word}')">${englishWordObj.emoji}</div>
-                    <div style="font-size:1.1rem; color:var(--ink-soft); margin-top:2px;">מָה הַמִּלָּה? <span onclick="speakWord('${englishWordObj.word}')" style="cursor:pointer; font-size:1.3rem;">🔊</span></div>`;
+                    <div class="say-line">מָה הַמִּלָּה? <button type="button" class="say-again" onclick="speakWord('${englishWordObj.word}')" aria-label="לִשְׁמֹעַ שׁוּב">🔊</button></div>`;
                 speakWord(englishWordObj.word);
                 const optionsEl = document.getElementById('options');
                 optionsEl.innerHTML = "";
@@ -3452,7 +3699,7 @@ const GaiaPlayer = (function () {
             currentAnswer = country.name;
 
             container.innerHTML = `
-                <div class="geo-flag-display">${flagImg(country.code, 160)}</div>
+                <div class="geo-flag-display">${flagImg(country.code)}</div>
                 <div class="geo-question">מָה שֵׁם הַמְּדִינָה?</div>`;
 
             const optionsEl = document.getElementById('options');
@@ -3482,6 +3729,7 @@ const GaiaPlayer = (function () {
         const MEMORY_BACK = '<span class="mc-back" aria-hidden="true">?</span>';
         function startMemoryGame(theme, difficulty) {
             stopAllGames();
+            replayGame = () => startMemoryGame(theme, difficulty);
             currentGameType = 'memory';
             currentLevel = theme + '_' + difficulty;
             GaiaHooks.emit('game_start', { subject: 'memory', level: theme + '_' + difficulty });
@@ -3504,7 +3752,7 @@ const GaiaPlayer = (function () {
                 const shuffled = shuffle(geographyData);
                 for (let i = 0; i < pairCount; i++) {
                     const c = shuffled[i];
-                    pool.push({ id: i, emojiVal: `<img src="https://flagcdn.com/w80/${c.code}.png" class="flag-img-small" alt="${c.code}">`, textVal: c.name });
+                    pool.push({ id: i, emojiVal: flagImg(c.code, 'flag-img-small'), textVal: c.name });
                 }
             }
 
@@ -3592,16 +3840,26 @@ const GaiaPlayer = (function () {
             }
         }
 
-        function generateButtons(correct, type) {
+        // The two forms of the letters that change at the end of a word.
+        const HEBREW_FINALS = { 'ם': 'מ', 'ן': 'נ', 'ץ': 'צ', 'ף': 'פ', 'ך': 'כ' };
+        function hebrewOtherForm(letter) {
+            return HEBREW_FINALS[letter] || Object.keys(HEBREW_FINALS).find(f => HEBREW_FINALS[f] === letter) || '';
+        }
+
+        // endsWord (Hebrew): the missing letter is the last of its word.
+        function generateButtons(correct, type, endsWord) {
             const container = document.getElementById('options');
             container.innerHTML = "";
             let options = [correct];
 
             if (type === 'hebrew') {
-                const allLetters = "אבגדהוזחטיכלמנסעפצקרשתםןףךץ";
+                // Only letters that could stand in that place: the end-of-word forms (ם ן ץ ף ך) at
+                // the end of a word and nowhere else, and never both forms of the missing letter
+                // (מ beside ם would be a trick, not a choice).
+                const letters = endsWord ? "אבגדהוזחטילסעקרשתםןץףך" : "אבגדהוזחטיכלמנסעפצקרשת";
                 while (options.length < 3) {
-                    let rand = allLetters[Math.floor(Math.random() * allLetters.length)];
-                    if (!options.includes(rand)) options.push(rand);
+                    let rand = letters[Math.floor(Math.random() * letters.length)];
+                    if (!options.includes(rand) && rand !== hebrewOtherForm(correct)) options.push(rand);
                 }
             } else if (type === 'english') {
                 const allLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -3714,7 +3972,7 @@ const GaiaPlayer = (function () {
 // ===== THE ROYAL INTRO =====
 // "יוֹצְאִים לַדֶּרֶךְ" opens the kingdom with a short film: the golden gates swing open on the
 // castle at night, fireworks go up, and Yoovy and Googy, in crowns and capes, walk out to greet
-// the player under a royal fanfare. It is a real-time 3D film (intro3d.js, built from intro3d/
+// the player under a royal fanfare. It is a real-time 3D film (kingdom3d.js, built from kingdom3d/
 // with three.js) when this device can play it smoothly; otherwise a drawn scene, one CSS
 // timeline (see THE ROYAL INTRO in the styles). Either way the map is set up under the last
 // golden flash. "דִּלּוּג" (or Escape) skips it, and nothing plays under reduced motion.
@@ -3904,20 +4162,33 @@ const GaiaPlayer = (function () {
             const box = document.createElement('div');
             box.id = 'intro'; box.className = 'in3d';
             box.setAttribute('aria-label', 'פְּתִיחָה: שַׁעֲרֵי הַמַּמְלָכָה נִפְתָּחִים');
-            const TL = GaiaIntro3D.timeline;
+            const TL = Kingdom3D.film.timeline;
             box.innerHTML = '<div class="in3d-stage"></div>' + titleHTML(TL.title) +
                 '<div class="in-flash"></div><button class="in-skip" type="button">דִּלּוּג ⏭</button>';
             document.body.appendChild(box);
             try {
-                const show = GaiaIntro3D.play(box.querySelector('.in3d-stage'));
-                film = 'played';   // it is let go at the end, to free the memory for the games
-                run(box, onDone, TL.handoff * 1000, TL.length * 1000,
+                const stageEl = box.querySelector('.in3d-stage');
+                const show = Kingdom3D.film.play(stageEl);
+                film = 'played';
+                playing = true;
+                // At the hand-over the film stops on a still under the golden flash, and its set
+                // is let go: the stage is then free for the map in 3D (or let go too, if there is none).
+                let over = false;
+                const finish = () => {
+                    if (over) return;
+                    over = true;
+                    show.stop();
+                    try { stageEl.appendChild(show.still()); } catch (e) { /* the last frame stays as it is */ }
+                    Kingdom3D.film.release();
+                    playing = false;
+                };
+                run(box, () => { finish(); onDone(); }, TL.handoff * 1000, TL.length * 1000,
                     { horns: TL.gates - 0.05, chord: TL.cheer - 0.36, title: TL.title + 0.1, glints: [1.35, 1.75], bursts: TL.bursts, thump: 0.08 },
-                    () => { show.stop(); GaiaIntro3D.dispose(); });
+                    finish);
                 return;
             } catch (e) {
-                console.warn('[intro3d] could not play', e);
-                film = 'no';
+                console.warn('[kingdom3d] could not play the film', e);
+                film = 'no'; playing = false;
                 box.remove();
             }
         }
@@ -3953,11 +4224,13 @@ const GaiaPlayer = (function () {
         if (canvas) canvas.addEventListener('webglcontextlost', skip, { once: true });
     }
 
-    // ----- the 3D film -----
-    // Fetched once the welcome screen is up; it builds its scene and checks this device can play
-    // it smoothly while the child is still on the welcome screen. Not under reduced motion, data
-    // saving or very little memory.
+    // ----- the kingdom in 3D -----
+    // kingdom3d.js is fetched once the welcome screen is up. It sets up its stage, builds the
+    // film and checks this device can play it smoothly while the child is still on the welcome
+    // screen, then goes on to the map in 3D (see THE MAP IN 3D in the map module). Not under
+    // reduced motion, data saving or very little memory.
     let film = null;   // null, 'loading', 'ready', 'played', 'late' (not ready in time) or 'no'
+    let playing = false;   // the film is on: nothing else is built meanwhile
     function introFaces() {   // the sisters' faces, drawn by the game's own girlFace
         const out = {};
         for (const who of ['yoovy', 'googy']) {
@@ -3976,7 +4249,10 @@ const GaiaPlayer = (function () {
             out[who] = {
                 open: svg('.g-mouth-grin,.g-mouth-sad,.g-mouth-o,.g-eyes-happy,.g-brows-up,.g-brows-sad,.g-drop'),
                 blink: svg('.g-mouth-grin,.g-mouth-sad,.g-mouth-o,.g-eyes-happy,.g-eyes-open,.g-brows-up,.g-brows-sad,.g-drop', shut),
-                laugh: svg('.g-mouth-happy,.g-mouth-sad,.g-mouth-o,.g-eyes-open,.g-brows-up,.g-brows-sad,.g-drop')
+                laugh: svg('.g-mouth-happy,.g-mouth-sad,.g-mouth-o,.g-eyes-open,.g-brows-up,.g-brows-sad,.g-drop'),
+                // for the games: a wrong answer, and the time running out
+                sad: svg('.g-mouth-happy,.g-mouth-grin,.g-mouth-o,.g-eyes-happy,.g-brows-happy,.g-brows-up'),
+                wow: svg('.g-mouth-happy,.g-mouth-grin,.g-mouth-sad,.g-eyes-happy,.g-brows-happy,.g-brows-sad,.g-drop')
             };
         }
         return out;
@@ -3987,27 +4263,30 @@ const GaiaPlayer = (function () {
         if (reducedMotion() || (net && net.saveData) || (navigator.deviceMemory && navigator.deviceMemory < 2)) { film = 'no'; return; }
         film = 'loading';
         const script = document.createElement('script');
-        script.src = 'intro3d.js?v=20261016b';
+        script.src = 'kingdom3d.js?v=20261113b';
         script.async = true;
         script.onerror = () => { film = 'no'; };
         script.onload = () => {
-            const G = window.GaiaIntro3D;
+            const G = window.Kingdom3D;
             if (!G || !G.supported()) { film = 'no'; return; }
-            G.prepare({ faces: introFaces(), width: innerWidth, height: innerHeight })
-                .then(() => window.__force3D || G.fits())
+            G.start({ faces: introFaces(), width: innerWidth, height: innerHeight })
+                // the film, unless the drawn intro has begun meanwhile
+                .then(() => film === 'loading' ? G.film.prepare().then(() => window.__force3D || G.film.fits()) : false)
                 .then(ok => {
                     if (film === 'loading' && ok) { film = 'ready'; return; }
                     if (film === 'loading') film = 'no';
-                    G.dispose();   // too slow here, or the drawn intro has already played
+                    G.film.release();   // too slow here, or not needed any more
                 })
-                .catch(e => { console.warn('[intro3d]', e); film = 'no'; try { G.dispose(); } catch (_) { /* nothing to free */ } });
+                .then(() => window.GaiaMap3D ? GaiaMap3D.prepare() : false)
+                .then(map => { if (!map && film !== 'ready' && !playing) G.dispose(); })
+                .catch(e => { console.warn('[kingdom3d]', e); if (film !== 'played') film = 'no'; try { G.dispose(); } catch (_) { /* nothing to free */ } });
         };
         document.head.appendChild(script);
     }
     if (document.readyState === 'complete') setTimeout(preloadFilm, 600);
     else window.addEventListener('load', () => setTimeout(preloadFilm, 600));
 
-    window.GaiaIntro = { play, get film() { return film; } };
+    window.GaiaIntro = { play, faces: introFaces, get film() { return film; }, get playing() { return playing; } };
 })();
 </script>
 <script>
@@ -4232,7 +4511,7 @@ const readingData = [
         ],
         questions: [
           { q: "מָה שֵׁם הַסּוּס?", options: ["גִּבּוֹר", "אוֹר", "טוֹב"], a: 1 },
-          { q: "אֵיפֹה הַסּוּס רָץ?", options: ["בַּגַּן", "בַּשָּׂדֶה", "בַּחוּץ"], a: 1 },
+          { q: "אֵיפֹה הַסּוּס רָץ?", options: ["בַּגַּן", "בַּשָּׂדֶה", "בָּאֻרְוָה"], a: 1 },
           { q: "אֵיךְ נָגְעָה יוּבָל בַּסּוּס?", options: ["בְּכֹחַ", "בְּעָדִינוּת", "בִּמְהִירוּת"], a: 1 }
         ]
       },
@@ -4565,13 +4844,16 @@ function renderReadingQuestion() {
             <summary>📖 לְהָצִיץ בַּסִּפּוּר</summary>
             <div class="reading-story-box">${readingStoryText(story)}</div>
         </details>` : '';
+    // The answers come in a new order every time: as the stories are written, the right one is
+    // the middle one in most questions, and a child soon learns to tap the middle without reading.
+    const order = shuffle(q.options.map((_, i) => i));
     const content = document.getElementById('reading-content');
     content.innerHTML = `
         <div class="reading-title reading-quiz-title">${story.title}</div>${peek}
         <div class="reading-question">❓ ${q.q}</div>
         <div id="reading-opts">
-            ${q.options.map((opt, i) =>
-                `<button class="reading-opt-btn" onclick="answerReading(${i})" id="ropt-${i}">${opt}</button>`
+            ${order.map(i =>
+                `<button class="reading-opt-btn" onclick="answerReading(${i})" id="ropt-${i}">${q.options[i]}</button>`
             ).join('')}
         </div>
     `;
@@ -6822,6 +7104,12 @@ const GaiaBoards = (function () {
     const LOCAL_KEY = 'gaiaBoards';   // { '<land>/<game>': [{ pid, name, grade, ms, k }] }
     let startedAt = 0;
     GaiaHooks.on(type => { if (type === 'game_start') startedAt = Date.now(); });
+    // time with the game paused (see PAUSE) is not playing time
+    let pausedAt = GaiaPause.on ? Date.now() : 0;
+    GaiaPause.onChange(paused => {
+        if (paused) pausedAt = Date.now();
+        else if (pausedAt) { if (startedAt) startedAt += Date.now() - pausedAt; pausedAt = 0; }
+    });
 
     const node = (tag, className, text) => {
         const n = document.createElement(tag);
@@ -7938,6 +8226,7 @@ const GaiaBoards = (function () {
     function landByKey(k) { return LANDS.find(function (l) { return l.key === k; }); }
 
     function placeAvatar(landKey, instant) {
+        if (world3d === 'on') K3().world.walkTo((landByKey(landKey) || CASTLE).key, instant || reduceMotion);
         if (!avatarEl) return;
         const land = landByKey(landKey) || CASTLE;
         const x = land.x + (land.x > VIEW_W / 2 ? -104 : 104), y = land.y + 25;
@@ -7954,15 +8243,16 @@ const GaiaBoards = (function () {
     }
 
     function refreshBadges() {
-        if (!built) return;
+        if (!built && !m3) return;
         LANDS.forEach(function (land) {
             if (land.anchor) return;
-            const badgeEl = document.querySelector('[data-badge="' + land.key + '"]');
-            if (!badgeEl) return;
             const stars = GaiaProgress.getSubjectStars(land.key);
             const medal = GaiaProgress.medalFor(stars);
-            badgeEl.textContent = (medal ? medal + ' ' : '') + '⭐' + stars;
+            document.querySelectorAll('[data-badge="' + land.key + '"]').forEach(function (badgeEl) {
+                badgeEl.textContent = (medal ? medal + ' ' : '') + '⭐' + stars;
+            });
         });
+        if (m3) measure3D();   // the plaques' widths follow their badges
         const total = GaiaProgress.totalStars();
         const tEl = document.getElementById('map-total-stars');
         const mEl = document.getElementById('map-total-medal');
@@ -8079,6 +8369,8 @@ const GaiaBoards = (function () {
         panel.classList.add('open');
         panel.setAttribute('aria-hidden', 'false');
         if (scrim) scrim.classList.add('open');
+        openLand = landKey;
+        focus3D();
     }
 
     function closeLandPanel() {
@@ -8086,14 +8378,219 @@ const GaiaBoards = (function () {
         const scrim = document.getElementById('land-scrim');
         if (panel) { panel.classList.remove('open'); panel.setAttribute('aria-hidden', 'true'); }
         if (scrim) scrim.classList.remove('open');
+        openLand = null;
+        focus3D();
     }
 
     function initAdventureMap() {
         applySky();
-        if (!built) { buildScene(); bindParallax(); }
+        if (world3d === 'ready' || world3d === 'on') show3D();
+        else if (!built) { buildScene(); bindParallax(); }
         else { refreshBadges(); placeAvatar(GaiaProgress.getLastPlayedLand(), true); }
         closeLandPanel();
     }
+
+    // ---- THE MAP IN 3D ----
+    // When kingdom3d.js is up and this device draws it smoothly, the map is the kingdom in 3D
+    // (Kingdom3D.world) instead of the drawing above: the page's own scroll moves its camera
+    // along the road, the lands' plaques are laid over it, a tap on a land opens its panel
+    // (the camera then comes close to the land, above the panel), and Yoovy and Googy walk
+    // there. Everything else is as on the drawn map, which stays for the devices without it.
+    let world3d = null;     // null, 'building', 'ready' (built and checked), 'on' (showing) or 'no'
+    let m3 = null;          // the 3D map's own elements, once it has been shown
+    let openLand = null;    // the land whose panel is open
+    const K3 = function () { return window.Kingdom3D; };
+    const onMap = function () { return document.getElementById('main-menu').classList.contains('active'); };
+
+    // Builds the kingdom, a step at a time and never while the film plays; true if it will be used.
+    function prepare3D() {
+        if (world3d) return Promise.resolve(world3d !== 'no');
+        world3d = 'building';
+        const breath = function () {
+            return new Promise(function (done) {
+                (function wait() { if (window.GaiaIntro && GaiaIntro.playing) setTimeout(wait, 150); else setTimeout(done, 0); })();
+            });
+        };
+        return K3().world.prepare({ at: GaiaProgress.getLastPlayedLand() || 'castle', breath: breath })
+            .then(breath)
+            .then(function () { return window.__force3D || K3().world.fits(); })
+            .then(function (ok) {
+                if (!ok) { world3d = 'no'; K3().world.release(); return false; }
+                world3d = 'ready';
+                if (onMap()) show3D(true);        // a game under way keeps its drawings; the 3D comes with the map
+                return true;
+            })
+            .catch(function (e) { console.warn('[kingdom3d] no 3D map', e); world3d = 'no'; return false; });
+    }
+
+    function show3D(late) {
+        if (world3d !== 'ready' && world3d !== 'on') return;
+        const K = K3().world, menu = document.getElementById('main-menu'), vp = document.getElementById('map-viewport');
+        if (!m3) {
+            const stage = document.createElement('div');
+            stage.id = 'map3d';
+            stage.innerHTML = '<div id="map3d-stage"></div><div id="map3d-labels"></div>';
+            const spacer = document.createElement('div');
+            spacer.id = 'map3d-spacer';
+            vp.appendChild(stage); vp.appendChild(spacer);
+            const plaques = {};
+            LANDS.forEach(function (land) {
+                const b = document.createElement(land.anchor ? 'div' : 'button');
+                b.className = 'land3d-plaque';
+                b.dataset.land = land.key;
+                if (!land.anchor) b.type = 'button';
+                b.innerHTML = '<span class="land-plaque"><span class="lp-name">' + land.name + '</span>' +
+                    (land.anchor ? '' : '<span class="lp-badge" data-badge="' + land.key + '"></span>') + '</span>';
+                if (!land.anchor) b.addEventListener('click', function () { pick3D(land.key); });
+                stage.lastChild.appendChild(b);
+                plaques[land.key] = b;
+            });
+            m3 = { stage: stage, holder: stage.firstChild, spacer: spacer, plaques: plaques, sizes: {}, range: 1, dragged: false };
+            bind3D(vp);
+        }
+        const first = world3d !== 'on';
+        world3d = 'on';
+        if (first) setTimeout(startBuddies, 1200);   // the sisters of the games' corner, once the map has settled
+        menu.classList.add('map3d');
+        if (late && first) { m3.stage.classList.add('map3d-arriving'); setTimeout(function () { m3.stage.classList.remove('map3d-arriving'); }, 700); }
+        K.attach(m3.holder, { onFrame: layout3D });
+        refreshBadges();
+        const at = (landByKey(GaiaProgress.getLastPlayedLand()) || CASTLE).key;
+        K.walkTo(at, true);
+        vp.scrollTop = K.scrollOf(at) * m3.range;
+        K.setScroll(vp.scrollTop / m3.range, true);
+        focus3D();
+    }
+
+    // the scroll's length follows the camera's travel; the plaques' sizes are kept for laying them out
+    function measure3D() {
+        if (!m3 || world3d !== 'on') return;
+        const vp = document.getElementById('map-viewport'), m = K3().world.metrics();
+        const k = vp.scrollTop / m3.range;
+        m3.range = Math.max(1, Math.round(m.range * m.pxPerUnit));
+        m3.spacer.style.height = (m3.range + vp.clientHeight) + 'px';
+        if (Math.abs(vp.scrollTop - k * m3.range) > 1) vp.scrollTop = k * m3.range;
+        for (const key in m3.plaques) m3.sizes[key] = { w: m3.plaques[key].offsetWidth, h: m3.plaques[key].offsetHeight };
+    }
+
+    // after every frame: each plaque under its land
+    function layout3D() {
+        if (!m3) return;
+        const W = m3.stage.clientWidth;
+        K3().world.spots().forEach(function (s) {
+            const el = m3.plaques[s.key], size = m3.sizes[s.key];
+            if (!el || !size) return;
+            if (!s.seen) { el.style.visibility = 'hidden'; return; }
+            const x = Math.max(4, Math.min(W - size.w - 4, s.x - size.w / 2));
+            el.style.visibility = 'visible';
+            el.style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + (s.above ? s.y - size.h : s.y + 3).toFixed(1) + 'px,0)';
+        });
+    }
+
+    function pick3D(key) {
+        K3().world.bounce(key);
+        openLandPanel(key);
+    }
+
+    // the camera comes close to the land whose panel is open, in what the panel leaves of the screen
+    function focus3D() {
+        if (world3d !== 'on') return;
+        const menu = document.getElementById('main-menu'), panel = document.getElementById('land-panel');
+        menu.classList.toggle('map3d-focus', !!openLand);
+        K3().world.focus(openLand, openLand ? Math.min(panel.offsetHeight, menu.clientHeight * 0.82) : 0);
+        if (openLand) {   // when the panel closes, the land is where the map is looking
+            const vp = document.getElementById('map-viewport');
+            vp.scrollTop = K3().world.scrollOf(openLand) * m3.range;
+        }
+    }
+
+    function bind3D(vp) {
+        const world = function () { return K3().world; };
+        vp.addEventListener('scroll', function () { if (world3d === 'on') world().setScroll(vp.scrollTop / m3.range); }, { passive: true });
+        window.addEventListener('resize', function () { if (world3d === 'on') setTimeout(function () { measure3D(); focus3D(); }, 60); });
+        const at = function (e) { const r = m3.stage.getBoundingClientRect(); return world().pick(e.clientX - r.left, e.clientY - r.top); };
+        m3.holder.addEventListener('click', function (e) {
+            if (m3.dragged) { m3.dragged = false; return; }
+            const key = at(e);
+            if (key && key !== CASTLE.key) pick3D(key);
+        });
+        // with a mouse: the hand over a land, and dragging the map to scroll it
+        let drag = null;
+        m3.holder.addEventListener('pointerdown', function (e) { if (e.pointerType === 'mouse' && e.button === 0) drag = { y: e.clientY, top: vp.scrollTop, moved: false }; });
+        window.addEventListener('pointermove', function (e) {
+            if (world3d !== 'on') return;
+            if (drag) {
+                const dy = e.clientY - drag.y;
+                if (Math.abs(dy) > 5) drag.moved = true;
+                if (drag.moved) vp.scrollTop = drag.top - dy;
+            } else if (e.pointerType === 'mouse' && e.target === K3().canvas) {
+                const key = at(e);
+                m3.holder.style.cursor = key && key !== CASTLE.key ? 'pointer' : 'grab';
+            }
+        });
+        window.addEventListener('pointerup', function () {
+            if (drag && drag.moved) { m3.dragged = true; setTimeout(function () { if (m3) m3.dragged = false; }, 0); }
+            drag = null;
+        });
+        // if the graphics card drops the map, the drawn map takes over for good
+        K3().canvas.addEventListener('webglcontextlost', drop3D, { once: true });
+    }
+
+    function drop3D() {
+        if (world3d === 'no') return;
+        const was = world3d === 'on';
+        world3d = 'no';
+        dropBuddies();
+        try { K3().dispose(); } catch (e) { console.warn('[kingdom3d]', e); }
+        const menu = document.getElementById('main-menu');
+        menu.classList.remove('map3d', 'map3d-focus');
+        if (m3) { m3.stage.remove(); m3.spacer.remove(); m3 = null; }
+        if (was) {
+            if (!built) { buildScene(); bindParallax(); }
+            else { refreshBadges(); placeAvatar(GaiaProgress.getLastPlayedLand(), true); }
+        }
+    }
+
+    // the 3D map is drawn only while the map is on the screen
+    GaiaHooks.on(function (type, data) {
+        if (type !== 'nav') return;
+        if (data.screen === 'main-menu') { if (world3d === 'ready' || world3d === 'on') show3D(); }
+        else if (world3d === 'on') K3().world.detach();
+    });
+    window.GaiaMap3D = { prepare: prepare3D, get state() { return world3d; } };
+
+    // ---- THE SISTERS IN 3D ----
+    // Once the map has shown in 3D, Yoovy and Googy in the corner of the games are in 3D too: a
+    // small canvas of their own in #gaia-char (Kingdom3D.buddies) takes the drawn girls' place
+    // and their moods (setGaiaState). They are drawn only while the corner shows.
+    let buddies3d = false;
+    function startBuddies() {
+        if (buddies3d || world3d !== 'on') return;
+        K3().buddies.create().then(function (canvas) {
+            if (buddies3d || world3d !== 'on') return;      // the 3D was dropped meanwhile
+            const el = document.getElementById('gaia-char');
+            canvas.addEventListener('webglcontextlost', dropBuddies, { once: true });
+            el.appendChild(canvas);
+            el.dataset.k3d = '1';
+            buddies3d = true;
+            K3().buddies.mood((el.className.match(/gaia-(\w+)/) || [])[1] || 'idle');
+            syncBuddies();
+        }).catch(function (e) { console.warn('[kingdom3d] no 3D sisters', e); dropBuddies(); });
+    }
+    function dropBuddies() {
+        buddies3d = false;
+        delete document.getElementById('gaia-char').dataset.k3d;
+        try { if (K3()) K3().buddies.dispose(); } catch (e) { /* gone already */ }
+    }
+    function syncBuddies() {
+        if (!buddies3d) return;
+        const B = K3().buddies, canvas = document.querySelector('#gaia-char .k3d-buddies');
+        if (canvas && canvas.getClientRects().length) { B.resize(canvas.clientWidth, canvas.clientHeight); B.start(); }
+        else B.stop();
+    }
+    GaiaHooks.on(function (type) { if (buddies3d && (type === 'nav' || type === 'game_start')) setTimeout(syncBuddies, 0); });
+    window.addEventListener('resize', function () { if (buddies3d) setTimeout(syncBuddies, 80); });
+    window.GaiaBuddies = { mood: function (m) { if (buddies3d) K3().buddies.mood(m); }, get on() { return buddies3d; } };
 
     // The shapes and gradients of the map and the land scenes, kept once in the page in a hidden
     // <svg> (not display:none, which switches its gradients off in some browsers).
@@ -8123,8 +8620,28 @@ const GaiaBoards = (function () {
             return;
         }
         body.dataset.land = land;
-        if (holder) holder.innerHTML = '<svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax slice" xmlns="' + SVG_NS + '">' + LAND_SCENES[land]() + '</svg>';
+        if (!holder) return;
+        const shot = landShot(land);
+        if (shot) { holder.textContent = ''; holder.appendChild(shot); }
+        else holder.innerHTML = '<svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax slice" xmlns="' + SVG_NS + '">' + LAND_SCENES[land]() + '</svg>';
     }
+    // the land itself, as it stands in the 3D kingdom, where there is one
+    function landShot(land) {
+        if (world3d !== 'on') return null;      // like the corner sisters, the 3D backdrops come once the 3D map has been seen
+        try { return K3().world.snapshot(land, innerWidth, innerHeight); }
+        catch (e) { console.warn('[kingdom3d] no backdrop', e); return null; }
+    }
+    // the screen turned or changed size: the picture is taken again to fit it
+    let shotTimer = null;
+    window.addEventListener('resize', function () {
+        clearTimeout(shotTimer);
+        shotTimer = setTimeout(function () {
+            const land = document.body.dataset.land, holder = document.getElementById('land-scene');
+            if (!land || !holder || !holder.querySelector('canvas')) return;
+            const shot = landShot(land);
+            if (shot) { holder.textContent = ''; holder.appendChild(shot); }
+        }, 250);
+    });
     GaiaHooks.on(function (type, data) {
         if (type === 'game_start' && SUBJECT_LAND[data.subject]) setLand(SUBJECT_LAND[data.subject]);
         else if (type === 'nav' && Object.prototype.hasOwnProperty.call(SCREEN_LAND, data.screen)) setLand(SCREEN_LAND[data.screen]);

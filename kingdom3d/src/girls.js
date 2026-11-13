@@ -263,7 +263,8 @@ function cape(c, look, mats) {
     return { group, update(t, trail, lift) { fill(t, trail, lift); place(t); } };
 }
 
-export function buildGirl(who, faceTex, mats) {
+// royal: in her crown and cape (the film); without them she is as in the game (the map, the games)
+export function buildGirl(who, faceTex, mats, { royal = true } = {}) {
     const L = LOOKS[who], D = DIM[who], Y = who === 'yoovy';
     const root = new THREE.Group(), body = new THREE.Group();
     root.add(body);
@@ -347,7 +348,7 @@ export function buildGirl(who, faceTex, mats) {
     body.add(head);
     head.add(mesh(new THREE.SphereGeometry(1, 48, 36), skin));
     const faceMat = new THREE.MeshStandardMaterial({ map: faceTex.open, transparent: true, roughness: 0.5, depthWrite: false,
-        polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2, premultipliedAlpha: true,
+        polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2, premultipliedAlpha: !faceTex.open.userData.plain,
         emissive: '#ffffff', emissiveMap: faceTex.open, emissiveIntensity: 0.14 });
     const face = new THREE.Mesh(faceShell(), faceMat);
     face.renderOrder = 1;
@@ -385,26 +386,29 @@ export function buildGirl(who, faceTex, mats) {
         fl.lookAt(at.clone().multiplyScalar(2));
         head.add(fl);
     }
-    // the crown, tilted on her hair
-    const cr = crown(D.crown, L.cape);
-    cr.scale.set(1 / (D.R * D.headScale[0]), 1 / (D.R * D.headScale[1]), 1 / (D.R * D.headScale[2]));
-    const crownHolder = new THREE.Group();
-    crownHolder.rotation.z = D.crown.tilt;
-    crownHolder.add(cr);
-    cr.position.y = D.crown.y / (D.R * D.headScale[1]) - 0.02;
-    head.add(crownHolder);
     const twinkles = [];
-    for (let k = 0; k < 3; k++) {
-        const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: mats.sparkleTex, color: '#fff3c8', blending: THREE.AdditiveBlending, depthWrite: false, opacity: 0 }));
-        const th = (k - 1) * 1.25;
-        s.position.set(Math.sin(th) * D.crown.r * 1.13, D.crown.h * 1.3, Math.cos(th) * D.crown.r * 1.13);
-        cr.add(s);
-        twinkles.push(s);
-    }
+    let cp = null;
+    if (royal) {
+        // the crown, tilted on her hair
+        const cr = crown(D.crown, L.cape);
+        cr.scale.set(1 / (D.R * D.headScale[0]), 1 / (D.R * D.headScale[1]), 1 / (D.R * D.headScale[2]));
+        const crownHolder = new THREE.Group();
+        crownHolder.rotation.z = D.crown.tilt;
+        crownHolder.add(cr);
+        cr.position.y = D.crown.y / (D.R * D.headScale[1]) - 0.02;
+        head.add(crownHolder);
+        for (let k = 0; k < 3; k++) {
+            const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: mats.sparkleTex, color: '#fff3c8', blending: THREE.AdditiveBlending, depthWrite: false, opacity: 0 }));
+            const th = (k - 1) * 1.25;
+            s.position.set(Math.sin(th) * D.crown.r * 1.13, D.crown.h * 1.3, Math.cos(th) * D.crown.r * 1.13);
+            cr.add(s);
+            twinkles.push(s);
+        }
 
-    // --- the cape ---
-    const cp = cape(D.cape, L, mats);
-    body.add(cp.group);
+        // --- the cape ---
+        cp = cape(D.cape, L, mats);
+        body.add(cp.group);
+    }
 
     // a soft shadow on the ground
     const blob = new THREE.Mesh(new THREE.PlaneGeometry(0.75, 0.75), mats.blob);
@@ -419,13 +423,14 @@ export function buildGirl(who, faceTex, mats) {
     const setFace = f => { if (f !== faceNow && faceTex[f]) { faceNow = f; faceMat.map = faceMat.emissiveMap = faceTex[f]; } };
     return {
         root, head, D, who,
-        // st: { x, z, walk (0..1), dist, hold (0..1), holdTarget (local Vector3), holdSide, cheer (0..1), wave (0..1), jump, face, look }
+        // st: { x, z, walk (0..1), dist, hold (0..1), holdTarget (local Vector3), holdSide, cheer (0..1), wave (0..1), jump, face, look },
+        // and for the map and the games: y (the ground), sway (the body leans to a side), armOut (arms lifted sideways)
         update(t, st) {
-            root.position.set(st.x, 0, st.z);
+            root.position.set(st.x, st.y || 0, st.z);
             root.rotation.y = st.turn || 0;
             const ph = (st.dist / stride) * Math.PI * 2, w = st.walk;
             body.position.y = (st.jump || 0) + w * 0.012 * (1 - Math.cos(ph * 2));
-            body.rotation.z = w * 0.035 * Math.sin(ph);
+            body.rotation.z = w * 0.035 * Math.sin(ph) + (st.sway || 0);
             body.rotation.y = w * 0.06 * Math.sin(ph);
             body.rotation.x = w * 0.05 + (st.lean || 0);
             const sq = st.squash || 0;
@@ -440,7 +445,7 @@ export function buildGirl(who, faceTex, mats) {
             for (let k = 0; k < 2; k++) {
                 const side = k ? 1 : -1, pivot = arms[k];
                 const swing = (k ? -1 : 1) * Math.sin(ph) * 0.42 * w;
-                qa.setFromEuler(e.set(swing, 0, side * (0.1 + 0.03 * Math.sin(t * 1.3 + k))));
+                qa.setFromEuler(e.set(swing, 0, side * (0.1 + 0.03 * Math.sin(t * 1.3 + k) + (st.armOut || 0))));
                 if (st.hold && st.holdSide === side) {
                     dir.copy(st.holdTarget).sub(tmp.set(side * D.shoulder[0], D.shoulder[1] + body.position.y, 0)).normalize();
                     qb.setFromUnitVectors(DOWN, dir);
@@ -463,7 +468,7 @@ export function buildGirl(who, faceTex, mats) {
                 s.scale.setScalar(0.04 + v * 0.14);
                 s.material.rotation = t * 1.5 + k;
             });
-            cp.update(t, w + Math.max(0, st.jumpVel || 0) * 0.3, (st.jump || 0) * 3);
+            if (cp) cp.update(t, w + Math.max(0, st.jumpVel || 0) * 0.3, (st.jump || 0) * 3);
         }
     };
 }

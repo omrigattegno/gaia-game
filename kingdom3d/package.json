@@ -1,0 +1,12 @@
+{
+  "name": "gaia-kingdom3d",
+  "private": true,
+  "description": "Yoovy & Googy: the kingdom in 3D (three.js): the royal intro, the map, the corner sisters; bundled into ../kingdom3d.js",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.12",
+    "three": "0.186.1"
+  }
+}
