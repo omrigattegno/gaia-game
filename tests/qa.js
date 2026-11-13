@@ -123,6 +123,27 @@ const check = (name, ok, info) => { if (!ok) fails++; console.log((ok ? 'PASS ' 
   await tick(1500);
   await page.evaluate(() => goHome()); await tick(300);
 
+  // --- reading: the right answer is not always in the same place ---
+  const spread = await page.evaluate(() => {
+    const data = [0, 0, 0], shown = [0, 0, 0];
+    startReadingCategory(0);
+    for (let round = 0; round < 40; round++) readingData.forEach((cat, c) => cat.stories.forEach((st, s) => st.questions.forEach((q, k) => {
+      currentReadingCategoryIdx = c; currentReadingStoryIdx = s; currentReadingQuestionIdx = k;
+      renderReadingQuestion();
+      const buttons = [...document.querySelectorAll('#reading-opts .reading-opt-btn')];
+      const place = buttons.findIndex(b => b.id === 'ropt-' + q.a);
+      if (buttons.length !== q.options.length || place < 0 || buttons[place].textContent !== q.options[q.a]) throw new Error('options lost: ' + q.q);
+      if (round === 0) data[q.a]++;
+      shown[place]++;
+    })));
+    goHome();
+    const total = shown.reduce((a, b) => a + b, 0);
+    return { data, shown: shown.map(n => Math.round(100 * n / total)) };
+  });
+  check('reading: the right answer is shown first, second and third about equally often (in the data it is the middle one in most questions)',
+    spread.data[1] > spread.data[0] * 2 && spread.shown.every(p => p > 26 && p < 41), spread);
+  await tick(300);
+
   // --- the flags and the fonts are the site's own ---
   const flags = await page.evaluate(async () => {
     const results = await Promise.all(geographyData.map(c => new Promise(done => {

@@ -2453,7 +2453,7 @@ const GaiaPlayer = (function () {
             // רמה 2 — כל האיברים
             { emoji: "🟤", name: "כָּבֵד",    func: "מְנַקֶּה אֶת הַדָּם מֵרַעֲלִים",         level: 2 },
             { emoji: "🟡", name: "קֵיבָה",    func: "מְפָרֶקֶת אֶת הָאוֹכֶל אַחֲרֵי הָאֲכִילָה", level: 2 },
-            { emoji: "🔴", name: "כְּלָיוֹת",  func: "מְסַנְּנוֹת פְּסוֹלֶת מֵהַדָּם",          level: 2 },
+            { emoji: "🟣", name: "כְּלָיוֹת",  func: "מְסַנְּנוֹת פְּסוֹלֶת מֵהַדָּם",          level: 2 },
             { emoji: "💪", name: "שְׁרִירִים", func: "מְאַפְשְׁרִים תְּנוּעָה שֶׁל הַגּוּף",     level: 2 },
             { emoji: "🩸", name: "דָּם",       func: "מוֹבִיל חַמְצָן וּמָזוֹן לְכָל הַגּוּף",   level: 2 },
             { emoji: "🧴", name: "עוֹר",       func: "מָגֵן עַל הַגּוּף מִבַּחוּץ",            level: 2 },
@@ -2518,11 +2518,11 @@ const GaiaPlayer = (function () {
             { word: "CANDY",    emoji: "🍬" },
             // צבעים (8)
             { word: "RED",      emoji: "🔴" }, { word: "BLUE",   emoji: "🔵" }, { word: "GREEN",  emoji: "🟢" },
-            { word: "PINK",     emoji: "💗" }, { word: "GOLD",   emoji: "🟡" }, { word: "WHITE",  emoji: "⬜" },
+            { word: "PINK",     emoji: "💗" }, { word: "YELLOW", emoji: "🟡" }, { word: "WHITE",  emoji: "⬜" },
             { word: "BLACK",    emoji: "⬛" }, { word: "PURPLE", emoji: "🟣" },
             // בית ספר (8)
-            { word: "PEN",      emoji: "🖊️" }, { word: "BOOK",   emoji: "📚" }, { word: "DESK",   emoji: "🪑" },
-            { word: "RULER",    emoji: "📏" }, { word: "CLASS",  emoji: "🏫" }, { word: "PENCIL", emoji: "✏️" },
+            { word: "PEN",      emoji: "🖊️" }, { word: "BOOK",   emoji: "📚" }, { word: "CHAIR",  emoji: "🪑" },
+            { word: "RULER",    emoji: "📏" }, { word: "SCHOOL", emoji: "🏫" }, { word: "PENCIL", emoji: "✏️" },
             { word: "BAG",      emoji: "🎒" }, { word: "PAPER",  emoji: "📄" },
             // טבע (12)
             { word: "SUN",      emoji: "☀️" }, { word: "MOON",   emoji: "🌙" }, { word: "STAR",   emoji: "⭐" },
@@ -2584,7 +2584,7 @@ const GaiaPlayer = (function () {
             // רמה 2 — מדינות נוספות
             { code: "ca", name: "קָנָדָה",              level: 2 },
             { code: "mx", name: "מֶקְסִיקוֹ",           level: 2 },
-            { code: "kr", name: "קוֹרֵאָה",             level: 2 },
+            { code: "kr", name: "דְּרוֹם קוֹרֵאָה",     level: 2 },
             { code: "in", name: "הוֹדּוּ",              level: 2 },
             { code: "tr", name: "טוּרְקִיָּה",          level: 2 },
             { code: "pl", name: "פּוֹלִין",             level: 2 },
@@ -2592,12 +2592,12 @@ const GaiaPlayer = (function () {
             { code: "no", name: "נוֹרְוֶגְיָה",         level: 2 },
             { code: "nl", name: "הוֹלַנְד",             level: 2 },
             { code: "be", name: "בֶּלְגְיָה",           level: 2 },
-            { code: "ch", name: "שְׁוַיְצַרְיָה",       level: 2 },
+            { code: "ch", name: "שְׁוַיְץ",             level: 2 },
             { code: "at", name: "אוֹסְטְרִיָּה",        level: 2 },
             { code: "gr", name: "יָוָן",                level: 2 },
             { code: "pt", name: "פּוֹרְטוּגָל",         level: 2 },
             { code: "eg", name: "מִצְרַיִם",            level: 2 },
-            { code: "za", name: "דָּרוֹם אַפְרִיקָה",   level: 2 },
+            { code: "za", name: "דְּרוֹם אַפְרִיקָה",   level: 2 },
             { code: "ar", name: "אַרְגֶנְטִינָה",       level: 2 },
             { code: "ua", name: "אוּקְרַאִינָה",        level: 2 },
             // רמה 2 — עוד מדינות
@@ -2616,7 +2616,7 @@ const GaiaPlayer = (function () {
             { code: "pe", name: "פֵּרוּ",               level: 2 },
             { code: "bo", name: "בּוֹלִיבְיָה",         level: 2 },
             { code: "ec", name: "אֶקְוָדוֹר",           level: 2 },
-            { code: "sa", name: "עַרַב הַסַּעוּדִית",   level: 2 },
+            { code: "sa", name: "עֲרַב הַסְּעוּדִית",   level: 2 },
             { code: "jo", name: "יַרְדֵּן",              level: 2 },
             { code: "lb", name: "לְבָנוֹן",             level: 2 },
             { code: "iq", name: "עִירַאק",              level: 2 },
@@ -4471,7 +4471,7 @@ const readingData = [
         ],
         questions: [
           { q: "מָה שֵׁם הַסּוּס?", options: ["גִּבּוֹר", "אוֹר", "טוֹב"], a: 1 },
-          { q: "אֵיפֹה הַסּוּס רָץ?", options: ["בַּגַּן", "בַּשָּׂדֶה", "בַּחוּץ"], a: 1 },
+          { q: "אֵיפֹה הַסּוּס רָץ?", options: ["בַּגַּן", "בַּשָּׂדֶה", "בָּאֻרְוָה"], a: 1 },
           { q: "אֵיךְ נָגְעָה יוּבָל בַּסּוּס?", options: ["בְּכֹחַ", "בְּעָדִינוּת", "בִּמְהִירוּת"], a: 1 }
         ]
       },
@@ -4804,13 +4804,16 @@ function renderReadingQuestion() {
             <summary>📖 לְהָצִיץ בַּסִּפּוּר</summary>
             <div class="reading-story-box">${readingStoryText(story)}</div>
         </details>` : '';
+    // The answers come in a new order every time: as the stories are written, the right one is
+    // the middle one in most questions, and a child soon learns to tap the middle without reading.
+    const order = shuffle(q.options.map((_, i) => i));
     const content = document.getElementById('reading-content');
     content.innerHTML = `
         <div class="reading-title reading-quiz-title">${story.title}</div>${peek}
         <div class="reading-question">❓ ${q.q}</div>
         <div id="reading-opts">
-            ${q.options.map((opt, i) =>
-                `<button class="reading-opt-btn" onclick="answerReading(${i})" id="ropt-${i}">${opt}</button>`
+            ${order.map(i =>
+                `<button class="reading-opt-btn" onclick="answerReading(${i})" id="ropt-${i}">${q.options[i]}</button>`
             ).join('')}
         </div>
     `;
