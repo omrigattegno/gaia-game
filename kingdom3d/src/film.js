@@ -205,7 +205,15 @@ export async function createFilm(stage) {
             };
             raf = requestAnimationFrame(frame);
             return {
-                stop() { stopped = true; cancelAnimationFrame(raf); window.removeEventListener('resize', fit); }
+                stop() { stopped = true; cancelAnimationFrame(raf); window.removeEventListener('resize', fit); },
+                // the frame on show now, as a picture (the stage's canvas can then go to the map)
+                still() {
+                    draw(shown);
+                    const c = document.createElement('canvas');
+                    c.width = stage.canvas.width; c.height = stage.canvas.height;
+                    c.getContext('2d').drawImage(stage.canvas, 0, 0);
+                    return c;
+                }
             };
         },
 

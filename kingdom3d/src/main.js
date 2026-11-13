@@ -6,8 +6,9 @@
 // index.html drives it through window.Kingdom3D.
 import { createStage } from './stage.js';
 import { createFilm, TIMELINE } from './film.js';
+import { createWorld } from './world/world.js';
 
-let stage = null, starting = null, film = null;
+let stage = null, starting = null, film = null, world = null, worldStarting = null;
 
 function supported() {
     try {
@@ -38,9 +39,36 @@ window.Kingdom3D = {
         release() { if (film) { film.release(); film = null; } }
     },
 
+    world: {
+        get ready() { return !!world; },
+        // builds the kingdom (in steps, so the page stays alive meanwhile)
+        prepare(opts) {
+            if (!worldStarting) worldStarting = createWorld(stage, opts).then(w => { world = w; });
+            return worldStarting;
+        },
+        fits() { return world.fits(); },
+        attach(container, opts) { world.attach(container, opts); },
+        detach() { if (world) world.detach(); },
+        get attached() { return !!world && world.attached; },
+        step(dt) { world.step(dt); },
+        metrics() { return world.metrics(); },
+        setScroll(k, snap) { world.setScroll(k, snap); },
+        scrollOf(key) { return world.scrollOf(key); },
+        focus(key, inset) { world.focus(key, inset); },
+        walkTo(key, instant) { world.walkTo(key, instant); },
+        bounce(key) { world.bounce(key); },
+        spots() { return world.spots(); },
+        pick(x, y) { return world.pick(x, y); },
+        info() { return world.info(); },
+        renderAt(o) { world.renderAt(o); },
+        release() { if (world) { world.release(); world = null; } worldStarting = null; }
+    },
+
     // Lets everything go, the renderer included.
     dispose() {
         if (film) { film.release(); film = null; }
+        if (world) { world.release(); world = null; }
+        worldStarting = null;
         if (stage) { stage.dispose(); stage = null; }
         starting = null;
     }

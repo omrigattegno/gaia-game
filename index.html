@@ -1025,6 +1025,31 @@
             #map-title { font-size: 1.2rem; }
         }
 
+        /* --- the map in 3D (see THE MAP IN 3D): the kingdom fills the screen and stays put, the
+           page scrolls a spacer behind it, and the lands' plaques are laid over it --- */
+        #main-menu.map3d #map-scene-holder, #main-menu.map3d #map-parallax, #main-menu.map3d #map-sky-fill { display: none; }
+        #main-menu.map3d #map-topbar { height: 0; padding-bottom: 0; align-items: flex-start; margin-bottom: calc(-1 * max(10px, env(safe-area-inset-top))); }
+        #map3d { position: sticky; top: 0; height: 100vh; height: 100dvh; overflow: hidden; z-index: 1; background: oklch(0.80 0.13 142); }
+        #map3d-stage, #map3d-labels { position: absolute; inset: 0; }
+        #map3d-stage { cursor: grab; touch-action: pan-y; -webkit-tap-highlight-color: transparent; }
+        #map3d-stage canvas { display: block; width: 100%; height: 100%; }
+        #map3d-labels { pointer-events: none; transition: opacity 250ms var(--ease-out-quart); }
+        #map3d-spacer { margin-top: -100vh; margin-top: -100dvh; pointer-events: none; }
+        .land3d-plaque {
+            position: absolute; left: 0; top: 0; visibility: hidden; pointer-events: auto; will-change: transform;
+            margin: 0; padding: 0; border: 0; background: none; font: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent;
+        }
+        div.land3d-plaque { cursor: default; }
+        .land3d-plaque .land-plaque { min-height: 40px; padding: 3px 12px; box-shadow: 0 3px 0 oklch(0.72 0.12 85), 0 6px 12px oklch(0.3 0.05 300 / 0.25); }
+        .land3d-plaque:active .land-plaque { transform: translateY(2px); box-shadow: 0 1px 0 oklch(0.72 0.12 85), 0 3px 8px oklch(0.3 0.05 300 / 0.25); }
+        .land3d-plaque:focus-visible .land-plaque { outline: 3px solid var(--brand); outline-offset: 2px; }
+        /* a land's panel is open: the camera is on the land, the plaques step aside */
+        #main-menu.map3d-focus #map3d-labels { opacity: 0; }
+        #main-menu.map3d-focus .land3d-plaque { pointer-events: none; }
+        #main-menu.map3d #land-scrim { background: linear-gradient(to top, oklch(0.3 0.05 300 / 0.3), oklch(0.3 0.05 300 / 0) 55%); }
+        .map3d-arriving { animation: map3d-in 0.6s var(--ease-out-quart); }
+        @keyframes map3d-in { from { opacity: 0; } to { opacity: 1; } }
+
         /* =========================================================
            GOOGY — English conversation friend
            ========================================================= */
@@ -3909,15 +3934,28 @@ const GaiaPlayer = (function () {
                 '<div class="in-flash"></div><button class="in-skip" type="button">דִּלּוּג ⏭</button>';
             document.body.appendChild(box);
             try {
-                const show = Kingdom3D.film.play(box.querySelector('.in3d-stage'));
-                film = 'played';   // it is let go at the end, to free the memory for the games
-                run(box, onDone, TL.handoff * 1000, TL.length * 1000,
+                const stageEl = box.querySelector('.in3d-stage');
+                const show = Kingdom3D.film.play(stageEl);
+                film = 'played';
+                playing = true;
+                // At the hand-over the film stops on a still under the golden flash, and its set
+                // is let go: the stage is then free for the map in 3D (or let go too, if there is none).
+                let over = false;
+                const finish = () => {
+                    if (over) return;
+                    over = true;
+                    show.stop();
+                    try { stageEl.appendChild(show.still()); } catch (e) { /* the last frame stays as it is */ }
+                    Kingdom3D.film.release();
+                    playing = false;
+                };
+                run(box, () => { finish(); onDone(); }, TL.handoff * 1000, TL.length * 1000,
                     { horns: TL.gates - 0.05, chord: TL.cheer - 0.36, title: TL.title + 0.1, glints: [1.35, 1.75], bursts: TL.bursts, thump: 0.08 },
-                    () => { show.stop(); Kingdom3D.dispose(); });
+                    finish);
                 return;
             } catch (e) {
-                console.warn('[intro3d] could not play', e);
-                film = 'no';
+                console.warn('[kingdom3d] could not play the film', e);
+                film = 'no'; playing = false;
                 box.remove();
             }
         }
@@ -3953,11 +3991,13 @@ const GaiaPlayer = (function () {
         if (canvas) canvas.addEventListener('webglcontextlost', skip, { once: true });
     }
 
-    // ----- the 3D film -----
-    // Fetched once the welcome screen is up; it builds its scene and checks this device can play
-    // it smoothly while the child is still on the welcome screen. Not under reduced motion, data
-    // saving or very little memory.
+    // ----- the kingdom in 3D -----
+    // kingdom3d.js is fetched once the welcome screen is up. It sets up its stage, builds the
+    // film and checks this device can play it smoothly while the child is still on the welcome
+    // screen, then goes on to the map in 3D (see THE MAP IN 3D in the map module). Not under
+    // reduced motion, data saving or very little memory.
     let film = null;   // null, 'loading', 'ready', 'played', 'late' (not ready in time) or 'no'
+    let playing = false;   // the film is on: nothing else is built meanwhile
     function introFaces() {   // the sisters' faces, drawn by the game's own girlFace
         const out = {};
         for (const who of ['yoovy', 'googy']) {
@@ -3976,7 +4016,10 @@ const GaiaPlayer = (function () {
             out[who] = {
                 open: svg('.g-mouth-grin,.g-mouth-sad,.g-mouth-o,.g-eyes-happy,.g-brows-up,.g-brows-sad,.g-drop'),
                 blink: svg('.g-mouth-grin,.g-mouth-sad,.g-mouth-o,.g-eyes-happy,.g-eyes-open,.g-brows-up,.g-brows-sad,.g-drop', shut),
-                laugh: svg('.g-mouth-happy,.g-mouth-sad,.g-mouth-o,.g-eyes-open,.g-brows-up,.g-brows-sad,.g-drop')
+                laugh: svg('.g-mouth-happy,.g-mouth-sad,.g-mouth-o,.g-eyes-open,.g-brows-up,.g-brows-sad,.g-drop'),
+                // for the games: a wrong answer, and the time running out
+                sad: svg('.g-mouth-happy,.g-mouth-grin,.g-mouth-o,.g-eyes-happy,.g-brows-happy,.g-brows-up'),
+                wow: svg('.g-mouth-happy,.g-mouth-grin,.g-mouth-sad,.g-eyes-happy,.g-brows-happy,.g-brows-sad,.g-drop')
             };
         }
         return out;
@@ -3994,21 +4037,23 @@ const GaiaPlayer = (function () {
             const G = window.Kingdom3D;
             if (!G || !G.supported()) { film = 'no'; return; }
             G.start({ faces: introFaces(), width: innerWidth, height: innerHeight })
-                .then(() => G.film.prepare())
-                .then(() => window.__force3D || G.film.fits())
+                // the film, unless the drawn intro has begun meanwhile
+                .then(() => film === 'loading' ? G.film.prepare().then(() => window.__force3D || G.film.fits()) : false)
                 .then(ok => {
                     if (film === 'loading' && ok) { film = 'ready'; return; }
                     if (film === 'loading') film = 'no';
-                    G.dispose();   // too slow here, or the drawn intro has already played
+                    G.film.release();   // too slow here, or not needed any more
                 })
-                .catch(e => { console.warn('[intro3d]', e); film = 'no'; try { G.dispose(); } catch (_) { /* nothing to free */ } });
+                .then(() => window.GaiaMap3D ? GaiaMap3D.prepare() : false)
+                .then(map => { if (!map && film !== 'ready' && !playing) G.dispose(); })
+                .catch(e => { console.warn('[kingdom3d]', e); if (film !== 'played') film = 'no'; try { G.dispose(); } catch (_) { /* nothing to free */ } });
         };
         document.head.appendChild(script);
     }
     if (document.readyState === 'complete') setTimeout(preloadFilm, 600);
     else window.addEventListener('load', () => setTimeout(preloadFilm, 600));
 
-    window.GaiaIntro = { play, get film() { return film; } };
+    window.GaiaIntro = { play, faces: introFaces, get film() { return film; }, get playing() { return playing; } };
 })();
 </script>
 <script>
@@ -7939,6 +7984,7 @@ const GaiaBoards = (function () {
     function landByKey(k) { return LANDS.find(function (l) { return l.key === k; }); }
 
     function placeAvatar(landKey, instant) {
+        if (world3d === 'on') K3().world.walkTo((landByKey(landKey) || CASTLE).key, instant || reduceMotion);
         if (!avatarEl) return;
         const land = landByKey(landKey) || CASTLE;
         const x = land.x + (land.x > VIEW_W / 2 ? -104 : 104), y = land.y + 25;
@@ -7955,15 +8001,16 @@ const GaiaBoards = (function () {
     }
 
     function refreshBadges() {
-        if (!built) return;
+        if (!built && !m3) return;
         LANDS.forEach(function (land) {
             if (land.anchor) return;
-            const badgeEl = document.querySelector('[data-badge="' + land.key + '"]');
-            if (!badgeEl) return;
             const stars = GaiaProgress.getSubjectStars(land.key);
             const medal = GaiaProgress.medalFor(stars);
-            badgeEl.textContent = (medal ? medal + ' ' : '') + '⭐' + stars;
+            document.querySelectorAll('[data-badge="' + land.key + '"]').forEach(function (badgeEl) {
+                badgeEl.textContent = (medal ? medal + ' ' : '') + '⭐' + stars;
+            });
         });
+        if (m3) measure3D();   // the plaques' widths follow their badges
         const total = GaiaProgress.totalStars();
         const tEl = document.getElementById('map-total-stars');
         const mEl = document.getElementById('map-total-medal');
@@ -8080,6 +8127,8 @@ const GaiaBoards = (function () {
         panel.classList.add('open');
         panel.setAttribute('aria-hidden', 'false');
         if (scrim) scrim.classList.add('open');
+        openLand = landKey;
+        focus3D();
     }
 
     function closeLandPanel() {
@@ -8087,14 +8136,184 @@ const GaiaBoards = (function () {
         const scrim = document.getElementById('land-scrim');
         if (panel) { panel.classList.remove('open'); panel.setAttribute('aria-hidden', 'true'); }
         if (scrim) scrim.classList.remove('open');
+        openLand = null;
+        focus3D();
     }
 
     function initAdventureMap() {
         applySky();
-        if (!built) { buildScene(); bindParallax(); }
+        if (world3d === 'ready' || world3d === 'on') show3D();
+        else if (!built) { buildScene(); bindParallax(); }
         else { refreshBadges(); placeAvatar(GaiaProgress.getLastPlayedLand(), true); }
         closeLandPanel();
     }
+
+    // ---- THE MAP IN 3D ----
+    // When kingdom3d.js is up and this device draws it smoothly, the map is the kingdom in 3D
+    // (Kingdom3D.world) instead of the drawing above: the page's own scroll moves its camera
+    // along the road, the lands' plaques are laid over it, a tap on a land opens its panel
+    // (the camera then comes close to the land, above the panel), and Yoovy and Googy walk
+    // there. Everything else is as on the drawn map, which stays for the devices without it.
+    let world3d = null;     // null, 'building', 'ready' (built and checked), 'on' (showing) or 'no'
+    let m3 = null;          // the 3D map's own elements, once it has been shown
+    let openLand = null;    // the land whose panel is open
+    const K3 = function () { return window.Kingdom3D; };
+    const onMap = function () { return document.getElementById('main-menu').classList.contains('active'); };
+
+    // Builds the kingdom, a step at a time and never while the film plays; true if it will be used.
+    function prepare3D() {
+        if (world3d) return Promise.resolve(world3d !== 'no');
+        world3d = 'building';
+        const breath = function () {
+            return new Promise(function (done) {
+                (function wait() { if (window.GaiaIntro && GaiaIntro.playing) setTimeout(wait, 150); else setTimeout(done, 0); })();
+            });
+        };
+        return K3().world.prepare({ at: GaiaProgress.getLastPlayedLand() || 'castle', breath: breath })
+            .then(breath)
+            .then(function () { return window.__force3D || K3().world.fits(); })
+            .then(function (ok) {
+                if (!ok) { world3d = 'no'; K3().world.release(); return false; }
+                world3d = 'ready';
+                if (onMap()) show3D(true);
+                return true;
+            })
+            .catch(function (e) { console.warn('[kingdom3d] no 3D map', e); world3d = 'no'; return false; });
+    }
+
+    function show3D(late) {
+        if (world3d !== 'ready' && world3d !== 'on') return;
+        const K = K3().world, menu = document.getElementById('main-menu'), vp = document.getElementById('map-viewport');
+        if (!m3) {
+            const stage = document.createElement('div');
+            stage.id = 'map3d';
+            stage.innerHTML = '<div id="map3d-stage"></div><div id="map3d-labels"></div>';
+            const spacer = document.createElement('div');
+            spacer.id = 'map3d-spacer';
+            vp.appendChild(stage); vp.appendChild(spacer);
+            const plaques = {};
+            LANDS.forEach(function (land) {
+                const b = document.createElement(land.anchor ? 'div' : 'button');
+                b.className = 'land3d-plaque';
+                b.dataset.land = land.key;
+                if (!land.anchor) b.type = 'button';
+                b.innerHTML = '<span class="land-plaque"><span class="lp-name">' + land.name + '</span>' +
+                    (land.anchor ? '' : '<span class="lp-badge" data-badge="' + land.key + '"></span>') + '</span>';
+                if (!land.anchor) b.addEventListener('click', function () { pick3D(land.key); });
+                stage.lastChild.appendChild(b);
+                plaques[land.key] = b;
+            });
+            m3 = { stage: stage, holder: stage.firstChild, spacer: spacer, plaques: plaques, sizes: {}, range: 1, dragged: false };
+            bind3D(vp);
+        }
+        const first = world3d !== 'on';
+        world3d = 'on';
+        menu.classList.add('map3d');
+        if (late && first) { m3.stage.classList.add('map3d-arriving'); setTimeout(function () { m3.stage.classList.remove('map3d-arriving'); }, 700); }
+        K.attach(m3.holder, { onFrame: layout3D });
+        refreshBadges();
+        const at = (landByKey(GaiaProgress.getLastPlayedLand()) || CASTLE).key;
+        K.walkTo(at, true);
+        vp.scrollTop = K.scrollOf(at) * m3.range;
+        K.setScroll(vp.scrollTop / m3.range, true);
+        focus3D();
+    }
+
+    // the scroll's length follows the camera's travel; the plaques' sizes are kept for laying them out
+    function measure3D() {
+        if (!m3 || world3d !== 'on') return;
+        const vp = document.getElementById('map-viewport'), m = K3().world.metrics();
+        const k = vp.scrollTop / m3.range;
+        m3.range = Math.max(1, Math.round(m.range * m.pxPerUnit));
+        m3.spacer.style.height = (m3.range + vp.clientHeight) + 'px';
+        if (Math.abs(vp.scrollTop - k * m3.range) > 1) vp.scrollTop = k * m3.range;
+        for (const key in m3.plaques) m3.sizes[key] = { w: m3.plaques[key].offsetWidth, h: m3.plaques[key].offsetHeight };
+    }
+
+    // after every frame: each plaque under its land
+    function layout3D() {
+        if (!m3) return;
+        const W = m3.stage.clientWidth;
+        K3().world.spots().forEach(function (s) {
+            const el = m3.plaques[s.key], size = m3.sizes[s.key];
+            if (!el || !size) return;
+            if (!s.seen) { el.style.visibility = 'hidden'; return; }
+            const x = Math.max(4, Math.min(W - size.w - 4, s.x - size.w / 2));
+            el.style.visibility = 'visible';
+            el.style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + (s.above ? s.y - size.h : s.y + 3).toFixed(1) + 'px,0)';
+        });
+    }
+
+    function pick3D(key) {
+        K3().world.bounce(key);
+        openLandPanel(key);
+    }
+
+    // the camera comes close to the land whose panel is open, in what the panel leaves of the screen
+    function focus3D() {
+        if (world3d !== 'on') return;
+        const menu = document.getElementById('main-menu'), panel = document.getElementById('land-panel');
+        menu.classList.toggle('map3d-focus', !!openLand);
+        K3().world.focus(openLand, openLand ? Math.min(panel.offsetHeight, menu.clientHeight * 0.82) : 0);
+        if (openLand) {   // when the panel closes, the land is where the map is looking
+            const vp = document.getElementById('map-viewport');
+            vp.scrollTop = K3().world.scrollOf(openLand) * m3.range;
+        }
+    }
+
+    function bind3D(vp) {
+        const world = function () { return K3().world; };
+        vp.addEventListener('scroll', function () { if (world3d === 'on') world().setScroll(vp.scrollTop / m3.range); }, { passive: true });
+        window.addEventListener('resize', function () { if (world3d === 'on') setTimeout(function () { measure3D(); focus3D(); }, 60); });
+        const at = function (e) { const r = m3.stage.getBoundingClientRect(); return world().pick(e.clientX - r.left, e.clientY - r.top); };
+        m3.holder.addEventListener('click', function (e) {
+            if (m3.dragged) { m3.dragged = false; return; }
+            const key = at(e);
+            if (key && key !== CASTLE.key) pick3D(key);
+        });
+        // with a mouse: the hand over a land, and dragging the map to scroll it
+        let drag = null;
+        m3.holder.addEventListener('pointerdown', function (e) { if (e.pointerType === 'mouse' && e.button === 0) drag = { y: e.clientY, top: vp.scrollTop, moved: false }; });
+        window.addEventListener('pointermove', function (e) {
+            if (world3d !== 'on') return;
+            if (drag) {
+                const dy = e.clientY - drag.y;
+                if (Math.abs(dy) > 5) drag.moved = true;
+                if (drag.moved) vp.scrollTop = drag.top - dy;
+            } else if (e.pointerType === 'mouse' && e.target === K3().canvas) {
+                const key = at(e);
+                m3.holder.style.cursor = key && key !== CASTLE.key ? 'pointer' : 'grab';
+            }
+        });
+        window.addEventListener('pointerup', function () {
+            if (drag && drag.moved) { m3.dragged = true; setTimeout(function () { if (m3) m3.dragged = false; }, 0); }
+            drag = null;
+        });
+        // if the graphics card drops the map, the drawn map takes over for good
+        K3().canvas.addEventListener('webglcontextlost', drop3D, { once: true });
+    }
+
+    function drop3D() {
+        if (world3d === 'no') return;
+        const was = world3d === 'on';
+        world3d = 'no';
+        try { K3().dispose(); } catch (e) { console.warn('[kingdom3d]', e); }
+        const menu = document.getElementById('main-menu');
+        menu.classList.remove('map3d', 'map3d-focus');
+        if (m3) { m3.stage.remove(); m3.spacer.remove(); m3 = null; }
+        if (was) {
+            if (!built) { buildScene(); bindParallax(); }
+            else { refreshBadges(); placeAvatar(GaiaProgress.getLastPlayedLand(), true); }
+        }
+    }
+
+    // the 3D map is drawn only while the map is on the screen
+    GaiaHooks.on(function (type, data) {
+        if (type !== 'nav') return;
+        if (data.screen === 'main-menu') { if (world3d === 'ready' || world3d === 'on') show3D(); }
+        else if (world3d === 'on') K3().world.detach();
+    });
+    window.GaiaMap3D = { prepare: prepare3D, get state() { return world3d; } };
 
     // The shapes and gradients of the map and the land scenes, kept once in the page in a hidden
     // <svg> (not display:none, which switches its gradients off in some browsers).
