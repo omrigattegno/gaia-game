@@ -70,8 +70,12 @@ window.Kingdom3D = {
     // Yoovy and Googy for the corner of the games: a small canvas of their own (see buddies.js)
     buddies: {
         get ready() { return !!buddies; },
-        // makes them (once) and returns their canvas, for the page to place
-        create() { if (!buddies) buddies = createBuddies(stage.dayFaces); return buddies.canvas; },
+        // makes them (once); resolves with their canvas, for the page to place, when they can be drawn
+        create() {
+            if (!buddies) buddies = createBuddies(stage.dayFaces);
+            const b = buddies;
+            return b.ready.then(() => b.canvas);
+        },
         mood(m) { if (buddies) buddies.mood(m); },
         resize(w, h) { if (buddies) buddies.resize(w, h); },
         start() { if (buddies) buddies.start(); },

@@ -105,10 +105,15 @@ export function createBuddies(faces) {
         renderer.render(scene, camera);
     };
 
-    let raf = 0, running = false, last = 0, lastDraw = 0;
+    // the shaders are made ready off to the side, so the page does not stop for them
+    let ok = false, gone = false;
+    const ready = renderer.compileAsync(scene, camera).then(() => { if (!gone) { ok = true; draw(0); } });
+
+    let raf = 0, running = false, lastDraw = 0;
     const frame = (now) => {
         if (!running) return;
         raf = requestAnimationFrame(frame);
+        if (!ok) return;
         // still unless something moves fast: 30 frames a second
         const lively = mood !== 'idle';
         if (!lively && now - lastDraw < 31) return;
@@ -119,6 +124,8 @@ export function createBuddies(faces) {
 
     const buddies = {
         canvas,
+        // resolves when they can be drawn (and have been, once)
+        ready,
         resize(w, h) {
             w = Math.max(2, w | 0); h = Math.max(2, h | 0);
             if (w === W && h === H) return;
@@ -127,7 +134,7 @@ export function createBuddies(faces) {
             renderer.setSize(w, h, false);
             camera.aspect = w / h;
             frameCamera();
-            draw(0);
+            if (ok) draw(0);
         },
         // 'idle' | 'happy' | 'sad' | 'surprised' | 'dance'
         mood(m) { if (m !== mood || m !== 'idle') { mood = m; since = 0; } },
@@ -136,8 +143,9 @@ export function createBuddies(faces) {
         stop() { running = false; cancelAnimationFrame(raf); },
         get running() { return running; },
         // one frame by hand (for the tests and the tools)
-        step(dt = 1 / 60) { draw(dt); },
+        step(dt = 1 / 60) { if (ok) draw(dt); },
         dispose() {
+            gone = true; ok = false;
             buddies.stop();
             scene.traverse(o => { if (o.geometry) o.geometry.dispose(); const ms = o.material ? (Array.isArray(o.material) ? o.material : [o.material]) : []; for (const m of ms) m.dispose(); });
             env.dispose();

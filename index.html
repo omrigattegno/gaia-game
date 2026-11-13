@@ -8329,18 +8329,19 @@ const GaiaBoards = (function () {
     // of their own in #gaia-char (Kingdom3D.buddies) takes the drawn girls' place and their moods
     // (setGaiaState). They are drawn only while the corner shows.
     let buddies3d = false;
+    const has3D = function () { return world3d === 'ready' || world3d === 'on'; };
     function startBuddies() {
-        if (buddies3d || (world3d !== 'ready' && world3d !== 'on')) return;
-        const el = document.getElementById('gaia-char');
-        try {
-            const canvas = K3().buddies.create();
+        if (buddies3d || !has3D()) return;
+        K3().buddies.create().then(function (canvas) {
+            if (buddies3d || !has3D()) return;      // the 3D was dropped meanwhile
+            const el = document.getElementById('gaia-char');
             canvas.addEventListener('webglcontextlost', dropBuddies, { once: true });
             el.appendChild(canvas);
             el.dataset.k3d = '1';
             buddies3d = true;
             K3().buddies.mood((el.className.match(/gaia-(\w+)/) || [])[1] || 'idle');
             syncBuddies();
-        } catch (e) { console.warn('[kingdom3d] no 3D sisters', e); dropBuddies(); }
+        }).catch(function (e) { console.warn('[kingdom3d] no 3D sisters', e); dropBuddies(); });
     }
     function dropBuddies() {
         buddies3d = false;
@@ -8392,7 +8393,7 @@ const GaiaBoards = (function () {
     }
     // the land itself, as it stands in the 3D kingdom, where there is one
     function landShot(land) {
-        if (world3d !== 'ready' && world3d !== 'on') return null;
+        if (!has3D()) return null;
         try { return K3().world.snapshot(land, innerWidth, innerHeight); }
         catch (e) { console.warn('[kingdom3d] no backdrop', e); return null; }
     }
