@@ -1330,7 +1330,7 @@
             border: 2px solid oklch(1 0 0 / 0.5); border-radius: 999px; padding: 8px 16px; cursor: pointer;
             font: inherit; font-size: 1.05rem; color: #fff; background: oklch(0.2 0.05 290 / 0.45);
         }
-        /* the 3D film (intro3d.js): its canvas under the same title, flash and skip button */
+        /* the 3D film (kingdom3d.js): its canvas under the same title, flash and skip button */
         #intro.in3d { background: #07051a; animation: in-out 0.7s 13.3s ease-in forwards; }
         .in3d-stage, .in3d-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
         .in3d .in-title { top: max(4vh, env(safe-area-inset-top)); z-index: 1; }
@@ -3714,7 +3714,7 @@ const GaiaPlayer = (function () {
 // ===== THE ROYAL INTRO =====
 // "יוֹצְאִים לַדֶּרֶךְ" opens the kingdom with a short film: the golden gates swing open on the
 // castle at night, fireworks go up, and Yoovy and Googy, in crowns and capes, walk out to greet
-// the player under a royal fanfare. It is a real-time 3D film (intro3d.js, built from intro3d/
+// the player under a royal fanfare. It is a real-time 3D film (kingdom3d.js, built from kingdom3d/
 // with three.js) when this device can play it smoothly; otherwise a drawn scene, one CSS
 // timeline (see THE ROYAL INTRO in the styles). Either way the map is set up under the last
 // golden flash. "דִּלּוּג" (or Escape) skips it, and nothing plays under reduced motion.
@@ -3904,16 +3904,16 @@ const GaiaPlayer = (function () {
             const box = document.createElement('div');
             box.id = 'intro'; box.className = 'in3d';
             box.setAttribute('aria-label', 'פְּתִיחָה: שַׁעֲרֵי הַמַּמְלָכָה נִפְתָּחִים');
-            const TL = GaiaIntro3D.timeline;
+            const TL = Kingdom3D.film.timeline;
             box.innerHTML = '<div class="in3d-stage"></div>' + titleHTML(TL.title) +
                 '<div class="in-flash"></div><button class="in-skip" type="button">דִּלּוּג ⏭</button>';
             document.body.appendChild(box);
             try {
-                const show = GaiaIntro3D.play(box.querySelector('.in3d-stage'));
+                const show = Kingdom3D.film.play(box.querySelector('.in3d-stage'));
                 film = 'played';   // it is let go at the end, to free the memory for the games
                 run(box, onDone, TL.handoff * 1000, TL.length * 1000,
                     { horns: TL.gates - 0.05, chord: TL.cheer - 0.36, title: TL.title + 0.1, glints: [1.35, 1.75], bursts: TL.bursts, thump: 0.08 },
-                    () => { show.stop(); GaiaIntro3D.dispose(); });
+                    () => { show.stop(); Kingdom3D.dispose(); });
                 return;
             } catch (e) {
                 console.warn('[intro3d] could not play', e);
@@ -3987,14 +3987,15 @@ const GaiaPlayer = (function () {
         if (reducedMotion() || (net && net.saveData) || (navigator.deviceMemory && navigator.deviceMemory < 2)) { film = 'no'; return; }
         film = 'loading';
         const script = document.createElement('script');
-        script.src = 'intro3d.js?v=20261016b';
+        script.src = 'kingdom3d.js?v=20261113';
         script.async = true;
         script.onerror = () => { film = 'no'; };
         script.onload = () => {
-            const G = window.GaiaIntro3D;
+            const G = window.Kingdom3D;
             if (!G || !G.supported()) { film = 'no'; return; }
-            G.prepare({ faces: introFaces(), width: innerWidth, height: innerHeight })
-                .then(() => window.__force3D || G.fits())
+            G.start({ faces: introFaces(), width: innerWidth, height: innerHeight })
+                .then(() => G.film.prepare())
+                .then(() => window.__force3D || G.film.fits())
                 .then(ok => {
                     if (film === 'loading' && ok) { film = 'ready'; return; }
                     if (film === 'loading') film = 'no';
