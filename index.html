@@ -4,18 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Yoovy &amp; Googy - לומדים בכיף</title>
+    <meta name="description" content="ממלכת הידע של יובי וגוגי: משחקי חשבון, עברית, קריאה, אנגלית, דגלים, גוף האדם, זיכרון, פאזלים ושחמט לילדות ולילדים.">
+    <meta name="theme-color" content="#8f55e0">
+    <link rel="icon" type="image/png" href="icons/favicon.png">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Yoovy &amp; Googy - לומדים בכיף">
+    <meta property="og:description" content="ממלכת הידע של יובי וגוגי: משחקי חשבון, עברית, קריאה, אנגלית, דגלים, גוף האדם, זיכרון, פאזלים ושחמט.">
+    <meta property="og:image" content="https://omrigattegno.github.io/gaia-game/icons/icon-512.png">
+    <meta property="og:locale" content="he_IL">
 
     <!-- Firebase (deferred: never blocks the first paint; initialised on DOMContentLoaded) -->
     <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 
-    <!-- Fonts: Fredoka (variable, Latin/digits) + Varela Round (full Hebrew coverage) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400..700&family=Varela+Round&display=swap" rel="stylesheet">
+    <!-- Fonts: Fredoka (variable, Latin/digits) + Varela Round (full Hebrew coverage), served by the
+         site itself (fonts/, under the SIL Open Font License): no third party, and they work offline -->
+    <link rel="preload" href="fonts/varela-round-hebrew.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
 
     <style>
+        @font-face {
+            font-family: 'Fredoka'; font-style: normal; font-weight: 400 700; font-stretch: 100%; font-display: swap;
+            src: url(fonts/fredoka-hebrew.woff2) format('woff2');
+            unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F;
+        }
+        @font-face {
+            font-family: 'Fredoka'; font-style: normal; font-weight: 400 700; font-stretch: 100%; font-display: swap;
+            src: url(fonts/fredoka-latin.woff2) format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'Varela Round'; font-style: normal; font-weight: 400; font-display: swap;
+            src: url(fonts/varela-round-hebrew.woff2) format('woff2');
+            unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F;
+        }
+        @font-face {
+            font-family: 'Varela Round'; font-style: normal; font-weight: 400; font-display: swap;
+            src: url(fonts/varela-round-latin.woff2) format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+
         /* =========================================================
            PALETTE — OKLCH custom properties (warm day → indigo night)
            No pure #000 / #fff; neutrals tinted toward brand purple.
@@ -264,10 +295,12 @@
             min-height: 100dvh;
             margin: 0;
             overflow: hidden;
-            user-select: none;
+            -webkit-user-select: none; user-select: none;   /* Safari needs the prefix: no text selection on a long press */
+            -webkit-touch-callout: none;
             touch-action: manipulation;
             color: var(--ink);
         }
+        input, textarea { -webkit-user-select: text; user-select: text; }
         /* Latin & digits prefer Fredoka; Hebrew stays on Varela Round via body fallback */
         .lat { font-family: 'Fredoka', sans-serif; }
 
@@ -461,7 +494,7 @@
 
         .math-display {
             font-size: clamp(2.8rem, 15vw, 4rem); font-weight: bold; color: var(--ink);
-            font-family: 'Fredoka', 'Courier New', monospace; margin: 22px 0;
+            font-family: 'Fredoka', 'Varela Round', 'Arial Rounded MT Bold', 'Trebuchet MS', sans-serif; margin: 22px 0;
             direction: ltr; unicode-bidi: bidi-override; white-space: nowrap;
         }
         .math-display.wide { font-size: clamp(2rem, 10.5vw, 3.4rem); }
@@ -607,7 +640,7 @@
         }
         .board-chips button {
             flex-shrink: 0; border: 2px solid oklch(0.85 0.08 90); background: oklch(0.98 0.03 95); color: var(--ink);
-            border-radius: 999px; padding: 6px 12px; font-size: 0.95rem; cursor: pointer; white-space: nowrap;
+            border-radius: 999px; padding: 6px 14px; min-height: 44px; font-size: 0.95rem; cursor: pointer; white-space: nowrap;
             font-family: 'Varela Round', 'Fredoka', sans-serif;
         }
         .board-chips button.active { background: var(--gold); border-color: oklch(0.72 0.15 80); font-weight: 700; }
@@ -619,7 +652,7 @@
         .board-rule { font-size: 0.85rem; color: var(--ink-soft); margin: 4px 0 6px; }
         .board-player-btn {
             border: none; background: none; color: var(--brand); text-decoration: underline; cursor: pointer;
-            font-size: 0.95rem; font-family: 'Varela Round', sans-serif; padding: 6px;
+            font-size: 0.95rem; font-family: 'Varela Round', sans-serif; padding: 6px 14px; min-height: 44px; min-width: 88px;
         }
         .player-girls { display: flex; justify-content: center; direction: rtl; }
         .player-girls .girl-googy { margin-right: -6px; }
@@ -724,26 +757,26 @@
         .english-word-display {
             font-size: 3.5rem; font-weight: 800; color: var(--ink);
             letter-spacing: 4px; direction: ltr; unicode-bidi: bidi-override;
-            font-family: 'Fredoka', 'Courier New', monospace;
+            font-family: 'Fredoka', 'Varela Round', 'Arial Rounded MT Bold', 'Trebuchet MS', sans-serif;
         }
 
         /* --- פוניקס אלפבית --- */
         .phonics-letter-big {
             font-size: 8rem; font-weight: 700; color: oklch(0.58 0.20 350);
-            font-family: 'Fredoka', 'Comic Sans MS', cursive;
+            font-family: 'Fredoka', 'Varela Round', 'Arial Rounded MT Bold', 'Trebuchet MS', sans-serif;
             text-shadow: 4px 4px 0 oklch(0.58 0.20 350 / 0.15);
             line-height: 1.05; cursor: pointer; animation: popIn 0.35s var(--ease-out-quart); display: inline-block;
         }
         .phonics-letter-small {
             font-size: 3rem; font-weight: 700; color: oklch(0.48 0.18 350);
-            font-family: 'Fredoka', 'Comic Sans MS', cursive; opacity: 0.6;
+            font-family: 'Fredoka', 'Varela Round', 'Arial Rounded MT Bold', 'Trebuchet MS', sans-serif; opacity: 0.6;
             cursor: pointer; margin-right: 8px;
         }
         .phonics-emoji-big { font-size: 3.8rem; margin: 4px 0; cursor: pointer; display: block; }
         .phonics-word-label { font-size: 1.3rem; color: var(--ink-soft); letter-spacing: 3px; direction: ltr; font-weight: 700; font-family: 'Fredoka', sans-serif; }
         .answer-btn-letter {
             border-radius: 20px; font-weight: 900; color: var(--lt-deep);
-            font-family: 'Fredoka', 'Comic Sans MS', cursive;
+            font-family: 'Fredoka', 'Varela Round', 'Arial Rounded MT Bold', 'Trebuchet MS', sans-serif;
             width: 28%; padding: 12px 4px; display: inline-flex; flex-direction: column;
             align-items: center; justify-content: center; margin: 4px 2% 10px; vertical-align: top;
         }
@@ -752,8 +785,10 @@
 
         /* --- גיאוגרפיה --- */
         .geo-flag-display { line-height: 1; margin: 10px 0; animation: bounce 3s infinite; }
-        .flag-img { width: 160px; border-radius: 8px; box-shadow: 0 4px 12px oklch(0.3 0.05 300 / 0.25); }
-        .flag-img-small { width: 60px; border-radius: 5px; box-shadow: 0 2px 6px oklch(0.3 0.05 300 / 0.25); }
+        .flag-img { width: 160px; height: auto; border-radius: 8px; box-shadow: 0 4px 12px oklch(0.3 0.05 300 / 0.25); }
+        .flag-img-small { width: 60px; height: auto; border-radius: 5px; box-shadow: 0 2px 6px oklch(0.3 0.05 300 / 0.25); }
+        .flag-emoji { font-size: 5rem; line-height: 1; }
+        .memory-card .flag-emoji { font-size: 2.4rem; }
         .geo-question { font-size: 1.1rem; color: var(--ink-soft); margin: 6px 0 10px; }
 
 
@@ -837,6 +872,7 @@
         .reading-back {
             background: none; border: none; font-size: 1.1rem; color: var(--lt-deep); cursor: pointer;
             direction: rtl; margin-bottom: 6px; font-family: 'Varela Round', 'Fredoka', sans-serif;
+            min-height: 44px; padding: 8px 12px;
         }
         .reading-btn { margin-top: 8px; font-size: 1.3rem; padding: 12px; }
         .reading-pick-head { direction: rtl; margin-bottom: 10px; }
@@ -867,7 +903,7 @@
         #mult-content { margin-top: 62px; padding: 8px 10px; }
         .mult-question {
             font-size: clamp(3rem, 16vw, 4.2rem); font-weight: bold; color: var(--ink);
-            font-family: 'Fredoka', 'Courier New', monospace; margin: 4px 0 18px; padding: 6px 0;
+            font-family: 'Fredoka', 'Varela Round', 'Arial Rounded MT Bold', 'Trebuchet MS', sans-serif; margin: 4px 0 18px; padding: 6px 0;
             direction: ltr; unicode-bidi: bidi-override; text-align: center; white-space: nowrap;
             background: radial-gradient(120% 100% at 50% 0%, var(--lt-soft), var(--surface) 75%);
             border: 2px solid var(--lt-line); border-radius: 24px;
@@ -925,7 +961,7 @@
         }
         #player-chip {
             pointer-events: auto; border: 2px solid var(--gold); background: var(--surface); color: var(--ink);
-            border-radius: 999px; padding: 7px 12px; font-size: 1rem; font-weight: 700; cursor: pointer;
+            border-radius: 999px; padding: 7px 12px; min-height: 44px; font-size: 1rem; font-weight: 700; cursor: pointer;
             box-shadow: 0 4px 10px oklch(0.3 0.05 300 / 0.2); font-family: 'Varela Round', sans-serif;
             max-width: 42vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
@@ -1459,6 +1495,41 @@
         .btn-chess { background: linear-gradient(135deg, oklch(0.62 0.11 55), oklch(0.48 0.10 45)); }
         /* the sisters stand in the corner only where they leave the board free */
         @media (max-width: 900px) { body:has(#chess-screen.active) #gaia-char { display: none; } }
+        /* "say it again" beside a question: big enough for a small finger */
+        .say-line { font-size: 1.05rem; color: var(--ink-soft); margin-top: 4px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .say-again {
+            width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--lt-line); background: var(--lt-soft);
+            font-size: 1.35rem; line-height: 1; cursor: pointer; padding: 0; -webkit-tap-highlight-color: transparent;
+        }
+        .say-again:active { transform: scale(0.94); }
+
+        /* the narrowest phones (320px): the three answers stay in one row */
+        @media (max-width: 340px) {
+            .options-container { gap: 7px; }
+            .answer-btn { min-width: 66px; height: 70px; font-size: 2rem; padding: 0 8px; }
+        }
+        /* short screens: the welcome card fits without scrolling to its button */
+        @media (max-height: 620px) {
+            #welcome-screen { padding: 20px 16px; }
+            .welcome-girls .girl { height: 128px; width: auto; }
+            .welcome-girls .girl-googy { margin-right: -24px; }
+            .logo-container { margin-bottom: 12px; }
+            .welcome-text { font-size: 1.5rem; }
+            .welcome-story { font-size: 1rem; line-height: 1.45; }
+        }
+
+        /* === THE ROTATE HINT (see THE ROTATE HINT in the script): a phone on its side === */
+        #rotate-hint {
+            display: none; position: fixed; inset: 0; z-index: 5000;
+            align-items: center; justify-content: center; gap: 22px; padding: 20px; text-align: center;
+            background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-bottom) 100%);
+        }
+        body.rotate-me:not(:has(#intro)) #rotate-hint { display: flex; }   /* the film is fine on its side */
+        #rotate-hint .rh-phone { font-size: 4.6rem; line-height: 1; animation: rh-turn 2.6s var(--ease-out-quart) infinite; }
+        #rotate-hint p { margin: 0; max-width: 60vw; font-size: 1.5rem; font-weight: 700; color: var(--brand-deep); line-height: 1.4; }
+        @keyframes rh-turn { 0%, 25% { transform: rotate(90deg); } 65%, 100% { transform: rotate(0deg); } }
+        @media (prefers-reduced-motion: reduce) { #rotate-hint .rh-phone { animation: none; } }
+
         @media (prefers-reduced-motion: reduce) {
             .chess-pc { transition: none; }
             .chess-star, .chess-sq.hint::before, .chess-pc.gone { animation: none; }
@@ -1517,6 +1588,7 @@
 </div>
 
 <div id="gaia-char" class="gaia-idle" aria-hidden="true"></div>
+<div id="rotate-hint" role="status"><span class="rh-phone" aria-hidden="true">📱</span><p>מְסוֹבְבִים אֶת הַטֶּלֶפוֹן — וּמַמְשִׁיכִים לְשַׂחֵק!</p></div>
 
     <div id="welcome-screen" class="screen active">
         <div class="logo-container">
@@ -1565,7 +1637,7 @@
                 <div class="hud-num">הֲפִיכוֹת: <span id="mem-flips">0</span></div>
             </div>
             <div id="memory-grid"></div>
-            <button class="home-btn" onclick="goHome()">🏠</button>
+            <button class="home-btn" onclick="goHome()" aria-label="חֲזָרָה לַמַּפָּה">🏠</button>
         </div>
     </div>
 
@@ -1602,7 +1674,7 @@
                 <div id="puzzle-grid" class="puzzle-grid"></div>
             </div>
             <button class="big-btn btn-puzzle puzzle-reshuffle" onclick="reshufflePuzzle()">לְעַרְבֵּב מֵחָדָשׁ 🔀</button>
-            <button class="home-btn" onclick="goHome()">🏠</button>
+            <button class="home-btn" onclick="goHome()" aria-label="חֲזָרָה לַמַּפָּה">🏠</button>
         </div>
     </div>
 
@@ -1618,7 +1690,7 @@
             <div class="options-container" id="options"></div>
             <div class="feedback" id="feedback"></div>
 
-            <button class="home-btn" onclick="goHome()">🏠</button>
+            <button class="home-btn" onclick="goHome()" aria-label="חֲזָרָה לַמַּפָּה">🏠</button>
         </div>
     </div>
 
@@ -1632,6 +1704,7 @@
 
             <div id="end-board"></div>
 
+            <button class="big-btn btn-level-1" id="end-again" onclick="playAgain()">סִיבּוּב נוֹסָף 🔁</button>
             <button class="big-btn btn-home" onclick="goHome()">חֲזָרָה לַמַּפָּה 🏠</button>
         </div>
     </div>
@@ -1645,7 +1718,7 @@
                 <div class="reading-progress" id="reading-q-progress"></div>
             </div>
             <div id="reading-content" style="margin-top:62px; padding:8px 10px;"></div>
-            <button class="home-btn" onclick="goHome()">🏠</button>
+            <button class="home-btn" onclick="goHome()" aria-label="חֲזָרָה לַמַּפָּה">🏠</button>
         </div>
     </div>
 
@@ -1677,7 +1750,7 @@
                 <div id="mult-score">⭐ 0</div>
             </div>
             <div id="mult-content"></div>
-            <button class="home-btn" onclick="goHome()">🏠</button>
+            <button class="home-btn" onclick="goHome()" aria-label="חֲזָרָה לַמַּפָּה">🏠</button>
         </div>
     </div>
 
@@ -1707,7 +1780,7 @@
                 <button id="googy-send" aria-label="לִשְׁלֹחַ">➤</button>
             </div>
             <div id="googy-end"></div>
-            <button class="home-btn" onclick="goHome()">🏠</button>
+            <button class="home-btn" onclick="goHome()" aria-label="חֲזָרָה לַמַּפָּה">🏠</button>
         </div>
     </div>
 
@@ -1763,7 +1836,7 @@
                 <button id="repeat-skip">דִּלּוּג עַל הַמִּשְׁפָּט</button>
             </div>
             <div id="repeat-end"></div>
-            <button class="home-btn" onclick="goHome()">🏠</button>
+            <button class="home-btn" onclick="goHome()" aria-label="חֲזָרָה לַמַּפָּה">🏠</button>
         </div>
     </div>
     <!-- ===== LEADERBOARD & PLAYER DIALOGS ===== -->
@@ -1811,6 +1884,57 @@
             });
         }
     };
+})();
+
+// ===== OFFLINE =====
+// sw.js keeps the page and what it needs, so the game also opens without a network
+// (the leaderboards then show this device's results).
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').catch(function (e) { console.warn('[offline] no service worker:', e && e.message); });
+    });
+}
+
+// ===== PAUSE =====
+// The game's clocks wait while the child cannot see the game: the page out of sight (another
+// tab, the screen locked, a phone call), or a phone turned on its side (the rotate hint below).
+// Whoever keeps a clock asks GaiaPause.on, and hears of a change through GaiaPause.onChange.
+window.GaiaPause = (function () {
+    const listeners = [];
+    let rotated = false, paused = document.hidden;
+    function update() {
+        const now = document.hidden || rotated;
+        if (now === paused) return;
+        paused = now;
+        listeners.forEach(fn => { try { fn(paused); } catch (e) { console.warn('[pause]', e); } });
+    }
+    document.addEventListener('visibilitychange', update);
+    return {
+        get on() { return paused; },
+        onChange(fn) { listeners.push(fn); },
+        setRotated(value) { rotated = !!value; update(); }
+    };
+})();
+
+// ===== THE ROTATE HINT =====
+// The game is laid out for a phone held upright; on its side the cards do not fit. A phone
+// on its side gets a friendly "turn me" over the game (see #rotate-hint), and the clocks wait.
+// Tablets and computers have the room, and are left alone. The screen's own orientation is
+// asked, not the window's shape: an open keyboard makes an upright phone's window wide and short.
+(function () {
+    const coarse = window.matchMedia ? window.matchMedia('(pointer: coarse)') : null;
+    function check() {
+        const type = screen.orientation && screen.orientation.type;
+        const sideways = type ? type.indexOf('landscape') === 0 : Math.abs(window.orientation) === 90;
+        const phone = Math.min(screen.width, screen.height) <= 480 && (!coarse || coarse.matches);
+        const on = !!(sideways && phone && window.innerWidth > window.innerHeight);
+        document.body.classList.toggle('rotate-me', on);
+        GaiaPause.setRotated(on);
+    }
+    window.addEventListener('orientationchange', check);
+    window.addEventListener('resize', check);
+    if (screen.orientation && screen.orientation.addEventListener) screen.orientation.addEventListener('change', check);
+    check();
 })();
 
 // ===== PROGRESS PERSISTENCE MODULE (loads before the engine) =====
@@ -2239,7 +2363,7 @@ const GaiaPlayer = (function () {
             { full: "פינגווין", emoji: "🐧" }, { full: "ינשוף", emoji: "🦉" }, { full: "שועל", emoji: "🦊" }, { full: "נמר", emoji: "🐆" },
             { full: "קנגורו", emoji: "🦘" }, { full: "תנין", emoji: "🐊" }, { full: "דולפין", emoji: "🐬" }, { full: "כריש", emoji: "🦈" },
             { full: "תמנון", emoji: "🐙" }, { full: "פנדה", emoji: "🐼" }, { full: "קיפוד", emoji: "🦔" }, { full: "יונה", emoji: "🕊️" },
-            { full: "טווס", emoji: "🦚" }, { full: "חמור", emoji: "🫏" }, { full: "חזיר", emoji: "🐷" }, { full: "ברווז", emoji: "🦆" },
+            { full: "טווס", emoji: "🦚" }, { full: "גמל", emoji: "🐫" }, { full: "חזיר", emoji: "🐷" }, { full: "ברווז", emoji: "🦆" },
             { full: "פלמינגו", emoji: "🦩" }, { full: "לטאה", emoji: "🦎" }, { full: "דבורה", emoji: "🐝" }, { full: "נמלה", emoji: "🐜" },
 
             // עוד אוכל (20)
@@ -2264,7 +2388,7 @@ const GaiaPlayer = (function () {
             // צבעים (10)
             { full: "אדום", emoji: "🔴" }, { full: "כחול", emoji: "🔵" }, { full: "ירוק", emoji: "🟢" }, { full: "צהוב", emoji: "🟡" },
             { full: "כתום", emoji: "🟠" }, { full: "סגול", emoji: "🟣" }, { full: "לבן", emoji: "⬜" }, { full: "שחור", emoji: "⬛" },
-            { full: "ורוד", emoji: "🩷" }, { full: "חום", emoji: "🟤" },
+            { full: "ורוד", emoji: "💗" }, { full: "חום", emoji: "🟤" },
 
             // טכנולוגיה וחפצים (7)
             { full: "מחשב", emoji: "💻" }, { full: "טלוויזיה", emoji: "📺" }, { full: "רדיו", emoji: "📻" }, { full: "מנורה", emoji: "💡" },
@@ -2287,7 +2411,7 @@ const GaiaPlayer = (function () {
 
             // מקצועות (10)
             { full: "רופא", emoji: "👨‍⚕️" }, { full: "טבח", emoji: "👨‍🍳" }, { full: "שוטר", emoji: "👮" },
-            { full: "כבאי", emoji: "🧑‍🚒" }, { full: "חייל", emoji: "💂" }, { full: "קוסם", emoji: "🪄" },
+            { full: "כבאי", emoji: "🧑‍🚒" }, { full: "חייל", emoji: "💂" }, { full: "קוסם", emoji: "🧙" },
             { full: "זמר", emoji: "🎤" }, { full: "גנן", emoji: "🌱" }, { full: "נגר", emoji: "🪚" },
             { full: "דייג", emoji: "🎣" },
 
@@ -2304,14 +2428,14 @@ const GaiaPlayer = (function () {
 
             // כלי בית ומטבח (12)
             { full: "מחבת", emoji: "🍳" }, { full: "קומקום", emoji: "☕" }, { full: "מראה", emoji: "🪞" },
-            { full: "אמבטיה", emoji: "🛁" }, { full: "מקלחת", emoji: "🚿" }, { full: "כרית", emoji: "🛌" },
+            { full: "אמבטיה", emoji: "🛁" }, { full: "מקלחת", emoji: "🚿" }, { full: "כף", emoji: "🥄" },
             { full: "סבון", emoji: "🧼" }, { full: "חלון", emoji: "🪟" }, { full: "מטאטא", emoji: "🧹" },
-            { full: "דלי", emoji: "🪣" }, { full: "צלחת", emoji: "🍽️" }, { full: "מגבת", emoji: "🧻" },
+            { full: "דלי", emoji: "🪣" }, { full: "צלחת", emoji: "🍽️" }, { full: "ספוג", emoji: "🧽" },
 
             // מקומות ובילוי (10)
             { full: "פארק", emoji: "🎡" }, { full: "קולנוע", emoji: "🎬" }, { full: "מוזיאון", emoji: "🏛️" },
             { full: "חוף", emoji: "🏖️" }, { full: "שוק", emoji: "🛒" }, { full: "חנות", emoji: "🏪" },
-            { full: "גן ילדים", emoji: "🛝" }, { full: "בית חולים", emoji: "🏥" },
+            { full: "קרקס", emoji: "🎪" }, { full: "בית חולים", emoji: "🏥" },
             { full: "אצטדיון", emoji: "🏟️" }, { full: "מסעדה", emoji: "🍴" }
         ];
 
@@ -2329,7 +2453,7 @@ const GaiaPlayer = (function () {
             // רמה 2 — כל האיברים
             { emoji: "🟤", name: "כָּבֵד",    func: "מְנַקֶּה אֶת הַדָּם מֵרַעֲלִים",         level: 2 },
             { emoji: "🟡", name: "קֵיבָה",    func: "מְפָרֶקֶת אֶת הָאוֹכֶל אַחֲרֵי הָאֲכִילָה", level: 2 },
-            { emoji: "🫘", name: "כְּלָיוֹת",  func: "מְסַנְּנוֹת פְּסוֹלֶת מֵהַדָּם",          level: 2 },
+            { emoji: "🔴", name: "כְּלָיוֹת",  func: "מְסַנְּנוֹת פְּסוֹלֶת מֵהַדָּם",          level: 2 },
             { emoji: "💪", name: "שְׁרִירִים", func: "מְאַפְשְׁרִים תְּנוּעָה שֶׁל הַגּוּף",     level: 2 },
             { emoji: "🩸", name: "דָּם",       func: "מוֹבִיל חַמְצָן וּמָזוֹן לְכָל הַגּוּף",   level: 2 },
             { emoji: "🧴", name: "עוֹר",       func: "מָגֵן עַל הַגּוּף מִבַּחוּץ",            level: 2 },
@@ -2354,7 +2478,7 @@ const GaiaPlayer = (function () {
             // גב ובטן
             { emoji: "🦴", name: "עַמּוּד הַשִּׁדְרָה",    func: "תּוֹמֵךְ בַּגּוּף וּמָגֵן עַל חוּט הַשִּׁדְרָה",         level: 2 },
             { emoji: "🤸", name: "גַּב",                  func: "תּוֹמֵךְ בַּגּוּף וּמְאַפְשֵׁר עֲמִידָה זְקוּפָה",       level: 2 },
-            { emoji: "🫃", name: "בֶּטֶן",               func: "מְכִילָה אֶת אֵיבְרֵי הָעִיכּוּל",                        level: 2 },
+            { emoji: "🧍", name: "בֶּטֶן",               func: "מְכִילָה אֶת אֵיבְרֵי הָעִיכּוּל",                        level: 2 },
             // מערכת עיכול
             { emoji: "🌀", name: "מֵעִי דַּק",            func: "סוֹפֵג חָמְרֵי תְּזוּנָה מֵהָאוֹכֶל לַגּוּף",            level: 2 },
             { emoji: "〰️", name: "מֵעִי גַּס",            func: "סוֹפֵג מַיִם וּמוֹצִיא פְּסוֹלֶת מֵהַגּוּף",              level: 2 },
@@ -2394,7 +2518,7 @@ const GaiaPlayer = (function () {
             { word: "CANDY",    emoji: "🍬" },
             // צבעים (8)
             { word: "RED",      emoji: "🔴" }, { word: "BLUE",   emoji: "🔵" }, { word: "GREEN",  emoji: "🟢" },
-            { word: "PINK",     emoji: "🩷" }, { word: "GOLD",   emoji: "🟡" }, { word: "WHITE",  emoji: "⬜" },
+            { word: "PINK",     emoji: "💗" }, { word: "GOLD",   emoji: "🟡" }, { word: "WHITE",  emoji: "⬜" },
             { word: "BLACK",    emoji: "⬛" }, { word: "PURPLE", emoji: "🟣" },
             // בית ספר (8)
             { word: "PEN",      emoji: "🖊️" }, { word: "BOOK",   emoji: "📚" }, { word: "DESK",   emoji: "🪑" },
@@ -2427,7 +2551,7 @@ const GaiaPlayer = (function () {
             { letter: 'K', emoji: '🪁', word: 'KITE' },
             { letter: 'L', emoji: '🦁', word: 'LION' },
             { letter: 'M', emoji: '🐒', word: 'MONKEY' },
-            { letter: 'N', emoji: '🪺', word: 'NEST' },
+            { letter: 'N', emoji: '👃', word: 'NOSE' },
             { letter: 'O', emoji: '🍊', word: 'ORANGE' },
             { letter: 'P', emoji: '🐷', word: 'PIG' },
             { letter: 'Q', emoji: '👑', word: 'QUEEN' },
@@ -2509,8 +2633,19 @@ const GaiaPlayer = (function () {
             { code: "sg", name: "סִינְגַפּוּר",          level: 2 },
         ];
 
-        function flagImg(code, size) {
-            return `<img src="https://flagcdn.com/w${size}/${code}.png" class="flag-img" alt="${code}">`;
+        // The flags are the site's own files (flags/, drawn by the flag-icons project): nothing is
+        // fetched from elsewhere, so they also show offline. The few with a detailed coat of arms
+        // are small pictures instead of long drawings. The alt text is empty: a country's code
+        // would give the answer away. If a file is ever missing, the flag's emoji stands in.
+        const FLAG_PICTURES = new Set(['rs', 'bo', 'mx', 'es', 'hr', 'ec']);
+        function flagImg(code, className) {
+            return `<img src="flags/${code}.${FLAG_PICTURES.has(code) ? 'webp' : 'svg'}" class="${className || 'flag-img'}" alt="" width="160" height="120" data-code="${code}" onerror="flagMissing(this)">`;
+        }
+        function flagMissing(img) {
+            const emoji = document.createElement('span');
+            emoji.className = 'flag-emoji';
+            emoji.textContent = String.fromCodePoint(...[...img.dataset.code.toUpperCase()].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
+            img.replaceWith(emoji);
         }
 
         let biologyOrg = {};
@@ -2597,6 +2732,7 @@ const GaiaPlayer = (function () {
             answerLocked = false;
             memoryLocked = false;
             memoryFlipped = [];
+            if (window.speechSynthesis) window.speechSynthesis.cancel();   // a word still being said
         }
 
         // --- ניהול מסכים ---
@@ -2873,6 +3009,7 @@ const GaiaPlayer = (function () {
         function startPuzzle(rows, cols, mode) {
             stopAllGames();
             if (mode) puzzleMode = mode;
+            replayGame = () => startPuzzle(rows, cols);
             currentGameType = 'puzzle';
             currentLevel = rows + 'x' + cols;
             scoreMax = PUZZLE_MAX_SCORE[currentLevel] || rows * cols * 10;
@@ -2893,7 +3030,7 @@ const GaiaPlayer = (function () {
             document.getElementById('puzzle-grid').classList.remove('puzzle-solved');
 
             puzzleTimerInterval = setInterval(() => {
-                if (!puzzleSolved) {
+                if (!puzzleSolved && !GaiaPause.on) {
                     puzzleSeconds++;
                     document.getElementById('puzzle-timer').innerText = puzzleSeconds;
                 }
@@ -2982,13 +3119,21 @@ const GaiaPlayer = (function () {
             });
         }
 
+        // A tap on a tile in the gap's row or column slides it, and every tile between it and
+        // the gap, one place over (each tile that moves counts as a move).
         function clickPuzzleTile(idx) {
             if (puzzleSolved) return;
-            const emptyIdx = puzzleGrid.indexOf(0);
-            if (!getPuzzleNeighbors(emptyIdx).includes(idx)) return;
-
-            [puzzleGrid[emptyIdx], puzzleGrid[idx]] = [puzzleGrid[idx], puzzleGrid[emptyIdx]];
-            puzzleMoves++;
+            let emptyIdx = puzzleGrid.indexOf(0);
+            const sameRow = Math.floor(idx / puzzleCols) === Math.floor(emptyIdx / puzzleCols);
+            const sameCol = idx % puzzleCols === emptyIdx % puzzleCols;
+            if (idx === emptyIdx || (!sameRow && !sameCol)) return;
+            const step = (sameRow ? 1 : puzzleCols) * (idx > emptyIdx ? 1 : -1);
+            while (emptyIdx !== idx) {
+                puzzleGrid[emptyIdx] = puzzleGrid[emptyIdx + step];
+                emptyIdx += step;
+                puzzleMoves++;
+            }
+            puzzleGrid[idx] = 0;
             document.getElementById('puzzle-moves').innerText = puzzleMoves;
             renderPuzzle();
             checkPuzzleSolved();
@@ -3141,10 +3286,18 @@ const GaiaPlayer = (function () {
         }
 
         // --- שעון עצר ---
+        // The question's clock. It waits while the page is out of sight (another tab, the screen
+        // locked, a phone call): a child who comes back finds the question as it was left.
+        let timerWaiting = false;   // a clock that should be running, held while the game is paused (see PAUSE)
         function startTimer() {
             stopTimer();
             timeLeft = getTimerSeconds();
             updateTimerDisplay();
+            runTimer();
+        }
+
+        function runTimer() {
+            if (GaiaPause.on) { timerWaiting = true; return; }
             timerInterval = setInterval(() => {
                 timeLeft--;
                 updateTimerDisplay();
@@ -3158,7 +3311,17 @@ const GaiaPlayer = (function () {
         function stopTimer() {
             clearInterval(timerInterval);
             timerInterval = null;
+            timerWaiting = false;
         }
+
+        GaiaPause.onChange(paused => {
+            if (paused) {
+                if (timerInterval) { clearInterval(timerInterval); timerInterval = null; timerWaiting = true; }
+            } else if (timerWaiting) {
+                timerWaiting = false;
+                runTimer();
+            }
+        });
 
         function updateTimerDisplay() {
             const el = document.getElementById('timer-num');
@@ -3242,9 +3405,17 @@ const GaiaPlayer = (function () {
             return a;
         }
 
+        // The game that is on, for the end screen's "another round".
+        let replayGame = null;
+        function playAgain() {
+            if (replayGame) replayGame();
+            else goHome();
+        }
+
         // Shared start for the 15-question games (hebrew / biology / math / english / geography).
         function startQuiz(type, level, pool, analyticsLevel) {
             stopAllGames();
+            replayGame = () => startQuiz(type, level, pool, analyticsLevel);
             currentGameType = type;
             currentLevel = level;
             scoreMax = MAX_QUESTIONS * 10;
@@ -3308,7 +3479,8 @@ const GaiaPlayer = (function () {
                 else htmlWord += wordStr[i];
             }
             container.innerHTML = `<div class="emoji-display">${hebrewWordObj.emoji}</div><div class="word-display">${htmlWord}</div>`;
-            generateButtons(currentAnswer, 'hebrew');
+            const endsWord = hiddenIndex === wordStr.length - 1 || wordStr[hiddenIndex + 1] === ' ';
+            generateButtons(currentAnswer, 'hebrew', endsWord);
             startTimer();
         }
 
@@ -3365,16 +3537,19 @@ const GaiaPlayer = (function () {
                 }
                 currentAnswer = isAddition ? n1 + n2 : n1 - n2;
                 container.innerHTML = `<div class="math-display wide">${n1} ${isAddition ? '+' : '-'} ${n2} = ?</div>`;
-            } else if (isAddition) {
-                n1 = Math.floor(Math.random() * (currentLevel - 1)) + 1;   // 1..N-1
-                n2 = Math.floor(Math.random() * (currentLevel - n1 + 1));  // 0..N-n1 → sum ≤ N
-                currentAnswer = n1 + n2;
-                container.innerHTML = `<div class="math-display">${n1} + ${n2} = ?</div>`;
             } else {
-                n1 = Math.floor(Math.random() * (currentLevel - 1)) + 2;   // 2..N
-                n2 = Math.floor(Math.random() * n1);                       // 0..n1-1
-                currentAnswer = n1 - n2;
-                container.innerHTML = `<div class="math-display">${n1} - ${n2} = ?</div>`;
+                // adding or taking away nothing is worth meeting, but only now and then
+                const zero = Math.random() < 0.06;
+                if (isAddition) {
+                    n1 = Math.floor(Math.random() * (currentLevel - 1)) + 1;                  // 1..N-1
+                    n2 = zero ? 0 : Math.floor(Math.random() * (currentLevel - n1)) + 1;      // 1..N-n1 → sum ≤ N
+                    currentAnswer = n1 + n2;
+                } else {
+                    n1 = Math.floor(Math.random() * (currentLevel - 1)) + 2;                  // 2..N
+                    n2 = zero ? 0 : Math.floor(Math.random() * (n1 - 1)) + 1;                 // 1..n1-1
+                    currentAnswer = n1 - n2;
+                }
+                container.innerHTML = `<div class="math-display">${n1} ${isAddition ? '+' : '-'} ${n2} = ?</div>`;
             }
             generateButtons(currentAnswer, 'math');
             startTimer();
@@ -3393,7 +3568,7 @@ const GaiaPlayer = (function () {
                     </div>
                     <div class="phonics-emoji-big" onclick="speakPhonics('${item.letter}','${item.word}')">${item.emoji}</div>
                     <div class="phonics-word-label">${item.word}</div>
-                    <div style="font-size:0.95rem; color:var(--ink-soft); margin-top:6px;">מָה הָאוֹת? <span onclick="speakPhonics('${item.letter}','${item.word}')" style="cursor:pointer; font-size:1.2rem;">🔊</span></div>`;
+                    <div class="say-line">מָה הָאוֹת? <button type="button" class="say-again" onclick="speakPhonics('${item.letter}','${item.word}')" aria-label="לִשְׁמֹעַ שׁוּב">🔊</button></div>`;
                 speakPhonics(item.letter, item.word);
                 const optionsEl = document.getElementById('options');
                 optionsEl.innerHTML = '';
@@ -3422,7 +3597,7 @@ const GaiaPlayer = (function () {
             if (currentLevel === 0) {
                 currentAnswer = englishWordObj.word;
                 container.innerHTML = `<div class="emoji-display" style="cursor:pointer;" onclick="speakWord('${englishWordObj.word}')">${englishWordObj.emoji}</div>
-                    <div style="font-size:1.1rem; color:var(--ink-soft); margin-top:2px;">מָה הַמִּלָּה? <span onclick="speakWord('${englishWordObj.word}')" style="cursor:pointer; font-size:1.3rem;">🔊</span></div>`;
+                    <div class="say-line">מָה הַמִּלָּה? <button type="button" class="say-again" onclick="speakWord('${englishWordObj.word}')" aria-label="לִשְׁמֹעַ שׁוּב">🔊</button></div>`;
                 speakWord(englishWordObj.word);
                 const optionsEl = document.getElementById('options');
                 optionsEl.innerHTML = "";
@@ -3484,7 +3659,7 @@ const GaiaPlayer = (function () {
             currentAnswer = country.name;
 
             container.innerHTML = `
-                <div class="geo-flag-display">${flagImg(country.code, 160)}</div>
+                <div class="geo-flag-display">${flagImg(country.code)}</div>
                 <div class="geo-question">מָה שֵׁם הַמְּדִינָה?</div>`;
 
             const optionsEl = document.getElementById('options');
@@ -3514,6 +3689,7 @@ const GaiaPlayer = (function () {
         const MEMORY_BACK = '<span class="mc-back" aria-hidden="true">?</span>';
         function startMemoryGame(theme, difficulty) {
             stopAllGames();
+            replayGame = () => startMemoryGame(theme, difficulty);
             currentGameType = 'memory';
             currentLevel = theme + '_' + difficulty;
             GaiaHooks.emit('game_start', { subject: 'memory', level: theme + '_' + difficulty });
@@ -3536,7 +3712,7 @@ const GaiaPlayer = (function () {
                 const shuffled = shuffle(geographyData);
                 for (let i = 0; i < pairCount; i++) {
                     const c = shuffled[i];
-                    pool.push({ id: i, emojiVal: `<img src="https://flagcdn.com/w80/${c.code}.png" class="flag-img-small" alt="${c.code}">`, textVal: c.name });
+                    pool.push({ id: i, emojiVal: flagImg(c.code, 'flag-img-small'), textVal: c.name });
                 }
             }
 
@@ -3624,16 +3800,26 @@ const GaiaPlayer = (function () {
             }
         }
 
-        function generateButtons(correct, type) {
+        // The two forms of the letters that change at the end of a word.
+        const HEBREW_FINALS = { 'ם': 'מ', 'ן': 'נ', 'ץ': 'צ', 'ף': 'פ', 'ך': 'כ' };
+        function hebrewOtherForm(letter) {
+            return HEBREW_FINALS[letter] || Object.keys(HEBREW_FINALS).find(f => HEBREW_FINALS[f] === letter) || '';
+        }
+
+        // endsWord (Hebrew): the missing letter is the last of its word.
+        function generateButtons(correct, type, endsWord) {
             const container = document.getElementById('options');
             container.innerHTML = "";
             let options = [correct];
 
             if (type === 'hebrew') {
-                const allLetters = "אבגדהוזחטיכלמנסעפצקרשתםןףךץ";
+                // Only letters that could stand in that place: the end-of-word forms (ם ן ץ ף ך) at
+                // the end of a word and nowhere else, and never both forms of the missing letter
+                // (מ beside ם would be a trick, not a choice).
+                const letters = endsWord ? "אבגדהוזחטילסעקרשתםןץףך" : "אבגדהוזחטיכלמנסעפצקרשת";
                 while (options.length < 3) {
-                    let rand = allLetters[Math.floor(Math.random() * allLetters.length)];
-                    if (!options.includes(rand)) options.push(rand);
+                    let rand = letters[Math.floor(Math.random() * letters.length)];
+                    if (!options.includes(rand) && rand !== hebrewOtherForm(correct)) options.push(rand);
                 }
             } else if (type === 'english') {
                 const allLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -6875,6 +7061,12 @@ const GaiaBoards = (function () {
     const LOCAL_KEY = 'gaiaBoards';   // { '<land>/<game>': [{ pid, name, grade, ms, k }] }
     let startedAt = 0;
     GaiaHooks.on(type => { if (type === 'game_start') startedAt = Date.now(); });
+    // time with the game paused (see PAUSE) is not playing time
+    let pausedAt = GaiaPause.on ? Date.now() : 0;
+    GaiaPause.onChange(paused => {
+        if (paused) pausedAt = Date.now();
+        else if (pausedAt) { if (startedAt) startedAt += Date.now() - pausedAt; pausedAt = 0; }
+    });
 
     const node = (tag, className, text) => {
         const n = document.createElement(tag);
