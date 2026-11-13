@@ -1937,6 +1937,46 @@ window.GaiaPause = (function () {
     check();
 })();
 
+// ===== AWAKE =====
+// While a game is on, the screen is asked not to go dark: a story takes a few minutes to read
+// and a chess move a while to think of, with no finger on the glass. The request is dropped on
+// the map, when the page is out of sight, and after four minutes without a touch (a phone left
+// open on a game still goes to sleep). Where the browser has no such thing, nothing happens.
+(function () {
+    if (!navigator.wakeLock || !navigator.wakeLock.request) return;
+    const IDLE = 4 * 60 * 1000;
+    let lock = null, asking = false, wanted = false, idle = null;
+    function hold() {
+        if (lock || asking || !wanted || document.hidden) return;
+        asking = true;
+        navigator.wakeLock.request('screen').then(function (l) {
+            asking = false;
+            lock = l;
+            l.addEventListener('release', function () { if (lock === l) lock = null; });
+            if (!wanted) drop();
+        }, function () { asking = false; });   // refused (battery saver, no touch yet): the next touch asks again
+    }
+    function drop() {
+        const l = lock;
+        lock = null;
+        if (l) l.release().catch(function () {});
+    }
+    function touched() {
+        clearTimeout(idle);
+        if (!wanted) return;
+        idle = setTimeout(drop, IDLE);
+        hold();
+    }
+    GaiaHooks.on(function (type, data) {
+        if (type !== 'nav') return;
+        wanted = data.screen !== 'main-menu' && data.screen !== 'welcome-screen';
+        if (wanted) touched();
+        else { clearTimeout(idle); drop(); }
+    });
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) touched(); });
+    document.addEventListener('pointerdown', touched, { passive: true });
+})();
+
 // ===== PROGRESS PERSISTENCE MODULE (loads before the engine) =====
 // localStorage key gaiaProgress (versioned). Tracks cumulative stars per land,
 // per-level best stars, reading progress, and last-played land.

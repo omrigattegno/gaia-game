@@ -5,7 +5,17 @@ const { open, ROOT } = require('./lib');
 let fails = 0;
 const check = (name, ok, info) => { if (!ok) fails++; console.log((ok ? 'PASS ' : 'FAIL ') + name + (info !== undefined ? '  ' + JSON.stringify(info).slice(0, 600) : '')); };
 (async () => {
-  const { browser, page, errors } = await open({ w: 390, h: 844 });
+  // a stand-in for the screen wake lock, so the test can see what the page asks for
+  const init = [() => {
+    window.__wake = { asked: 0, held: 0 };
+    Object.defineProperty(navigator, 'wakeLock', { configurable: true, value: { request: async () => {
+      window.__wake.asked++; window.__wake.held++;
+      const l = new EventTarget();
+      l.release = async () => { window.__wake.held--; l.dispatchEvent(new Event('release')); };
+      return l;
+    } } });
+  }];
+  const { browser, page, errors } = await open({ w: 390, h: 844, init });
   const tick = ms => page.clock.runFor(ms);
   await tick(300);
   await page.click('.start-btn', { force: true }); await tick(300);
@@ -59,6 +69,20 @@ const check = (name, ok, info) => { if (!ok) fails++; console.log((ok ? 'PASS ' 
     check(`math up to ${N}: 600 questions in range with three different answers; "+ 0" / "- 0" in a few of them only`, r.bad === 0 && r.zeros > 5 && r.zeros < 80 && r.answers >= N - 1, r);
   }
   await page.evaluate(() => goHome()); await tick(300);
+
+  // --- the screen stays awake during a game, and only then ---
+  const wake0 = await page.evaluate(() => ({ ...window.__wake }));
+  await land('reading'); await panelBtn(0);
+  await tick(50);
+  const wake1 = await page.evaluate(() => ({ ...window.__wake }));
+  await tick(5 * 60 * 1000);
+  const wakeIdle = await page.evaluate(() => ({ ...window.__wake }));
+  await page.mouse.click(5, 5); await tick(50);
+  const wakeTouch = await page.evaluate(() => ({ ...window.__wake }));
+  await page.evaluate(() => goHome()); await tick(300);
+  const wake2 = await page.evaluate(() => ({ ...window.__wake }));
+  check('the screen is kept awake while a game is on: asked on entering, let go after minutes without a touch, asked again at a touch, let go on the map',
+    wake0.held === 0 && wake1.held === 1 && wakeIdle.held === 0 && wakeTouch.held === 1 && wake2.held === 0, { wake0, wake1, wakeIdle, wakeTouch, wake2 });
 
   // --- the clocks wait while the page is out of sight ---
   const hide = on => page.evaluate(on => { Object.defineProperty(document, 'hidden', { configurable: true, get: () => on }); document.dispatchEvent(new Event('visibilitychange')); }, on);
