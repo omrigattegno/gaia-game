@@ -8182,8 +8182,7 @@ const GaiaBoards = (function () {
             .then(function (ok) {
                 if (!ok) { world3d = 'no'; K3().world.release(); return false; }
                 world3d = 'ready';
-                if (onMap()) show3D(true);
-                setTimeout(startBuddies, 1200);   // once the map has settled
+                if (onMap()) show3D(true);        // a game under way keeps its drawings; the 3D comes with the map
                 return true;
             })
             .catch(function (e) { console.warn('[kingdom3d] no 3D map', e); world3d = 'no'; return false; });
@@ -8216,6 +8215,7 @@ const GaiaBoards = (function () {
         }
         const first = world3d !== 'on';
         world3d = 'on';
+        if (first) setTimeout(startBuddies, 1200);   // the sisters of the games' corner, once the map has settled
         menu.classList.add('map3d');
         if (late && first) { m3.stage.classList.add('map3d-arriving'); setTimeout(function () { m3.stage.classList.remove('map3d-arriving'); }, 700); }
         K.attach(m3.holder, { onFrame: layout3D });
@@ -8325,15 +8325,14 @@ const GaiaBoards = (function () {
     window.GaiaMap3D = { prepare: prepare3D, get state() { return world3d; } };
 
     // ---- THE SISTERS IN 3D ----
-    // Where the map is in 3D, Yoovy and Googy in the corner of the games are too: a small canvas
-    // of their own in #gaia-char (Kingdom3D.buddies) takes the drawn girls' place and their moods
-    // (setGaiaState). They are drawn only while the corner shows.
+    // Once the map has shown in 3D, Yoovy and Googy in the corner of the games are in 3D too: a
+    // small canvas of their own in #gaia-char (Kingdom3D.buddies) takes the drawn girls' place
+    // and their moods (setGaiaState). They are drawn only while the corner shows.
     let buddies3d = false;
-    const has3D = function () { return world3d === 'ready' || world3d === 'on'; };
     function startBuddies() {
-        if (buddies3d || !has3D()) return;
+        if (buddies3d || world3d !== 'on') return;
         K3().buddies.create().then(function (canvas) {
-            if (buddies3d || !has3D()) return;      // the 3D was dropped meanwhile
+            if (buddies3d || world3d !== 'on') return;      // the 3D was dropped meanwhile
             const el = document.getElementById('gaia-char');
             canvas.addEventListener('webglcontextlost', dropBuddies, { once: true });
             el.appendChild(canvas);
@@ -8393,7 +8392,7 @@ const GaiaBoards = (function () {
     }
     // the land itself, as it stands in the 3D kingdom, where there is one
     function landShot(land) {
-        if (!has3D()) return null;
+        if (world3d !== 'on') return null;      // like the corner sisters, the 3D backdrops come once the 3D map has been seen
         try { return K3().world.snapshot(land, innerWidth, innerHeight); }
         catch (e) { console.warn('[kingdom3d] no backdrop', e); return null; }
     }
