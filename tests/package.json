@@ -4,7 +4,7 @@
   "description": "Browser tests of Yoovy & Googy (Playwright, Chromium)",
   "scripts": {
     "test": "node run.js",
-    "test:quick": "node run.js chess play qa offline"
+    "test:quick": "node run.js chess play qa offline security"
   },
   "devDependencies": {
     "playwright": "^1.50.0"

@@ -14,3 +14,16 @@ FIREBASE_PROJECT_ID = "gaia-game-a32c0"
 name = "PER_PLAYER"
 namespace_id = "1001"
 simple = { limit = 10, period = 60 }
+
+# At most 30 requests a minute from one network address (a home, a classroom), valid or not.
+[[ratelimits]]
+name = "PER_IP"
+namespace_id = "1002"
+simple = { limit = 30, period = 60 }
+
+# At most 60 chat turns a minute from all players together: a player's sign-in is free to get,
+# so this (with the spend limit in the Anthropic console) is what bounds the bill.
+[[ratelimits]]
+name = "EVERYONE"
+namespace_id = "1003"
+simple = { limit = 60, period = 60 }

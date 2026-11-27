@@ -6,6 +6,8 @@ const GOOGLE_JWKS_URL =
     "https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com";
 
 let cached = null; // { url, keys: Map<kid, CryptoKey>, expiresAt }
+let refreshedAt = 0; // the last time the keys were fetched again because of an unknown key id
+const REFRESH_EVERY_MS = 60_000;
 
 function base64UrlToBytes(part) {
     const base64 = part.replace(/-/g, "+").replace(/_/g, "/");
@@ -54,7 +56,12 @@ export async function verifyFirebaseToken(token, projectId, jwksUrl = GOOGLE_JWK
     if (payload.auth_time !== undefined && !(payload.auth_time <= now + skew)) return null;
 
     let key = (await signingKeys(jwksUrl, false)).get(header.kid);
-    if (!key) key = (await signingKeys(jwksUrl, true)).get(header.kid); // keys rotated
+    // An unknown key id: Google may have rotated the keys, so they are fetched again, but at most
+    // once a minute (a made-up key id in every request must not turn into a fetch per request).
+    if (!key && Date.now() - refreshedAt >= REFRESH_EVERY_MS) {
+        refreshedAt = Date.now();
+        key = (await signingKeys(jwksUrl, true)).get(header.kid);
+    }
     if (!key) return null;
 
     const signed = new TextEncoder().encode(parts[0] + "." + parts[1]);
