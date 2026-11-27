@@ -9,6 +9,7 @@ const SUITES = {
     play: 'a full play-through of every land and level on the drawn (2D) game',
     qa: 'fair letters, the clocks that wait, another round, the puzzle, the flags and fonts, the turn-me hint',
     offline: 'the service worker: the game opens and plays with no network',
+    security: 'the content security policy, names on the boards, the write to the shared board, the database rules as text, Googy\'s sign-in check',
     map3d: 'the 3D map, the corner sisters, the 3D backdrops, and falling back to the drawings'
 };
 const wanted = process.argv.slice(2).length ? process.argv.slice(2) : Object.keys(SUITES);

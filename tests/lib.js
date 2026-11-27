@@ -1,6 +1,9 @@
 // Shared launcher for the game's tests. Nothing here touches the real network: the page and
 // the site's own files (fonts, flags, icons) are served from the repository at https://gaia.test/,
-// and every other request is aborted (so Firebase is "down": the boards are this device's).
+// and every other request is aborted. The Firebase SDK (firebase/) is not served either, so the
+// page runs without Firebase: the boards are this device's and nothing can reach the real
+// database. With firebase: true the SDK is served (to test that it loads), and it still reaches
+// nothing: its requests are aborted like every other, and its web sockets are closed at once.
 // The 3D bundle is served only when asked for (bundle: true), with software GL (gl: true).
 // By default the page's clock is the test's (page.clock.runFor), its CSS animations are off,
 // and the intro is skipped.
@@ -11,17 +14,19 @@ const ROOT = path.join(__dirname, '..');
 const GL_ARGS = ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'];
 
 async function open({ html = ROOT + '/index.html', bundle = null, gl = false, clock = true, anim = false, time, intro = false, force3d = false,
-                      storage, w = 400, h = 800, dpr = 1, reducedMotion = false, init = [] } = {}) {
+                      storage, w = 400, h = 800, dpr = 1, reducedMotion = false, init = [], firebase = false, userAgent } = {}) {
   const HTML = fs.readFileSync(html, 'utf8');
   const JS = bundle === true ? fs.readFileSync(ROOT + '/kingdom3d.js', 'utf8') : (bundle ? fs.readFileSync(bundle, 'utf8') : null);
   const browser = await chromium.launch({ args: gl ? GL_ARGS : [] });
-  const ctx = await browser.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: dpr, reducedMotion: reducedMotion ? 'reduce' : 'no-preference', serviceWorkers: 'block' });
+  const ctx = await browser.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: dpr, reducedMotion: reducedMotion ? 'reduce' : 'no-preference', serviceWorkers: 'block', ...(userAgent ? { userAgent } : {}) });
   const page = await ctx.newPage();
   const errors = [];
   page.on('pageerror', e => errors.push('pageerror: ' + e.message));
   page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push('console: ' + m.text()); });
+  await page.routeWebSocket(/.*/, ws => ws.close());
   await page.route('**/*', route => {
     const u = route.request().url();
+    if (!firebase && u.startsWith('https://gaia.test/firebase/')) return route.abort();
     if (u === 'https://gaia.test/' || u === 'https://gaia.test/index.html') return route.fulfill({ status: 200, contentType: 'text/html; charset=utf-8', body: HTML });
     if (JS && /^https:\/\/gaia\.test\/kingdom3d\.js(\?|$)/.test(u)) return route.fulfill({ status: 200, contentType: 'text/javascript; charset=utf-8', body: JS });
     // the site's own files (fonts, flags, icons)
