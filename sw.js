@@ -2,11 +2,12 @@
 //
 // The page itself is asked from the network first, so a new version shows at once; the kept
 // copy is used only when the network does not answer (or takes too long). Everything else the
-// site owns (the fonts, the flags, the icons, the 3D bundle) is handed over from the cache at
-// once and refreshed behind the scenes for the next visit. The Firebase scripts are kept as
-// well, so the page starts offline; the leaderboards then show this device's results.
-// Nothing else is touched: the shared boards, the sign-in and the analytics go straight out.
-const CACHE = 'gaia-v1';
+// site owns (the fonts, the flags, the icons, the 3D bundle, the Firebase SDK) is handed over
+// from the cache at once and refreshed behind the scenes for the next visit. Offline, the
+// leaderboards show this device's results.
+// Nothing from another site is kept or touched: the shared boards, the sign-in and the
+// analytics go straight out.
+const CACHE = 'gaia-v2';
 const PAGE = './';
 const SHELL = [
     PAGE, 'manifest.webmanifest', 'icons/icon-192.png',
@@ -18,7 +19,6 @@ const SHELL = [
 // is simply fetched when it is first shown. (The codes are geographyData's in index.html.)
 const FLAGS = 'il us gb fr de it ru jp cn br au es ca mx kr in tr pl se no nl be ch at gr pt eg za ar ua dk fi ie hu ro bg hr rs sk cz cl co pe bo ec sa jo lb iq ae ma tn ng ke id my th vn nz sg'.split(' ');
 const PICTURES = ['rs', 'bo', 'mx', 'es', 'hr', 'ec'];
-const FIREBASE_SDK = 'https://www.gstatic.com/firebasejs/';
 const PAGE_PATIENCE = 4000;   // ms to wait for the network before the kept page is shown
 
 self.addEventListener('install', event => {
@@ -60,7 +60,7 @@ self.addEventListener('fetch', event => {
         }
         return;
     }
-    if (url.origin === self.location.origin || request.url.startsWith(FIREBASE_SDK)) {
+    if (url.origin === self.location.origin) {
         event.respondWith(keptThenRefreshed(request, url, event));
         event.waitUntil(keepFlags());
     }
@@ -86,7 +86,7 @@ async function keptThenRefreshed(request, url, event) {
     const cache = await caches.open(CACHE);
     const kept = await cache.match(request);
     const fresh = fetch(request).then(response => {
-        if (response && (response.ok || response.type === 'opaque')) {
+        if (response && response.ok) {
             cache.put(request, response.clone());
             if (url.search) forgetOtherVersions(cache, url);
         }

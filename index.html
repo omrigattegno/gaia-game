@@ -2,6 +2,11 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <!-- What this page may load and talk to: its own files, and Firebase (the anonymous sign-in and
+         the shared leaderboards). Anything else is refused by the browser. The inline scripts and
+         styles are the page's own. The hosts are the ones the Firebase SDK uses; when
+         GOOGY_API_URL is set, the worker's origin has to join connect-src (tests/security.js checks). -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://apis.google.com https://*.firebaseio.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com; frame-src https://gaia-game-a32c0.firebaseapp.com https://*.firebaseio.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Yoovy &amp; Googy - לומדים בכיף</title>
     <meta name="description" content="ממלכת הידע של יובי וגוגי: משחקי חשבון, עברית, קריאה, אנגלית, דגלים, גוף האדם, זיכרון, פאזלים ושחמט לילדות ולילדים.">
@@ -15,10 +20,11 @@
     <meta property="og:image" content="https://omrigattegno.github.io/gaia-game/icons/icon-512.png">
     <meta property="og:locale" content="he_IL">
 
-    <!-- Firebase (deferred: never blocks the first paint; initialised on DOMContentLoaded) -->
-    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+    <!-- Firebase (deferred: never blocks the first paint; initialised on DOMContentLoaded).
+         The SDK is served by the site itself (firebase/, see its README): no script from another site. -->
+    <script defer src="firebase/10.12.0/firebase-app-compat.js"></script>
+    <script defer src="firebase/10.12.0/firebase-auth-compat.js"></script>
+    <script defer src="firebase/10.12.0/firebase-database-compat.js"></script>
 
     <!-- Fonts: Fredoka (variable, Latin/digits) + Varela Round (full Hebrew coverage), served by the
          site itself (fonts/, under the SIL Open Font License): no third party, and they work offline -->
@@ -2282,17 +2288,35 @@ document.querySelector('.welcome-girls').innerHTML = girlSVG('yoovy', { size: 19
 const GaiaPlayer = (function () {
     const KEY = 'gaiaPlayers';
     let state = { current: null, list: [] };   // list: [{ pid, name }]
+    // A name on the boards is seen by other children, so it is only a name: no markup, nothing
+    // that works as a link, an address or a handle (. : @ / \), no invisible or text-direction
+    // characters (the joiner of emoji stays), and no phone number (more than 4 digits: none).
+    // firebase-rules.json refuses the same on the shared board.
+    function cleanName(name) {
+        let text = (typeof name === 'string' ? name : '')
+            .replace(/[<>.:@\/\\]/g, ' ')
+            .replace(/[\u0000-\u0008\u000e-\u001f\u007f-\u009f\u00ad\u061c\u180e\u200b\u200c\u200e\u200f\u202a-\u202e\u2060-\u206f\ufeff\ufff9-\ufffb]/g, '')
+            .replace(/\s+/g, ' ').trim();
+        if ((text.match(/[0-9]/g) || []).length > 4) text = text.replace(/[0-9]/g, '').replace(/\s+/g, ' ').trim();
+        return text.slice(0, 20).replace(/[\ud800-\udbff]$/, '').trim();   // never half an emoji
+    }
     try {
+        // what was saved is read as data from outside: only players with a name and an id are kept
         const saved = JSON.parse(localStorage.getItem(KEY));
-        if (saved && Array.isArray(saved.list)) state = saved;
+        if (saved && Array.isArray(saved.list)) {
+            const list = [];
+            saved.list.forEach(p => {
+                const pid = p && typeof p.pid === 'string' ? p.pid : '', name = p ? cleanName(p.name) : '';
+                if (name && /^[a-z0-9]{1,16}$/.test(pid) && !list.some(q => q.pid === pid)) list.push({ pid, name });
+            });
+            state = { current: list.some(p => p.pid === saved.current) ? saved.current : null, list: list.slice(0, 50) };
+        }
     } catch (e) { /* no saved players */ }
     const save = () => {
         try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { console.warn('[players] save failed', e); }
     };
     return {
-        cleanName(name) {
-            return String(name || '').replace(/[\u0000-\u001f<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, 20).trim();
-        },
+        cleanName,
         current() { return state.list.find(p => p.pid === state.current) || null; },
         list() { return state.list.slice(); },
         choose(pid) {
@@ -7126,8 +7150,16 @@ const GaiaBoards = (function () {
         return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
     }
     const sortKey = (g, ms) => g * 1e8 + (BOARD_MAX_MS - ms);
-    const validRow = r => r && typeof r.name === 'string' && r.name && Number.isInteger(r.grade) &&
-        r.grade >= 0 && r.grade <= 100 && Number.isFinite(r.ms) && r.ms > 0 && r.ms <= BOARD_MAX_MS;
+    // A row as the boards show it. Rows come from outside (the shared board is written by
+    // anyone who plays; this device's rows were saved earlier), so every one is checked:
+    // numbers in range, a name that is only a name (GaiaPlayer.cleanName), the key worked out again.
+    function cleanRow(r, pid) {
+        if (!r || typeof r.name !== 'string' || typeof pid !== 'string' || !pid ||
+            !Number.isInteger(r.grade) || r.grade < 0 || r.grade > 100 ||
+            !Number.isFinite(r.ms) || r.ms <= 0 || r.ms > BOARD_MAX_MS) return null;
+        const name = GaiaPlayer.cleanName(r.name);
+        return name ? { pid, name, grade: r.grade, ms: r.ms, k: sortKey(r.grade, r.ms) } : null;
+    }
 
     // --- this device ---
     function readLocal() {
@@ -7138,7 +7170,7 @@ const GaiaBoards = (function () {
     }
     function localRows(land, game) {
         const rows = readLocal()[land + '/' + game];
-        return Array.isArray(rows) ? rows.filter(validRow) : [];
+        return Array.isArray(rows) ? rows.map(r => cleanRow(r, r && r.pid)).filter(Boolean) : [];
     }
     function saveLocal(land, game, row) {
         const all = readLocal();
@@ -7150,17 +7182,25 @@ const GaiaBoards = (function () {
         catch (e) { console.warn('[boards] local save failed', e); }
     }
 
-    // --- the shared board (see firebase-rules.json: only a better row is accepted) ---
+    // --- the shared board (see firebase-rules.json: only a better row is accepted, one row in
+    // an update, and an update every 5 seconds at most) ---
     function sendOnline(land, game, row) {
         if (!db) return Promise.resolve(false);
         return withTimeout(authReady, 5000).then(user => {
-            if (!user) return false;
+            const name = GaiaPlayer.cleanName(row.name);
+            if (!user || !name) return false;
             const stamp = firebase.database.ServerValue.TIMESTAMP;
-            return db.ref().update({
-                ['boards/' + land + '/' + game + '/' + user.uid + '_' + row.pid]:
-                    { name: row.name, grade: row.grade, ms: row.ms, k: row.k, at: stamp },
+            const path = land + '/' + game + '/' + user.uid + '_' + row.pid;
+            const write = named => db.ref().update(Object.assign({
+                ['boards/' + path]: { name, grade: row.grade, ms: row.ms, k: row.k, at: stamp },
                 ['scoreRate/' + user.uid]: stamp
-            }).then(() => true);
+            }, named ? { ['scoreRow/' + user.uid]: path } : {}));
+            // scoreRow names the one row this update writes. Rules published before scoreRow
+            // existed refuse that path, so a refused update is tried once more without it
+            // (the rules in the repository refuse that second one; then the first refusal stands).
+            return write(true)
+                .catch(e => (/permission/i.test(String(e && (e.code || e.message))) ? write(false) : Promise.reject(e)))
+                .then(() => true);
         }).catch(e => {
             console.warn('[boards] not saved online:', e && (e.code || e.message));
             return false;
@@ -7184,9 +7224,8 @@ const GaiaBoards = (function () {
         const read = db.ref('boards/' + land + '/' + game).orderByChild('k').limitToLast(BOARD_TOP * 3).once('value', snap => {
             const online = [];
             snap.forEach(child => {
-                const v = child.val();
-                if (!validRow(v) || v.k !== sortKey(v.grade, v.ms)) return;
-                online.push({ pid: child.key.slice(child.key.lastIndexOf('_') + 1), name: v.name, grade: v.grade, ms: v.ms, k: v.k });
+                const row = cleanRow(child.val(), child.key.slice(child.key.lastIndexOf('_') + 1));
+                if (row) online.push(row);
             });
             onRows(merge([online, local]), 'online');
         }, err => {
@@ -8723,7 +8762,8 @@ const GaiaBoards = (function () {
             try {
                 let id = sessionStorage.getItem('analytics_sid');
                 const started = Number(sessionStorage.getItem('analytics_sid_started')) || Date.now();
-                if (id) return { id, isNew: false, startedAt: started };
+                // it becomes part of a database path: only an id of the shape made here is taken back
+                if (id && /^sess_[a-z0-9]{1,16}_[a-z0-9]{1,16}$/.test(id)) return { id, isNew: false, startedAt: started };
                 id = newId();
                 sessionStorage.setItem('analytics_sid', id);
                 sessionStorage.setItem('analytics_sid_started', String(Date.now()));
