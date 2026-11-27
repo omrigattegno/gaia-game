@@ -1,7 +1,9 @@
 // Googy — the English-conversation friend in Yoovy & Googy.
 // This Cloudflare Worker sits between the game and the Claude API: the API key stays
 // here, only signed-in players of the game can talk, and every request is size- and
-// rate-limited. Nothing the child writes is stored or logged.
+// rate-limited (per network address, per player, and all players together: signing in is
+// free, so the limit on everyone is what bounds the bill; the spend limit set in the
+// Anthropic console is the last line). Nothing the child writes is stored or logged.
 //
 // POST /chat  { topic, level, messages: [{role, content}], final }
 //          →  { reply, hebrew, suggestions, feedback }
@@ -12,7 +14,8 @@ import { verifyFirebaseToken } from "./auth.js";
 import { PERSONA, TOPICS, LEVELS, GoogyTurn, FINAL_TURN, SAFE_TURN } from "./googy.js";
 
 const MODEL = "claude-opus-5-5";
-const MAX_BODY_CHARS = 32 * 1024;
+const MAX_BODY_BYTES = 32 * 1024;
+const MAX_REPLY_TOKENS = 1500;    // a turn is a few short lines; this bounds a reply that was talked into being long
 const MAX_MESSAGES = 31;          // a whole chat: the child's 16 lines and Googy's 15 replies
 const MAX_CHILD_CHARS = 300;
 const MAX_GOOGY_CHARS = 600;
@@ -30,8 +33,40 @@ function corsHeaders(origin) {
 function json(body, status, origin) {
     return new Response(JSON.stringify(body), {
         status,
-        headers: { "Content-Type": "application/json; charset=utf-8", ...(origin ? corsHeaders(origin) : {}) },
+        headers: {
+            "Content-Type": "application/json; charset=utf-8",
+            "Cache-Control": "no-store",
+            "X-Content-Type-Options": "nosniff",
+            ...(origin ? corsHeaders(origin) : {}),
+        },
     });
+}
+
+// The request's text, or null when it is larger than the limit (by its declared length, or
+// while reading it: the reading stops there, so a huge body is never held in memory).
+async function readBody(request, maxBytes) {
+    if (Number(request.headers.get("Content-Length")) > maxBytes) return null;
+    if (!request.body) return "";
+    const reader = request.body.getReader();
+    const chunks = [];
+    let size = 0;
+    for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        size += value.byteLength;
+        if (size > maxBytes) {
+            await reader.cancel();
+            return null;
+        }
+        chunks.push(value);
+    }
+    const bytes = new Uint8Array(size);
+    let at = 0;
+    for (const chunk of chunks) {
+        bytes.set(chunk, at);
+        at += chunk.byteLength;
+    }
+    return new TextDecoder().decode(bytes);
 }
 
 // The conversation the game sent: known topic and level, alternating turns that start
@@ -85,6 +120,12 @@ export default {
         if (!corsOrigin) return json({ error: "forbidden_origin" }, 403, null);
         if (!env.ANTHROPIC_API_KEY) return json({ error: "not_configured" }, 503, corsOrigin);
 
+        // Before anything costly (checking a token, reading the body): one address cannot flood.
+        if (env.PER_IP) {
+            const { success } = await env.PER_IP.limit({ key: request.headers.get("CF-Connecting-IP") || "unknown" });
+            if (!success) return json({ error: "rate_limited" }, 429, corsOrigin);
+        }
+
         let uid = null;
         try {
             const token = (request.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
@@ -98,9 +139,15 @@ export default {
             const { success } = await env.PER_PLAYER.limit({ key: uid });
             if (!success) return json({ error: "rate_limited" }, 429, corsOrigin);
         }
+        // All players together. Counted only for signed-in players within their own limit, so
+        // requests without a valid sign-in cannot use it up.
+        if (env.EVERYONE) {
+            const { success } = await env.EVERYONE.limit({ key: "all" });
+            if (!success) return json({ error: "busy" }, 503, corsOrigin);
+        }
 
-        const raw = await request.text();
-        if (raw.length > MAX_BODY_CHARS) return json({ error: "too_large" }, 413, corsOrigin);
+        const raw = await readBody(request, MAX_BODY_BYTES);
+        if (raw === null) return json({ error: "too_large" }, 413, corsOrigin);
         let conversation = null;
         try { conversation = readConversation(JSON.parse(raw)); } catch { /* invalid JSON */ }
         if (!conversation) return json({ error: "bad_request" }, 400, corsOrigin);
@@ -118,7 +165,7 @@ export default {
         try {
             const response = await client.beta.messages.parse({
                 model: MODEL,
-                max_tokens: 4096,
+                max_tokens: MAX_REPLY_TOKENS,
                 betas: ["server-side-fallback-2026-07-01"],
                 fallbacks: "default",
                 cache_control: { type: "ephemeral" },
